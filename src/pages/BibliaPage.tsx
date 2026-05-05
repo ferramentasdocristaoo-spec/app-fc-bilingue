@@ -6,24 +6,60 @@ import { Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PageShell from "@/components/PageShell";
 
-const VERSIONS = [
-  { id: "ACF11", name: "ACF - Almeida Corrigida Fiel" },
-  { id: "ARA", name: "ARA - Almeida Revista e Atualizada" },
-  { id: "ARC09", name: "ARC - Almeida Revista e Corrigida" },
-  { id: "ALM21", name: "AS21 - Almeida Século 21" },
-  { id: "KJA", name: "KJA - King James Atualizada" },
-  { id: "NAA", name: "NAA - Nova Almeida Atualizada" },
-  { id: "NBV07", name: "NBV - Nova Bíblia Viva" },
-  { id: "NTLH", name: "NTLH - Nova Tradução Ling. de Hoje" },
-  { id: "NVIPT", name: "NVI - Nova Versão Internacional" },
-  { id: "NVT", name: "NVT - Nova Versão Transformadora" },
-  { id: "TB10", name: "TB - Tradução Brasileira" },
-  { id: "VFL", name: "VFL - Versão Fácil de Ler" },
-  { id: "MENS", name: "A Mensagem" },
-  { id: "CNBB", name: "CNBB - Bíblia CNBB" },
-  { id: "OL", name: "OL - O Livro" },
-  { id: "NTJud", name: "NT Judaico" },
-];
+const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = {
+  "pt-PT": [
+    { id: "ARA", name: "ARA - Almeida Revista e Atualizada" },
+    { id: "ACF11", name: "ACF - Almeida Corrigida Fiel" },
+    { id: "ARC09", name: "ARC - Almeida Revista e Corrigida" },
+    { id: "NVIPT", name: "NVI - Nova Versão Internacional" },
+    { id: "NAA", name: "NAA - Nova Almeida Atualizada" },
+    { id: "NBV07", name: "NBV - Nova Bíblia Viva" },
+    { id: "NTLH", name: "NTLH - Nova Tradução Ling. de Hoje" },
+    { id: "NVT", name: "NVT - Nova Versão Transformadora" },
+    { id: "ALM21", name: "AS21 - Almeida Século 21" },
+    { id: "KJA", name: "KJA - King James Atualizada" },
+    { id: "VFL", name: "VFL - Versão Fácil de Ler" },
+    { id: "MENS", name: "A Mensagem" },
+    { id: "OL", name: "OL - O Livro" },
+  ],
+  "en": [
+    { id: "KJV", name: "KJV - King James Version" },
+    { id: "NKJV", name: "NKJV - New King James Version" },
+    { id: "WEB", name: "WEB - World English Bible" },
+    { id: "ASV", name: "ASV - American Standard Version" },
+    { id: "YLT", name: "YLT - Young's Literal Translation" },
+    { id: "BBE", name: "BBE - Bible in Basic English" },
+    { id: "DARBY", name: "DARBY - Darby Translation" },
+  ],
+  "es": [
+    { id: "RVR60", name: "RVR60 - Reina-Valera 1960" },
+    { id: "RVR95", name: "RVR95 - Reina-Valera 1995" },
+    { id: "NVI", name: "NVI - Nueva Versión Internacional" },
+    { id: "BTX", name: "BTX - Biblia Textual" },
+    { id: "DHH94", name: "DHH - Dios Habla Hoy" },
+  ],
+  "fr": [
+    { id: "LSG", name: "LSG - Louis Segond 1910" },
+    { id: "NEG79", name: "NEG79 - Nouvelle Édition de Genève" },
+    { id: "NBS", name: "NBS - Nouvelle Bible Segond" },
+    { id: "BFC", name: "BFC - Bible en Français Courant" },
+    { id: "PDV2017", name: "PDV - Parole de Vie" },
+  ],
+  "it": [
+    { id: "CEI", name: "CEI - Conferenza Episcopale Italiana" },
+    { id: "NR06", name: "NR06 - Nuova Riveduta 2006" },
+    { id: "TILC", name: "TILC - Traduzione Interconfessionale" },
+    { id: "IEP", name: "IEP - Riveduta 1927" },
+  ],
+};
+
+const DEFAULT_VERSION_BY_LANG: Record<string, string> = {
+  "pt-PT": "ARA",
+  "en": "KJV",
+  "es": "RVR60",
+  "fr": "LSG",
+  "it": "CEI",
+};
 
 const BOOKS = [
   { id: 1, name: "Gênesis", chapters: 50 },
@@ -101,14 +137,22 @@ interface Verse {
 }
 
 const BibliaPage = () => {
-  const { t } = useTranslation();
-  const [version, setVersion] = useState("ARA");
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const versions = VERSIONS_BY_LANG[lang] ?? VERSIONS_BY_LANG["pt-PT"];
+  const [version, setVersion] = useState(() => DEFAULT_VERSION_BY_LANG[lang] ?? "ARA");
   const [bookId, setBookId] = useState(1);
   const [chapter, setChapter] = useState(1);
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const verseRefs = useRef<Record<number, HTMLParagraphElement | null>>({});
+
+  // Reset version to language default when language changes
+  useEffect(() => {
+    setVersion(DEFAULT_VERSION_BY_LANG[lang] ?? "ARA");
+    setVerses([]);
+  }, [lang]);
 
   const bookNames = t("biblia.books", { returnObjects: true }) as string[];
   const currentBook = BOOKS.find((b) => b.id === bookId)!;
@@ -205,7 +249,7 @@ const BibliaPage = () => {
             <SelectValue placeholder={t("biblia.versionLabel")} />
           </SelectTrigger>
           <SelectContent className="max-h-60">
-            {VERSIONS.map((v) => (
+            {versions.map((v) => (
               <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
             ))}
           </SelectContent>

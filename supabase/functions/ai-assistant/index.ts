@@ -7,6 +7,18 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const LANG_NAMES: Record<string, string> = {
+  "pt-PT": "European Portuguese (Portugal)",
+  "en": "English",
+  "fr": "French",
+  "es": "Spanish",
+  "it": "Italian",
+};
+
+function getLangName(lang: string): string {
+  return LANG_NAMES[lang] || "European Portuguese (Portugal)";
+}
+
 // Busca versículos reais na bible-api.com (tradução Almeida, sem API key)
 async function fetchBibleVerse(referencia: string): Promise<string | null> {
   try {
@@ -77,6 +89,10 @@ serve(async (req) => {
 
     const { action, payload } = await req.json();
 
+    // Extract and validate language
+    const lang = payload.lang || "pt-PT";
+    const langName = getLangName(lang);
+
     // --- Rate limiting: max 10 AI calls per IP per minute ---
     const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString();
@@ -94,7 +110,7 @@ serve(async (req) => {
       });
     }
 
-    // Build cache key from action + sorted payload values
+    // Build cache key from action + sorted payload values (includes lang)
     const cacheKey = JSON.stringify(payload, Object.keys(payload).sort());
 
     // Check cache first (respect TTL via expires_at)
@@ -107,13 +123,13 @@ serve(async (req) => {
       .maybeSingle();
 
     if (cached) {
-      console.log(`Cache HIT for ${action}: ${cacheKey}`);
+      console.log(`Cache HIT for ${action} [${lang}]: ${cacheKey}`);
       return new Response(JSON.stringify({ result: cached.result }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    console.log(`Cache MISS for ${action}: ${cacheKey}`);
+    console.log(`Cache MISS for ${action} [${lang}]: ${cacheKey}`);
     let result: any;
 
     switch (action) {
@@ -121,34 +137,33 @@ serve(async (req) => {
         const { titulo, textoBase, tema, tipo, tempo } = payload;
         const minutos = parseInt(tempo) || 15;
         const numPontos = minutos <= 10 ? 2 : minutos <= 30 ? 3 : minutos <= 60 ? 5 : minutos <= 90 ? 7 : 10;
-        const profundidade = minutos <= 15 ? "breve e direto" : minutos <= 45 ? "detalhado" : "extremamente profundo e extenso, com sub-pontos, ilustrações, exemplos práticos e múltiplas referências bíblicas em cada ponto";
+        const profundidade = minutos <= 15 ? "brief and direct" : minutos <= 45 ? "detailed" : "extremely deep and extensive, with sub-points, illustrations, practical examples and multiple biblical references in each point";
 
-        // Buscar texto bíblico real se houver referência
         let contextoVersiculo = "";
         if (textoBase) {
           const textoBiblico = await fetchBibleVerse(textoBase);
           if (textoBiblico) {
-            contextoVersiculo = `\n\nTEXTO BÍBLICO REAL (tradução Almeida):\n"${textoBiblico}"\n\nUse este texto real como base do sermão.`;
+            contextoVersiculo = `\n\nBIBLICAL TEXT (Almeida translation):\n"${textoBiblico}"\n\nUse this real text as the basis of the sermon.`;
           }
         }
 
         result = await callAiStructured(
           OPENAI_API_KEY,
-          `Você é um teólogo evangélico experiente. Gere esboços de sermões completos e profundos. Responda em português do Brasil. O sermão deve ter conteúdo suficiente para ${minutos} minutos de pregação.`,
-          `Gere um esboço de sermão para ${minutos} minutos de pregação. Título: ${titulo || "A definir"}, Texto Base: ${textoBase || "A definir"}, Tema: ${tema || "Geral"}, Tipo: ${tipo || "Temático"}. O sermão deve ser ${profundidade}. Inclua introdução elaborada, ${numPontos} pontos de desenvolvimento com versículos e conteúdo proporcional à duração, aplicação prática detalhada e conclusão com apelo.${contextoVersiculo}`,
+          `You are an experienced evangelical theologian. Generate complete and deep sermon outlines. You MUST respond entirely in ${langName}. The sermon should have enough content for ${minutos} minutes of preaching.`,
+          `Generate a sermon outline for ${minutos} minutes of preaching. Title: ${titulo || "To be defined"}, Base Text: ${textoBase || "To be defined"}, Theme: ${tema || "General"}, Type: ${tipo || "Thematic"}. The sermon should be ${profundidade}. Include an elaborate introduction, ${numPontos} development points with verses and content proportional to the duration, detailed practical application and conclusion with an altar call.${contextoVersiculo}`,
           {
             name: "sermon_outline",
-            description: "Retorna esboço de sermão estruturado",
+            description: "Returns structured sermon outline",
             parameters: {
               type: "object",
               properties: {
-                titulo: { type: "string", description: "Título do sermão" },
-                texto_base: { type: "string", description: "Referência bíblica base" },
+                titulo: { type: "string", description: "Sermon title" },
+                texto_base: { type: "string", description: "Base biblical reference" },
                 introducao: {
                   type: "object",
                   properties: {
-                    gancho: { type: "string", description: "Frase de abertura impactante" },
-                    contextualizacao: { type: "string", description: "Contextualização do tema" },
+                    gancho: { type: "string", description: "Impactful opening sentence" },
+                    contextualizacao: { type: "string", description: "Theme contextualization" },
                   },
                   required: ["gancho", "contextualizacao"],
                 },
@@ -158,15 +173,15 @@ serve(async (req) => {
                     type: "object",
                     properties: {
                       titulo: { type: "string" },
-                      conteudo: { type: "string", description: "Desenvolvimento do ponto" },
-                      versiculos: { type: "array", items: { type: "string" }, description: "Versículos de apoio" },
+                      conteudo: { type: "string", description: "Development of the point" },
+                      versiculos: { type: "array", items: { type: "string" }, description: "Supporting verses" },
                     },
                     required: ["titulo", "conteudo", "versiculos"],
                   },
-                  description: "Pontos principais do sermão (quantidade proporcional à duração)",
+                  description: "Main sermon points (quantity proportional to duration)",
                 },
-                aplicacao_pratica: { type: "string", description: "Como aplicar na vida cotidiana" },
-                conclusao: { type: "string", description: "Conclusão e apelo final" },
+                aplicacao_pratica: { type: "string", description: "How to apply in daily life" },
+                conclusao: { type: "string", description: "Conclusion and final altar call" },
               },
               required: ["titulo", "texto_base", "introducao", "pontos", "aplicacao_pratica", "conclusao"],
             },
@@ -178,55 +193,54 @@ serve(async (req) => {
       case "raio-x": {
         const { referencia } = payload;
 
-        // Buscar texto bíblico real para injetar como contexto
         let contextoVersiculo = "";
         if (referencia) {
           const textoBiblico = await fetchBibleVerse(referencia);
           if (textoBiblico) {
-            contextoVersiculo = `\n\nTEXTO BÍBLICO REAL (tradução Almeida):\n"${textoBiblico}"\n\nUse este texto real como referência para a análise.`;
+            contextoVersiculo = `\n\nBIBLICAL TEXT (Almeida translation):\n"${textoBiblico}"\n\nUse this real text as reference for the analysis.`;
           }
         }
 
         result = await callAiStructured(
           OPENAI_API_KEY,
-          `Você é um estudioso bíblico especialista em exegese e línguas originais. Responda em português do Brasil.`,
-          `Faça um Raio-X completo da passagem: ${referencia}. Inclua versões bíblicas, palavras-chave no original, contexto histórico, contexto literário e aplicação.${contextoVersiculo}`,
+          `You are a biblical scholar specializing in exegesis and original languages. You MUST respond entirely in ${langName}.`,
+          `Do a complete X-Ray of the passage: ${referencia}. Include biblical versions, keywords in the original language, historical context, literary context and application.${contextoVersiculo}`,
           {
             name: "verse_analysis",
-            description: "Retorna análise completa de versículo",
+            description: "Returns complete verse analysis",
             parameters: {
               type: "object",
               properties: {
-                referencia: { type: "string", description: "A referência bíblica analisada" },
+                referencia: { type: "string", description: "The analyzed biblical reference" },
                 versoes: {
                   type: "array",
                   items: {
                     type: "object",
                     properties: {
-                      sigla: { type: "string", description: "Sigla da versão (NVI, ACF, NVT, ARA)" },
-                      texto: { type: "string", description: "Texto do versículo nessa versão" },
+                      sigla: { type: "string", description: "Version abbreviation (NVI, ACF, NVT, ARA)" },
+                      texto: { type: "string", description: "Verse text in that version" },
                     },
                     required: ["sigla", "texto"],
                   },
-                  description: "Versículo em 4 versões diferentes",
+                  description: "Verse in 4 different versions",
                 },
                 palavras_chave: {
                   type: "array",
                   items: {
                     type: "object",
                     properties: {
-                      palavra: { type: "string", description: "Palavra em português" },
-                      original: { type: "string", description: "Palavra no idioma original (grego/hebraico)" },
+                      palavra: { type: "string", description: "Word in the target language" },
+                      original: { type: "string", description: "Word in original language (Greek/Hebrew)" },
                       transliteracao: { type: "string" },
-                      significado: { type: "string", description: "Significado e nuances" },
+                      significado: { type: "string", description: "Meaning and nuances" },
                     },
                     required: ["palavra", "original", "transliteracao", "significado"],
                   },
-                  description: "3-5 palavras-chave no original",
+                  description: "3-5 keywords in the original",
                 },
-                contexto_historico: { type: "string", description: "Quem escreveu, para quem, quando e por quê" },
-                contexto_literario: { type: "string", description: "O que vem antes e depois da passagem" },
-                aplicacao: { type: "string", description: "Principal ensinamento e relevância atual" },
+                contexto_historico: { type: "string", description: "Who wrote it, for whom, when and why" },
+                contexto_literario: { type: "string", description: "What comes before and after the passage" },
+                aplicacao: { type: "string", description: "Main teaching and current relevance" },
               },
               required: ["referencia", "versoes", "palavras_chave", "contexto_historico", "contexto_literario", "aplicacao"],
             },
@@ -239,19 +253,19 @@ serve(async (req) => {
         const { tema } = payload;
         result = await callAiStructured(
           OPENAI_API_KEY,
-          `Você é um líder espiritual cristão evangélico com dom de escrita devocional. Responda em português do Brasil.`,
-          `Gere um devocional completo${tema ? ` sobre: ${tema}` : ""}. Inclua leitura do dia, meditação profunda e oração.`,
+          `You are an evangelical Christian spiritual leader with a gift for devotional writing. You MUST respond entirely in ${langName}.`,
+          `Generate a complete devotional${tema ? ` about: ${tema}` : ""}. Include a daily reading, deep meditation and prayer.`,
           {
             name: "devotional",
-            description: "Retorna devocional estruturado",
+            description: "Returns structured devotional",
             parameters: {
               type: "object",
               properties: {
-                titulo: { type: "string", description: "Título do devocional" },
-                leitura: { type: "string", description: "Referência bíblica para leitura do dia" },
-                versiculo_chave: { type: "string", description: "Um versículo destacado com referência" },
-                meditacao: { type: "string", description: "Reflexão profunda de 3-4 parágrafos" },
-                oracao: { type: "string", description: "Oração completa e sincera" },
+                titulo: { type: "string", description: "Devotional title" },
+                leitura: { type: "string", description: "Biblical reference for daily reading" },
+                versiculo_chave: { type: "string", description: "A highlighted verse with reference" },
+                meditacao: { type: "string", description: "Deep reflection of 3-4 paragraphs" },
+                oracao: { type: "string", description: "Complete and sincere prayer" },
               },
               required: ["titulo", "leitura", "versiculo_chave", "meditacao", "oracao"],
             },
@@ -264,24 +278,24 @@ serve(async (req) => {
         const { categoria } = payload;
         result = await callAiStructured(
           OPENAI_API_KEY,
-          `Você é um especialista bíblico. Responda em português do Brasil com versículos completos.`,
-          `Garimpo bíblico sobre "${categoria}". Liste 8-10 versículos relevantes com texto completo (NVI) e explicação breve.`,
+          `You are a biblical specialist. You MUST respond entirely in ${langName} with complete verses.`,
+          `Biblical mining on "${categoria}". List 8-10 relevant verses with full text and brief explanation.`,
           {
             name: "bible_mining",
-            description: "Retorna versículos garimpados por tema",
+            description: "Returns mined verses by theme",
             parameters: {
               type: "object",
               properties: {
-                tema: { type: "string", description: "O tema pesquisado" },
-                resumo: { type: "string", description: "Breve introdução sobre o que a Bíblia diz sobre esse tema" },
+                tema: { type: "string", description: "The researched theme" },
+                resumo: { type: "string", description: "Brief introduction about what the Bible says about this theme" },
                 versiculos: {
                   type: "array",
                   items: {
                     type: "object",
                     properties: {
-                      referencia: { type: "string", description: "Referência bíblica (ex: João 3:16)" },
-                      texto: { type: "string", description: "Texto completo do versículo" },
-                      aplicacao: { type: "string", description: "Breve explicação de como se aplica ao tema" },
+                      referencia: { type: "string", description: "Biblical reference (e.g.: John 3:16)" },
+                      texto: { type: "string", description: "Full verse text" },
+                      aplicacao: { type: "string", description: "Brief explanation of how it applies to the theme" },
                     },
                     required: ["referencia", "texto", "aplicacao"],
                   },
@@ -298,11 +312,11 @@ serve(async (req) => {
         const { nome } = payload;
         result = await callAiStructured(
           OPENAI_API_KEY,
-          `Você é um linguista especializado em línguas antigas (hebraico, aramaico, grego e latim). Responda em português do Brasil.`,
-          `Pesquise o nome "${nome}". Significado em hebraico, aramaico, grego e latim (com caracteres originais e transliteração), etimologia detalhada e história. NÃO inclua referências bíblicas. Se não existir em alguma língua, coloque null.`,
+          `You are a linguist specializing in ancient languages (Hebrew, Aramaic, Greek and Latin). You MUST respond entirely in ${langName}.`,
+          `Research the name "${nome}". Meaning in Hebrew, Aramaic, Greek and Latin (with original characters and transliteration), detailed etymology and history. Do NOT include biblical references. If it doesn't exist in a language, put null.`,
           {
             name: "nome_resultado",
-            description: "Retorna significado estruturado de um nome",
+            description: "Returns structured meaning of a name",
             parameters: {
               type: "object",
               properties: {
@@ -365,7 +379,7 @@ serve(async (req) => {
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
     const { error: cacheErr } = await sb.from("ai_cache").insert({ action, cache_key: cacheKey, result, expires_at: expiresAt });
     if (cacheErr) console.warn("Cache save error:", cacheErr.message);
-    else console.log(`Cache SAVED for ${action}: ${cacheKey}`);
+    else console.log(`Cache SAVED for ${action} [${lang}]: ${cacheKey}`);
 
     return new Response(JSON.stringify({ result }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
