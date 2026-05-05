@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,15 +19,8 @@ const SS_PASS = "fc-admin-pass";
 
 type Tab = "dashboard" | "analytics" | "users" | "sermons" | "cache";
 
-const NAV: { id: Tab; label: string; icon: any }[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "analytics", label: "Análises", icon: BarChart3 },
-  { id: "users", label: "Usuários", icon: Users },
-  { id: "sermons", label: "Sermões", icon: ScrollText },
-  { id: "cache", label: "Cache do gerador", icon: Brain },
-];
-
 const AdminPage = () => {
+  const { t } = useTranslation();
   const [authed, setAuthed] = useState(false);
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPass, setAdminPass] = useState("");
@@ -39,6 +33,14 @@ const AdminPage = () => {
   const [pwOpen, setPwOpen] = useState(false);
   const [newPw, setNewPw] = useState("");
   const [newPw2, setNewPw2] = useState("");
+
+  const NAV: { id: Tab; label: string; icon: any }[] = [
+    { id: "dashboard", label: t("admin.dashboard"), icon: LayoutDashboard },
+    { id: "analytics", label: t("admin.analytics"), icon: BarChart3 },
+    { id: "users", label: t("admin.users"), icon: Users },
+    { id: "sermons", label: t("admin.sermons"), icon: ScrollText },
+    { id: "cache", label: t("admin.cache"), icon: Brain },
+  ];
 
   const creds = {
     _admin_email: sessionStorage.getItem(SS_EMAIL) || "",
@@ -61,7 +63,7 @@ const AdminPage = () => {
     });
     setLoading(false);
     if (error || !data) {
-      setLoginError("E-mail ou senha incorretos.");
+      setLoginError(t("admin.errorInvalid"));
       return;
     }
     sessionStorage.setItem(SS_EMAIL, adminEmail.trim().toLowerCase());
@@ -77,12 +79,12 @@ const AdminPage = () => {
   };
 
   const handleChangePassword = async () => {
-    if (newPw.length < 6) return toast.error("Senha muito curta (mín. 6).");
-    if (newPw !== newPw2) return toast.error("Senhas não conferem.");
+    if (newPw.length < 6) return toast.error(t("admin.passwordTooShort"));
+    if (newPw !== newPw2) return toast.error(t("admin.passwordMismatch"));
     const { error } = await supabase.rpc("admin_change_password", { ...creds, _new_password: newPw });
-    if (error) return toast.error("Erro ao trocar senha.");
+    if (error) return toast.error(t("common.error"));
     sessionStorage.setItem(SS_PASS, newPw);
-    toast.success("Senha alterada.");
+    toast.success(t("admin.passwordChanged"));
     setNewPw("");
     setNewPw2("");
     setPwOpen(false);
@@ -96,16 +98,16 @@ const AdminPage = () => {
           <div className="w-full rounded-xl border border-border bg-card p-6 space-y-5">
             <div className="text-center space-y-1">
               <Shield className="w-8 h-8 mx-auto text-primary" />
-              <h1 className="font-display text-xl font-bold text-primary">Painel Admin</h1>
-              <p className="text-sm text-muted-foreground">Acesso restrito</p>
+              <h1 className="font-display text-xl font-bold text-primary">{t("admin.title")}</h1>
+              <p className="text-sm text-muted-foreground">{t("admin.subtitle")}</p>
             </div>
             <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-1.5"><Label>E-mail</Label><Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} placeholder="admin@..." /></div>
-              <div className="space-y-1.5"><Label>Senha</Label><Input type="password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} /></div>
+              <div className="space-y-1.5"><Label>{t("admin.emailLabel")}</Label><Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} placeholder="admin@..." /></div>
+              <div className="space-y-1.5"><Label>{t("admin.passwordLabel")}</Label><Input type="password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} /></div>
               {loginError && <p className="text-sm text-destructive bg-destructive/10 rounded-lg p-3">{loginError}</p>}
               <Button type="submit" className="w-full gap-2" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
-                Entrar
+                {t("admin.button")}
               </Button>
             </form>
           </div>
@@ -142,7 +144,7 @@ const AdminPage = () => {
         <div className="p-5 border-b border-border flex items-center gap-3">
           <div className="w-9 h-9"><img src={logo} alt="" className="w-full h-full object-contain" /></div>
           <div>
-            <h1 className="font-display text-base font-bold text-primary leading-tight">Painel Admin</h1>
+            <h1 className="font-display text-base font-bold text-primary leading-tight">{t("admin.title")}</h1>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider">FC Sermon</p>
           </div>
         </div>
@@ -174,14 +176,14 @@ const AdminPage = () => {
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition"
           >
             <KeyRound className="w-4 h-4" />
-            Trocar senha
+            {t("admin.changePassword")}
           </button>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition"
           >
             <LogOut className="w-4 h-4" />
-            Sair
+            {t("admin.logout")}
           </button>
         </div>
       </aside>
@@ -205,14 +207,14 @@ const AdminPage = () => {
 
       <Dialog open={pwOpen} onOpenChange={setPwOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Trocar senha de admin</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t("admin.changePasswordTitle")}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div className="space-y-1.5"><Label>Nova senha</Label><Input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} /></div>
-            <div className="space-y-1.5"><Label>Confirmar nova senha</Label><Input type="password" value={newPw2} onChange={(e) => setNewPw2(e.target.value)} /></div>
+            <div className="space-y-1.5"><Label>{t("admin.newPassword")}</Label><Input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} /></div>
+            <div className="space-y-1.5"><Label>{t("admin.confirmPassword")}</Label><Input type="password" value={newPw2} onChange={(e) => setNewPw2(e.target.value)} /></div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPwOpen(false)}>Cancelar</Button>
-            <Button onClick={handleChangePassword}>Salvar</Button>
+            <Button variant="outline" onClick={() => setPwOpen(false)}>{t("admin.cancel")}</Button>
+            <Button onClick={handleChangePassword}>{t("admin.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

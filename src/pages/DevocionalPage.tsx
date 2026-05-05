@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ const SectionCard = ({ titulo, icone, children }: { titulo: string; icone: React
 );
 
 const DevocionalPage = () => {
+  const { t } = useTranslation();
   const [tema, setTema] = useState("");
   const [resultado, setResultado] = useState<DevocionalResult | null>(null);
   const { callAi, loading } = useAi();
@@ -37,16 +39,15 @@ const DevocionalPage = () => {
   };
 
   return (
-    <PageShell title="Gerar Devocional">
+    <PageShell title={t("sidebar.devocional.title")}>
       <div className="max-w-2xl mx-auto flex flex-col gap-5">
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Informe um tema (opcional) e o gerador criará um devocional completo com leitura do dia, versículo-chave, meditação e oração sugerida para sua comunhão diária.
-        </p>
+        <p className="text-sm text-muted-foreground leading-relaxed">{t("devocional.description")}</p>
+
         <div className="rounded-xl border border-border bg-card/50 p-4 space-y-3">
-          <p className="text-sm text-muted-foreground font-medium">Tema (opcional)</p>
+          <p className="text-sm text-muted-foreground font-medium">{t("devocional.label")}</p>
           <div className="flex gap-2">
             <Input
-              placeholder="Ex: gratidão, perdão, fé..."
+              placeholder={t("devocional.placeholder")}
               value={tema}
               onChange={(e) => setTema(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && gerar()}
@@ -60,7 +61,7 @@ const DevocionalPage = () => {
         {loading && (
           <div className="flex items-center justify-center py-12 gap-3 text-muted-foreground">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            <span className="text-sm">Gerando devocional...</span>
+            <span className="text-sm">{t("devocional.loading")}</span>
           </div>
         )}
 
@@ -70,27 +71,23 @@ const DevocionalPage = () => {
               <h2 className="font-display text-2xl font-bold text-primary">{resultado.titulo}</h2>
             </div>
 
-            {/* Leitura do Dia */}
             <div className="rounded-xl border border-border bg-card/50 p-4 space-y-2">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-primary" />
-                <h3 className="font-display font-bold text-sm text-primary">📖 Leitura do Dia</h3>
+                <h3 className="font-display font-bold text-sm text-primary">📖 {t("devocional.reading")}</h3>
               </div>
               <p className="text-lg font-display font-bold text-foreground">{resultado.leitura}</p>
             </div>
 
-            {/* Versículo Chave */}
             <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 text-center space-y-2">
               <p className="text-base text-foreground italic leading-relaxed">"{resultado.versiculo_chave}"</p>
             </div>
 
-            {/* Meditação */}
-            <SectionCard titulo="💭 Meditação" icone={<span />}>
+            <SectionCard titulo={`💭 ${t("devocional.meditation")}`} icone={<span />}>
               <p className="whitespace-pre-wrap">{resultado.meditacao}</p>
             </SectionCard>
 
-            {/* Oração */}
-            <SectionCard titulo="🙏 Oração Sugerida" icone={<MessageCircle className="w-4 h-4 text-primary" />}>
+            <SectionCard titulo={`🙏 ${t("devocional.prayer")}`} icone={<MessageCircle className="w-4 h-4 text-primary" />}>
               <p className="italic whitespace-pre-wrap">{resultado.oracao}</p>
             </SectionCard>
           </div>

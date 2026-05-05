@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
@@ -100,6 +101,7 @@ interface Verse {
 }
 
 const BibliaPage = () => {
+  const { t } = useTranslation();
   const [version, setVersion] = useState("ARA");
   const [bookId, setBookId] = useState(1);
   const [chapter, setChapter] = useState(1);
@@ -108,6 +110,7 @@ const BibliaPage = () => {
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const verseRefs = useRef<Record<number, HTMLParagraphElement | null>>({});
 
+  const bookNames = t("biblia.books", { returnObjects: true }) as string[];
   const currentBook = BOOKS.find((b) => b.id === bookId)!;
 
   const fetchChapter = useCallback(async () => {
@@ -119,7 +122,7 @@ const BibliaPage = () => {
       const data = await res.json();
       setVerses(data);
     } catch {
-      toast({ title: "Erro", description: "Não foi possível carregar o capítulo. Tente outra versão.", variant: "destructive" });
+      toast({ title: t("biblia.error"), description: t("biblia.errorMessage"), variant: "destructive" });
       setVerses([]);
     } finally {
       setLoading(false);
@@ -155,27 +158,27 @@ const BibliaPage = () => {
   };
 
   return (
-    <PageShell title="Bíblia Sagrada">
+    <PageShell title={t("sidebar.biblia.title")}>
       {/* Selectors */}
       <div className="flex flex-wrap gap-2 mb-4">
         <Select value={String(bookId)} onValueChange={(v) => { setBookId(Number(v)); setChapter(1); }}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Livro" />
+            <SelectValue placeholder={t("biblia.bookLabel")} />
           </SelectTrigger>
           <SelectContent className="max-h-60">
             {BOOKS.map((b) => (
-              <SelectItem key={b.id} value={String(b.id)}>{b.name}</SelectItem>
+              <SelectItem key={b.id} value={String(b.id)}>{bookNames[b.id - 1] || b.name}</SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Select value={String(chapter)} onValueChange={(v) => { setChapter(Number(v)); setSelectedVerse(null); }}>
           <SelectTrigger className="w-[100px]">
-            <SelectValue placeholder="Cap." />
+            <SelectValue placeholder={t("biblia.chapterLabel")} />
           </SelectTrigger>
           <SelectContent className="max-h-60">
             {Array.from({ length: currentBook.chapters }, (_, i) => (
-              <SelectItem key={i + 1} value={String(i + 1)}>Cap. {i + 1}</SelectItem>
+              <SelectItem key={i + 1} value={String(i + 1)}>{t("biblia.chapterFormat", { chapter: i + 1 })}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -187,11 +190,11 @@ const BibliaPage = () => {
             verseRefs.current[num]?.scrollIntoView({ behavior: "smooth", block: "center" });
           }}>
             <SelectTrigger className="w-[100px]">
-              <SelectValue placeholder="Vers." />
+              <SelectValue placeholder={t("biblia.verseLabel")} />
             </SelectTrigger>
             <SelectContent className="max-h-60">
               {verses.map((v) => (
-                <SelectItem key={v.verse} value={String(v.verse)}>v. {v.verse}</SelectItem>
+                <SelectItem key={v.verse} value={String(v.verse)}>{t("biblia.verseFormat", { verse: v.verse })}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -199,7 +202,7 @@ const BibliaPage = () => {
 
         <Select value={version} onValueChange={setVersion}>
           <SelectTrigger className="w-[260px]">
-            <SelectValue placeholder="Versão" />
+            <SelectValue placeholder={t("biblia.versionLabel")} />
           </SelectTrigger>
           <SelectContent className="max-h-60">
             {VERSIONS.map((v) => (
@@ -211,7 +214,7 @@ const BibliaPage = () => {
 
       {/* Chapter title */}
       <h2 className="text-xl font-bold text-foreground mb-4">
-        {currentBook.name} {chapter}
+        {bookNames[bookId - 1] || currentBook.name} {chapter}
       </h2>
 
       {/* Verses */}
@@ -235,18 +238,18 @@ const BibliaPage = () => {
       ) : (
         <div className="text-center py-16 text-muted-foreground">
           <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-40" />
-          <p>Versão não disponível para este livro. Tente outra.</p>
+          <p>{t("biblia.emptyState")}</p>
         </div>
       )}
 
       {/* Navigation */}
       <div className="flex justify-between items-center pt-4 border-t border-border">
         <Button variant="outline" size="sm" onClick={goToPrevChapter} disabled={bookId === 1 && chapter === 1}>
-          <ChevronLeft className="w-4 h-4 mr-1" /> Anterior
+          <ChevronLeft className="w-4 h-4 mr-1" /> {t("biblia.previousButton")}
         </Button>
-        <span className="text-xs text-muted-foreground">{currentBook.name} {chapter}</span>
+        <span className="text-xs text-muted-foreground">{bookNames[bookId - 1] || currentBook.name} {chapter}</span>
         <Button variant="outline" size="sm" onClick={goToNextChapter} disabled={bookId === 66 && chapter === currentBook.chapters}>
-          Próximo <ChevronRight className="w-4 h-4 ml-1" />
+          {t("biblia.nextButton")} <ChevronRight className="w-4 h-4 ml-1" />
         </Button>
       </div>
     </PageShell>

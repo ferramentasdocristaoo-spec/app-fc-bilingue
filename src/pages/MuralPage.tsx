@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ interface Pedido {
 }
 
 const MuralPage = () => {
+  const { t, i18n } = useTranslation();
   const [nome, setNome] = useState("");
   const [pedido, setPedido] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -28,27 +30,27 @@ const MuralPage = () => {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchPedidos = async () => {
-    const { data, error } = await supabase
-      .from("prayer_requests")
-      .select("*")
-      .order("created_at", { ascending: false });
+  const categorias = [
+    { value: "Saúde", label: t("mural.categoryHealth") },
+    { value: "Família", label: t("mural.categoryFamily") },
+    { value: "Finanças", label: t("mural.categoryFinances") },
+    { value: "Trabalho", label: t("mural.categoryWork") },
+    { value: "Espiritual", label: t("mural.categorySpirituality") },
+    { value: "Geral", label: t("mural.categoryGeneral") },
+  ];
 
+  const fetchPedidos = async () => {
+    const { data, error } = await supabase.from("prayer_requests").select("*").order("created_at", { ascending: false });
     if (data) setPedidos(data as Pedido[]);
     if (error) console.error(error);
   };
 
-  useEffect(() => {
-    fetchPedidos();
-  }, []);
+  useEffect(() => { fetchPedidos(); }, []);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Imagem muito grande. Máximo 5MB.");
-      return;
-    }
+    if (file.size > 5 * 1024 * 1024) { toast.error(t("mural.errorImageSize")); return; }
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
   };
@@ -60,30 +62,16 @@ const MuralPage = () => {
   };
 
   const enviar = async () => {
-    if (!pedido.trim()) {
-      toast.error("Escreva seu pedido de oração.");
-      return;
-    }
+    if (!pedido.trim()) { toast.error(t("mural.errorEmpty")); return; }
     setLoading(true);
-
     let image_url: string | null = null;
 
     if (imageFile) {
       const ext = imageFile.name.split(".").pop();
       const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("prayer-images")
-        .upload(path, imageFile);
-
-      if (uploadError) {
-        toast.error("Erro ao enviar imagem.");
-        setLoading(false);
-        return;
-      }
-
-      const { data: urlData } = supabase.storage
-        .from("prayer-images")
-        .getPublicUrl(path);
+      const { error: uploadError } = await supabase.storage.from("prayer-images").upload(path, imageFile);
+      if (uploadError) { toast.error(t("common.error")); setLoading(false); return; }
+      const { data: urlData } = supabase.storage.from("prayer-images").getPublicUrl(path);
       image_url = urlData.publicUrl;
     }
 
@@ -95,98 +83,56 @@ const MuralPage = () => {
     });
 
     if (error) {
-      toast.error("Erro ao enviar pedido.");
+      toast.error(t("common.error"));
       console.error(error);
     } else {
-      toast.success("Pedido enviado com sucesso! 🙏");
-      setNome("");
-      setPedido("");
-      setCategoria("");
-      removeImage();
-      fetchPedidos();
+      toast.success("🙏");
+      setNome(""); setPedido(""); setCategoria(""); removeImage(); fetchPedidos();
     }
     setLoading(false);
   };
 
   const orar = async (id: string, currentAmens: number) => {
-    const { error } = await supabase
-      .from("prayer_requests")
-      .update({ amens: currentAmens + 1 })
-      .eq("id", id);
-
-    if (!error) {
-      setPedidos((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, amens: p.amens + 1 } : p))
-      );
-    }
+    const { error } = await supabase.from("prayer_requests").update({ amens: currentAmens + 1 }).eq("id", id);
+    if (!error) setPedidos((prev) => prev.map((p) => (p.id === id ? { ...p, amens: p.amens + 1 } : p)));
   };
 
   return (
-    <PageShell title="Mural de Clamor">
+    <PageShell title={t("sidebar.mural.title")}>
       <div className="max-w-sm mx-auto flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Compartilhe seus pedidos de oração com a comunidade. Outros podem interceder clicando em "Estou Orando". Você também pode enviar uma imagem junto.
-        </p>
-        {/* Formulário */}
+        <p className="text-sm text-muted-foreground leading-relaxed">{t("mural.description")}</p>
+
         <div className="menu-card flex-col items-start gap-3">
-          <h3 className="font-semibold text-sm text-primary">Novo Pedido de Oração</h3>
-          <Input
-            placeholder="Seu nome (ou deixe vazio para Anônimo)"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-          />
-          <Textarea
-            placeholder="Seu pedido de oração..."
-            value={pedido}
-            onChange={(e) => setPedido(e.target.value)}
-          />
+          <h3 className="font-semibold text-sm text-primary">{t("mural.formTitle")}</h3>
+          <Input placeholder={t("mural.namePlaceholder")} value={nome} onChange={(e) => setNome(e.target.value)} />
+          <Textarea placeholder={t("mural.requestPlaceholder")} value={pedido} onChange={(e) => setPedido(e.target.value)} />
           <Select value={categoria} onValueChange={setCategoria}>
-            <SelectTrigger><SelectValue placeholder="Categoria" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t("mural.categoryLabel")} /></SelectTrigger>
             <SelectContent>
-              {["Saúde", "Família", "Finanças", "Trabalho", "Espiritual", "Geral"].map((c) => (
-                <SelectItem key={c} value={c}>{c}</SelectItem>
-              ))}
+              {categorias.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
             </SelectContent>
           </Select>
 
-          {/* Upload de imagem */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImageSelect}
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
 
           {imagePreview ? (
             <div className="relative w-full">
               <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover rounded-md" />
-              <Button
-                variant="destructive"
-                size="icon"
-                className="absolute top-1 right-1 h-6 w-6"
-                onClick={removeImage}
-              >
+              <Button variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={removeImage}>
                 <X className="h-3 w-3" />
               </Button>
             </div>
           ) : (
-            <Button
-              variant="outline"
-              className="w-full gap-2"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <ImagePlus className="h-4 w-4" />
-              Adicionar Imagem
+            <Button variant="outline" className="w-full gap-2" onClick={() => fileInputRef.current?.click()}>
+              <ImagePlus className="h-4 w-4" /> {t("mural.addImage")}
             </Button>
           )}
 
           <Button onClick={enviar} className="w-full" disabled={loading}>
-            {loading ? "Enviando..." : "Enviar Pedido"}
+            {loading ? t("mural.sending") : t("mural.submitButton")}
           </Button>
         </div>
 
-        {/* Lista de pedidos */}
         {pedidos.map((p) => (
           <div key={p.id} className="menu-card flex-col items-start gap-2">
             <div className="flex items-center justify-between w-full">
@@ -194,28 +140,20 @@ const MuralPage = () => {
               <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{p.categoria}</span>
             </div>
             <p className="text-sm text-foreground">{p.pedido}</p>
-            {p.image_url && (
-              <img
-                src={p.image_url}
-                alt="Imagem do pedido"
-                className="w-full h-40 object-cover rounded-md"
-              />
-            )}
+            {p.image_url && <img src={p.image_url} alt="" className="w-full h-40 object-cover rounded-md" />}
             <div className="flex items-center justify-between w-full">
               <span className="text-xs text-muted-foreground">
-                {new Date(p.created_at).toLocaleDateString("pt-BR")}
+                {new Date(p.created_at).toLocaleDateString(i18n.language)}
               </span>
               <Button variant="outline" size="sm" onClick={() => orar(p.id, p.amens)} className="gap-1 text-xs">
-                🙏 Estou Orando ({p.amens})
+                🙏 {t("mural.prayingButton", { count: p.amens })}
               </Button>
             </div>
           </div>
         ))}
 
         {pedidos.length === 0 && (
-          <p className="text-center text-sm text-muted-foreground py-8">
-            Nenhum pedido de oração ainda. Seja o primeiro! 🙏
-          </p>
+          <p className="text-center text-sm text-muted-foreground py-8">{t("mural.emptyState")}</p>
         )}
       </div>
     </PageShell>

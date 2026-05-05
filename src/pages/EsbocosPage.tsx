@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
 import { Input } from "@/components/ui/input";
 import { Search, Copy, Download, FileText, X, Trash2 } from "lucide-react";
@@ -17,6 +18,7 @@ interface Sermao {
 }
 
 const EsbocosPage = () => {
+  const { t, i18n } = useTranslation();
   const [busca, setBusca] = useState("");
   const [sermoes, setSermoes] = useState<Sermao[]>(() =>
     JSON.parse(localStorage.getItem("fc-sermoes") || "[]")
@@ -34,7 +36,7 @@ const EsbocosPage = () => {
   const handleCopiar = () => {
     if (!selecionado) return;
     navigator.clipboard.writeText(selecionado.conteudo);
-    toast({ title: "Copiado!", description: "Sermão copiado para a área de transferência." });
+    toast({ title: t("esbocos.copiedNotif"), description: t("esbocos.copiedMessage") });
   };
 
   const handleDownloadTxt = () => {
@@ -70,22 +72,20 @@ const EsbocosPage = () => {
     localStorage.setItem("fc-sermoes", JSON.stringify(novos));
     setSermoes(novos);
     setSelecionado(null);
-    toast({ title: "Excluído", description: "Sermão removido com sucesso." });
+    toast({ title: t("esbocos.deletedNotif"), description: t("esbocos.deletedMessage") });
   };
 
   return (
-    <PageShell title="Meus Esboços">
+    <PageShell title={t("sidebar.esbocos.title")}>
       <div className="max-w-sm mx-auto flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Aqui ficam todos os sermões que você salvou na Oficina. Toque em um esboço para visualizar, copiar, exportar ou excluir.
-        </p>
+        <p className="text-sm text-muted-foreground leading-relaxed">{t("esbocos.description")}</p>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Buscar sermões..." className="pl-10" value={busca} onChange={(e) => setBusca(e.target.value)} />
+          <Input placeholder={t("esbocos.searchPlaceholder")} className="pl-10" value={busca} onChange={(e) => setBusca(e.target.value)} />
         </div>
 
         {filtrados.length === 0 ? (
-          <p className="text-center text-muted-foreground text-sm py-8">Nenhum esboço encontrado.</p>
+          <p className="text-center text-muted-foreground text-sm py-8">{t("esbocos.emptyState")}</p>
         ) : (
           filtrados.map((s, i) => (
             <div
@@ -94,13 +94,13 @@ const EsbocosPage = () => {
               onClick={() => setSelecionado(s)}
             >
               <div className="flex items-center justify-between w-full">
-                <h3 className="font-semibold text-sm text-foreground">{s.titulo || "Sem título"}</h3>
+                <h3 className="font-semibold text-sm text-foreground">{s.titulo || t("esbocos.defaultTitle")}</h3>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${s.status === "finalizado" ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
                   {s.status}
                 </span>
               </div>
               <p className="text-xs text-muted-foreground">{s.textoBase} • {s.tema}</p>
-              <p className="text-xs text-muted-foreground">{new Date(s.data).toLocaleDateString("pt-BR")}</p>
+              <p className="text-xs text-muted-foreground">{new Date(s.data).toLocaleDateString(i18n.language)}</p>
             </div>
           ))
         )}
@@ -109,7 +109,7 @@ const EsbocosPage = () => {
       <Dialog open={!!selecionado} onOpenChange={(open) => !open && setSelecionado(null)}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-primary font-display">{selecionado?.titulo || "Sem título"}</DialogTitle>
+            <DialogTitle className="text-primary font-display">{selecionado?.titulo || t("esbocos.defaultTitle")}</DialogTitle>
           </DialogHeader>
           {selecionado && (
             <div className="flex flex-col gap-4">
@@ -118,20 +118,20 @@ const EsbocosPage = () => {
                 <span>•</span>
                 <span>{selecionado.tema}</span>
                 <span>•</span>
-                <span>{new Date(selecionado.data).toLocaleDateString("pt-BR")}</span>
+                <span>{new Date(selecionado.data).toLocaleDateString(i18n.language)}</span>
               </div>
               <pre className="text-sm text-foreground whitespace-pre-wrap leading-relaxed bg-muted/30 rounded-lg p-4">
                 {selecionado.conteudo}
               </pre>
               <div className="grid grid-cols-3 gap-2">
                 <Button variant="outline" size="sm" className="gap-1.5" onClick={handleCopiar}>
-                  <Copy className="w-3.5 h-3.5" /> Copiar
+                  <Copy className="w-3.5 h-3.5" /> {t("esbocos.copyButton")}
                 </Button>
                 <Button variant="outline" size="sm" className="gap-1.5" onClick={handleDownloadPdf}>
-                  <Download className="w-3.5 h-3.5" /> PDF
+                  <Download className="w-3.5 h-3.5" /> {t("esbocos.pdfButton")}
                 </Button>
                 <Button variant="outline" size="sm" className="gap-1.5" onClick={handleDownloadTxt}>
-                  <FileText className="w-3.5 h-3.5" /> TXT
+                  <FileText className="w-3.5 h-3.5" /> {t("esbocos.txtButton")}
                 </Button>
               </div>
               <Button
@@ -143,7 +143,7 @@ const EsbocosPage = () => {
                   if (idx >= 0) handleExcluir(idx);
                 }}
               >
-                <Trash2 className="w-3.5 h-3.5" /> Excluir
+                <Trash2 className="w-3.5 h-3.5" /> {t("esbocos.deleteButton")}
               </Button>
             </div>
           )}
