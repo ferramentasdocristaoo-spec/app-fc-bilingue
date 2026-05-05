@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Dark theme (default) */
+  :root {
+    --background: 220 20% 10%;
+    --foreground: 43 30% 90%;
+
+    --card: 220 18% 14%;
+    --card-foreground: 43 30% 90%;
+
+    --popover: 220 18% 14%;
+    --popover-foreground: 43 30% 90%;
+
+    --primary: 43 60% 55%;
+    --primary-foreground: 220 20% 8%;
+
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 43 30% 85%;
+
+    --muted: 220 15% 16%;
+    --muted-foreground: 220 10% 55%;
+
+    --accent: 43 50% 45%;
+    --accent-foreground: 43 30% 95%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 43 30% 25%;
+    --input: 220 15% 20%;
+    --ring: 43 60% 55%;
+
+    --radius: 0.75rem;
+
+    --gold-gradient: linear-gradient(135deg, hsl(43, 60%, 55%), hsl(38, 70%, 40%));
+    --gold-shimmer: linear-gradient(90deg, hsl(43, 50%, 45%), hsl(43, 70%, 60%), hsl(43, 50%, 45%));
+    --dark-texture: radial-gradient(ellipse at 20% 50%, hsl(220, 20%, 13%) 0%, hsl(220, 20%, 8%) 100%);
+
+    --sidebar-background: 220 18% 12%;
+    --sidebar-foreground: 43 30% 90%;
+    --sidebar-primary: 43 60% 55%;
+    --sidebar-primary-foreground: 220 20% 8%;
+    --sidebar-accent: 220 15% 18%;
+    --sidebar-accent-foreground: 43 30% 90%;
+    --sidebar-border: 43 30% 25%;
+    --sidebar-ring: 43 60% 55%;
+  }
+
+  /* Light theme - warm earthy palette */
+  .light {
+    --background: 30 30% 95%;
+    --foreground: 20 40% 20%;
+
+    --card: 30 25% 98%;
+    --card-foreground: 20 40% 20%;
+
+    --popover: 30 25% 98%;
+    --popover-foreground: 20 40% 20%;
+
+    --primary: 30 50% 45%;
+    --primary-foreground: 30 25% 98%;
+
+    --secondary: 30 20% 90%;
+    --secondary-foreground: 20 30% 30%;
+
+    --muted: 30 15% 92%;
+    --muted-foreground: 20 15% 50%;
+
+    --accent: 30 50% 45%;
+    --accent-foreground: 30 25% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 20% 85%;
+    --input: 30 20% 90%;
+    --ring: 30 50% 45%;
+
+    --gold-gradient: linear-gradient(135deg, hsl(30, 50%, 45%), hsl(25, 60%, 35%));
+    --gold-shimmer: linear-gradient(90deg, hsl(30, 40%, 40%), hsl(30, 60%, 55%), hsl(30, 40%, 40%));
+    --dark-texture: none;
+
+    --sidebar-background: 30 25% 96%;
+    --sidebar-foreground: 20 40% 20%;
+    --sidebar-primary: 30 50% 45%;
+    --sidebar-primary-foreground: 30 25% 98%;
+    --sidebar-accent: 30 20% 90%;
+    --sidebar-accent-foreground: 20 30% 30%;
+    --sidebar-border: 30 20% 85%;
+    --sidebar-ring: 30 50% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    min-height: 100vh;
+  }
+
+  :root:not(.light) body {
+    background-image: var(--dark-texture);
+  }
+}
+
+@layer utilities {
+  .gold-border {
+    border: 1px solid hsl(var(--border));
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.15);
+  }
+
+  .gold-text {
+    background: var(--gold-shimmer);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .menu-card {
+    @apply gold-border rounded-xl p-4 flex items-center gap-4 transition-all duration-300 bg-card;
+  }
+
+  .menu-card:active {
+    @apply scale-[0.98];
+    box-shadow: 0 0 15px hsl(var(--primary) / 0.2);
+  }
+}
+
+/* Font size scaling for accessibility */
+.font-scale-small {
+  font-size: 0.95em;
+}
+.font-scale-medium {
+  font-size: 1em;
+}
+.font-scale-large {
+  zoom: 1.15;
+}
+.font-scale-xlarge {
+  zoom: 1.35;
+}

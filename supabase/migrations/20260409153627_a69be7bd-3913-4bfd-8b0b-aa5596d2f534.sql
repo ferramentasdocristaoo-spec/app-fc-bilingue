@@ -1,0 +1,1 @@
+ALTER TABLE public.ai_cache ADD COLUMN IF NOT EXISTS expires_at timestamptz DEFAULT (now() + interval '30 days');
