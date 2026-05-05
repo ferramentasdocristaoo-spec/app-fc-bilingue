@@ -2,7 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 
 const languages = [
-  { code: 'pt', flag: '🇧🇷', name: 'Português' },
+  { code: 'pt', flag: '🇧🇷', name: 'Português (BR)' },
+  { code: 'pt-PT', flag: '🇵🇹', name: 'Português (PT)' },
   { code: 'en', flag: '🇺🇸', name: 'English' },
   { code: 'fr', flag: '🇫🇷', name: 'Français' },
   { code: 'es', flag: '🇪🇸', name: 'Español' },
