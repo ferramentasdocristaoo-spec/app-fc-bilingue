@@ -1,0 +1,269 @@
+{
+  "appName": "Outils du Chrétien",
+  "subtitle": "Outils du Chrétien",
+  "login": {
+    "title": "Se connecter",
+    "subtitle": "Accédez avec votre e-mail approuvé pour l'achat.",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "votre@email.com",
+    "button": "Se connecter",
+    "footer": "Accès exclusif aux acheteurs. Votre e-mail est automatiquement activé après la confirmation de l'achat.",
+    "errorEmpty": "Veuillez entrer votre e-mail.",
+    "errorNotApproved": "Cet e-mail n'a pas encore été approuvé. Veuillez attendre la confirmation de votre achat.",
+    "errorBlocked": "Cet e-mail est bloqué. Veuillez contacter le support."
+  },
+  "admin": {
+    "title": "Panneau d'administration",
+    "subtitle": "Accès restreint",
+    "emailLabel": "E-mail",
+    "passwordLabel": "Mot de passe",
+    "button": "Se connecter",
+    "errorInvalid": "E-mail ou mot de passe invalide.",
+    "dashboard": "Tableau de bord",
+    "analytics": "Analytique",
+    "users": "Utilisateurs",
+    "sermons": "Sermons",
+    "cache": "Cache du générateur",
+    "changePassword": "Changer le mot de passe",
+    "logout": "Se déconnecter",
+    "changePasswordTitle": "Changer le mot de passe administrateur",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "passwordTooShort": "Mot de passe trop court (min. 6).",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "passwordChanged": "Mot de passe modifié avec succès!"
+  },
+  "sidebar": {
+    "modules": "Modules",
+    "home": "Accueil",
+    "logout": "Se déconnecter",
+    "oficina": {
+      "title": "Atelier de Sermon",
+      "description": "Créez et organisez vos plans"
+    },
+    "esbocos": {
+      "title": "Mes Plans",
+      "description": "Accédez à vos plans sauvegardés"
+    },
+    "raioX": {
+      "title": "Rayon X du Verset",
+      "description": "Analysez les versets en profondeur"
+    },
+    "devocional": {
+      "title": "Générer une Dévotionnelle",
+      "description": "Créez des dévotionnelles personnalisées"
+    },
+    "nomes": {
+      "title": "Signification des Noms",
+      "description": "Découvrez le sens des noms bibliques"
+    },
+    "garimpo": {
+      "title": "Exploitation Biblique",
+      "description": "Recherchez des versets par thème"
+    },
+    "mural": {
+      "title": "Mur de Prière",
+      "description": "Partagez des demandes de prière"
+    },
+    "voz": {
+      "title": "Voix de Dieu",
+      "description": "Recevez une parole quotidienne"
+    },
+    "pulpito": {
+      "title": "Chaire Partagée",
+      "description": "Consultez les plans communautaires"
+    },
+    "biblia": {
+      "title": "Bible Sacrée",
+      "description": "Lisez la Bible en différentes versions"
+    }
+  },
+  "dashboard": {
+    "lightMode": "Mode clair",
+    "darkMode": "Mode sombre",
+    "install": "Installer l'application",
+    "selectLanguage": "Sélectionner la langue"
+  },
+  "oficina": {
+    "description": "Créez des plans de sermon complets avec introduction, développement et conclusion. Personnalisez le thème, le verset de base et la durée.",
+    "themeLabel": "Thème du Sermon *",
+    "themePlaceholder": "Thème",
+    "verseLabel": "Verset de Base (Optionnel)",
+    "versePlaceholder": "Ex: Jean 3:16",
+    "timeLabel": "Durée du Sermon: {{minutes}} minutes",
+    "typeLabel": "Type de Plan",
+    "typePlaceholder": "Type de Plan",
+    "generateButton": "Générer le Sermon",
+    "generating": "Génération...",
+    "copyButton": "Copier",
+    "pdfButton": "PDF",
+    "txtButton": "TXT",
+    "editButton": "Modifier",
+    "draftButton": "Brouillon",
+    "finalButton": "Finaliser",
+    "backButton": "Retour",
+    "introduction": "Introduction",
+    "application": "Application Pratique",
+    "conclusion": "Conclusion et Appel",
+    "copiedNotif": "Copier",
+    "copiedMessage": "Sermon copié dans le presse-papiers.",
+    "draftSaved": "Brouillon enregistré!",
+    "sermonFinalized": "Sermon finalisé!"
+  },
+  "esbocos": {
+    "description": "Gérez tous vos plans sauvegardés. Modifiez, partagez ou supprimez selon les besoins.",
+    "searchPlaceholder": "Rechercher des sermons...",
+    "emptyState": "Aucun plan trouvé.",
+    "defaultTitle": "Sans titre",
+    "copyButton": "Copier",
+    "pdfButton": "PDF",
+    "txtButton": "TXT",
+    "deleteButton": "Supprimer",
+    "copiedNotif": "Copier",
+    "deletedNotif": "Supprimé",
+    "deletedMessage": "Sermon supprimé avec succès."
+  },
+  "raioX": {
+    "description": "Analysez les versets bibliques en profondeur avec comparaison de versions, étymologie et contexte historique.",
+    "label": "Référence Biblique",
+    "placeholder": "Ex: Jean 3:16",
+    "loading": "Analyse de {{reference}}...",
+    "comparative": "Comparaison des Versions",
+    "keywords": "Mots-clés dans l'Original",
+    "historical": "Contexte Historique",
+    "literary": "Contexte Littéraire",
+    "theological": "Application Théologique"
+  },
+  "devocional": {
+    "description": "Générez des dévotionnelles personnalisées avec lecture, méditation et prière suggérée pour la croissance spirituelle.",
+    "label": "Thème (optionnel)",
+    "placeholder": "Ex: gratitude, pardon, foi...",
+    "loading": "Génération de la dévotionnelle...",
+    "reading": "Lecture du Jour",
+    "meditation": "Méditation",
+    "prayer": "Prière Suggérée"
+  },
+  "nomes": {
+    "description": "Découvrez le sens des noms bibliques par l'étymologie et l'histoire.",
+    "label": "Mot ou Nom",
+    "placeholder": "Entrez un nom...",
+    "loading": "Recherche de la signification de {{name}}...",
+    "result": "Résultat de la Traduction",
+    "etymology": "Étymologie",
+    "history": "Histoire du Nom",
+    "variations": "Variations du Nom",
+    "hebrew": "Hébreu",
+    "greek": "Grec",
+    "aramaic": "Araméen",
+    "latin": "Latin"
+  },
+  "garimpo": {
+    "description": "Recherchez des versets bibliques par thème. Découvrez ce que la Bible dit sur les sujets que vous recherchez.",
+    "label": "Thème de Recherche",
+    "placeholder": "Ex: anxiété, pardon, foi...",
+    "suggestions": "Suggestions",
+    "loading": "Exploitation de versets sur {{theme}}...",
+    "results": "Versets Trouvés",
+    "newSearch": "Nouvelle Recherche",
+    "suggestionAnxiety": "Anxiété",
+    "suggestionFaith": "Foi",
+    "suggestionStrength": "Force",
+    "suggestionPeace": "Paix",
+    "suggestionForgiveness": "Pardon",
+    "suggestionLove": "Amour",
+    "suggestionHope": "Espérance",
+    "suggestionJoy": "Joie",
+    "suggestionWisdom": "Sagesse",
+    "suggestionGratitude": "Gratitude"
+  },
+  "mural": {
+    "description": "Partagez vos demandes de prière avec la communauté et priez pour les demandes des autres.",
+    "formTitle": "Nouvelle Demande de Prière",
+    "namePlaceholder": "Votre nom (ou laissez vide pour Anonyme)",
+    "requestPlaceholder": "Votre demande de prière...",
+    "categoryLabel": "Catégorie",
+    "addImage": "Ajouter une Image",
+    "sending": "Envoi...",
+    "submitButton": "Soumettre la Demande",
+    "prayingButton": "Je Prie ({{count}})",
+    "emptyState": "Aucune demande de prière pour le moment. Soyez le premier!",
+    "errorEmpty": "Veuillez écrire votre demande de prière.",
+    "errorImageSize": "Image trop grande. Maximum 5MB.",
+    "categoryHealth": "Santé",
+    "categoryFamily": "Famille",
+    "categoryFinances": "Finances",
+    "categoryWork": "Travail",
+    "categorySpirituality": "Spiritualité",
+    "categoryGeneral": "Général"
+  },
+  "voz": {
+    "description": "Recevez une parole de Dieu pour le jour. Une promesse biblique choisie spécialement pour vous.",
+    "button": "Recevoir une Parole"
+  },
+  "pulpito": {
+    "description": "Consultez les plans partagés par d'autres prédicateurs de la communauté.",
+    "cloneButton": "Cloner le Plan",
+    "byAuthor": "par {{author}} • {{date}}",
+    "clonedAlert": "Plan cloné dans votre bibliothèque!"
+  },
+  "biblia": {
+    "description": "Lisez la Bible Sacrée en différentes versions. Comparez les versions et approfondissez votre étude des Écritures.",
+    "bookLabel": "Livre",
+    "chapterLabel": "Ch.",
+    "verseLabel": "V.",
+    "versionLabel": "Version",
+    "previousButton": "Précédent",
+    "nextButton": "Suivant",
+    "chapterFormat": "Ch. {{chapter}}",
+    "verseFormat": "v. {{verse}}",
+    "emptyState": "Version non disponible pour ce livre. Essayez une autre.",
+    "error": "Erreur",
+    "errorMessage": "Impossible de charger le chapitre. Essayez une autre version.",
+    "books": [
+      "Genèse", "Exode", "Lévitique", "Nombres", "Deutéronome",
+      "Josué", "Juges", "Ruth", "1 Samuel", "2 Samuel",
+      "1 Rois", "2 Rois", "1 Chroniques", "2 Chroniques", "Esdras",
+      "Néhémie", "Esther", "Job", "Psaumes", "Proverbes",
+      "L'Ecclésiaste", "Le Cantique des Cantiques", "Ésaïe", "Jérémie", "Lamentations",
+      "Ézéchiel", "Daniel", "Osée", "Joël", "Amos",
+      "Abdias", "Jonas", "Michée", "Nahum", "Habacuc",
+      "Sophonie", "Aggée", "Zacharie", "Malachie",
+      "Matthieu", "Marc", "Luc", "Jean", "Actes",
+      "Romains", "1 Corinthiens", "2 Corinthiens", "Galates", "Éphésiens",
+      "Philippiens", "Colossiens", "1 Thessaloniciens", "2 Thessaloniciens", "1 Timothée",
+      "2 Timothée", "Tite", "Philémon", "Hébreux", "Jacques",
+      "1 Pierre", "2 Pierre", "1 Jean", "2 Jean", "3 Jean",
+      "Jude", "Apocalypse"
+    ]
+  },
+  "install": {
+    "title": "Installer Outils du Chrétien",
+    "button": "Installer",
+    "description": "Installez notre application pour accéder à tous les outils hors ligne.",
+    "iosSteps": "Pour installer sur iOS, appuyez sur l'icône de partage, puis sur 'Ajouter à l'écran d'accueil'.",
+    "androidSteps": "Pour installer sur Android, appuyez sur le menu ⋮, puis sur 'Installer l'app'."
+  },
+  "fontSize": {
+    "small": "P",
+    "medium": "M",
+    "large": "G",
+    "xlarge": "TG"
+  },
+  "notFound": {
+    "title": "Oups! Page non trouvée",
+    "description": "La page que vous recherchez n'existe pas.",
+    "button": "Retour à l'accueil"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer"
+  }
+}

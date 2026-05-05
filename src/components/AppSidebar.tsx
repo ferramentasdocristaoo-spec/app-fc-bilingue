@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Home, Mic, LogOut } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,22 +16,23 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 
-export const menuItems = [
-  { icon: BookOpen, title: "Oficina de Sermões", description: "Crie e organize seus esboços", path: "/oficina" },
-  { icon: FolderOpen, title: "Meus Esboços", description: "Sua biblioteca pessoal", path: "/esbocos" },
-  { icon: Zap, title: "Raio-X do Versículo", description: "Aprofunde seu entendimento", path: "/raio-x" },
-  { icon: Heart, title: "Gerar Devocional", description: "Roteiro diário para comunhão", path: "/devocional" },
-  { icon: Search, title: "Significado de Nomes", description: "Origem e propósito bíblico", path: "/nomes" },
-  { icon: Sparkles, title: "Garimpo Bíblico", description: "Busca por temas específicos", path: "/garimpo" },
-  { icon: MessageCircle, title: "Mural de Clamor", description: "Onde a comunidade intercede", path: "/mural" },
-  { icon: Mic, title: "Voz de Deus", description: "Uma palavra para você", path: "/voz-de-deus" },
-  { icon: Users, title: "Púlpito Compartilhado", description: "Troque inspirações", path: "/pulpito" },
-  { icon: BookOpen, title: "Bíblia Sagrada", description: "Leia em diversas versões", path: "/biblia" },
-];
-
 export function AppSidebar() {
+  const { t } = useTranslation();
   const location = useLocation();
   const { signOut, email } = useAuth();
+
+  const menuItems = [
+    { icon: BookOpen, title: t("sidebar.oficina.title"), description: t("sidebar.oficina.description"), path: "/oficina" },
+    { icon: FolderOpen, title: t("sidebar.esbocos.title"), description: t("sidebar.esbocos.description"), path: "/esbocos" },
+    { icon: Zap, title: t("sidebar.raioX.title"), description: t("sidebar.raioX.description"), path: "/raio-x" },
+    { icon: Heart, title: t("sidebar.devocional.title"), description: t("sidebar.devocional.description"), path: "/devocional" },
+    { icon: Search, title: t("sidebar.nomes.title"), description: t("sidebar.nomes.description"), path: "/nomes" },
+    { icon: Sparkles, title: t("sidebar.garimpo.title"), description: t("sidebar.garimpo.description"), path: "/garimpo" },
+    { icon: MessageCircle, title: t("sidebar.mural.title"), description: t("sidebar.mural.description"), path: "/mural" },
+    { icon: Mic, title: t("sidebar.voz.title"), description: t("sidebar.voz.description"), path: "/voz-de-deus" },
+    { icon: Users, title: t("sidebar.pulpito.title"), description: t("sidebar.pulpito.description"), path: "/pulpito" },
+    { icon: BookOpen, title: t("sidebar.biblia.title"), description: t("sidebar.biblia.description"), path: "/biblia" },
+  ];
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
@@ -38,14 +40,14 @@ export function AppSidebar() {
         <img src={logo} alt="FC Sermon" className="w-10 h-10 object-contain shrink-0" />
         <div className="overflow-hidden group-data-[collapsible=icon]:hidden">
           <h2 className="font-display text-sm font-bold text-primary leading-tight">FC Sermon</h2>
-          <p className="text-[10px] text-muted-foreground">Ferramentas do Cristão</p>
+          <p className="text-[10px] text-muted-foreground">{t("appName")}</p>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-muted-foreground text-[10px] uppercase tracking-wider">
-            Módulos
+            {t("sidebar.modules")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -53,7 +55,7 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild isActive={location.pathname === "/"}>
                   <NavLink to="/" end>
                     <Home className="h-4 w-4" />
-                    <span>Início</span>
+                    <span>{t("sidebar.home")}</span>
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -77,7 +79,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton onClick={signOut} className="text-muted-foreground hover:text-destructive">
               <LogOut className="h-4 w-4" />
-              <span>Sair</span>
+              <span>{t("sidebar.logout")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Loader2, LogIn } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const LoginPage = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -17,7 +20,7 @@ const LoginPage = () => {
     setError("");
 
     if (!email.trim()) {
-      setError("Digite seu e-mail.");
+      setError(t("login.errorEmpty"));
       return;
     }
 
@@ -36,18 +39,18 @@ const LoginPage = () => {
 
         <div className="w-full rounded-xl border border-border bg-card p-6 space-y-5">
           <div className="text-center space-y-1">
-            <h1 className="font-display text-xl font-bold text-primary">Entrar</h1>
+            <h1 className="font-display text-xl font-bold text-primary">{t("login.title")}</h1>
             <p className="text-sm text-muted-foreground">
-              Acesse com o e-mail liberado pela compra.
+              {t("login.subtitle")}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium">E-mail</Label>
+              <Label className="text-sm font-medium">{t("login.emailLabel")}</Label>
               <Input
                 type="email"
-                placeholder="seu@email.com"
+                placeholder={t("login.emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -59,13 +62,15 @@ const LoginPage = () => {
 
             <Button type="submit" className="w-full gap-2" disabled={loading}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
-              Entrar
+              {t("login.button")}
             </Button>
           </form>
         </div>
 
+        <LanguageSwitcher className="justify-center" variant="horizontal" />
+
         <p className="text-xs text-muted-foreground text-center max-w-xs">
-          Acesso exclusivo para compradores. Seu e-mail é liberado automaticamente após a confirmação da compra.
+          {t("login.footer")}
         </p>
       </div>
     </div>

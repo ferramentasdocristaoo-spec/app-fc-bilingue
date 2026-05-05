@@ -1,0 +1,269 @@
+{
+  "appName": "Ferramentas do Cristão",
+  "subtitle": "Ferramentas do Cristão",
+  "login": {
+    "title": "Entrar",
+    "subtitle": "Acesse com o e-mail liberado pela compra.",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "seu@email.com",
+    "button": "Entrar",
+    "footer": "Acesso exclusivo para compradores. Seu e-mail é liberado automaticamente após a confirmação da compra.",
+    "errorEmpty": "Digite seu e-mail.",
+    "errorNotApproved": "Este e-mail ainda não foi liberado. Aguarde a confirmação da sua compra.",
+    "errorBlocked": "Este e-mail está bloqueado. Entre em contato com o suporte."
+  },
+  "admin": {
+    "title": "Painel Admin",
+    "subtitle": "Acesso restrito",
+    "emailLabel": "E-mail",
+    "passwordLabel": "Senha",
+    "button": "Entrar",
+    "errorInvalid": "E-mail ou senha incorretos.",
+    "dashboard": "Dashboard",
+    "analytics": "Análises",
+    "users": "Usuários",
+    "sermons": "Sermões",
+    "cache": "Cache do gerador",
+    "changePassword": "Trocar senha",
+    "logout": "Sair",
+    "changePasswordTitle": "Trocar senha de admin",
+    "newPassword": "Nova senha",
+    "confirmPassword": "Confirmar nova senha",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "passwordTooShort": "Senha muito curta (min. 6).",
+    "passwordMismatch": "Senhas não conferem.",
+    "passwordChanged": "Senha alterada com sucesso!"
+  },
+  "sidebar": {
+    "modules": "Módulos",
+    "home": "Início",
+    "logout": "Sair",
+    "oficina": {
+      "title": "Oficina de Sermões",
+      "description": "Crie e organize seus esboços"
+    },
+    "esbocos": {
+      "title": "Meus Esboços",
+      "description": "Acesse seus esboços salvos"
+    },
+    "raioX": {
+      "title": "Raio-X do Versículo",
+      "description": "Analise versículos em profundidade"
+    },
+    "devocional": {
+      "title": "Gerar Devocional",
+      "description": "Crie devocionais personalizados"
+    },
+    "nomes": {
+      "title": "Significado de Nomes",
+      "description": "Descubra o significado de nomes bíblicos"
+    },
+    "garimpo": {
+      "title": "Garimpo Bíblico",
+      "description": "Busque versículos por tema"
+    },
+    "mural": {
+      "title": "Mural de Clamor",
+      "description": "Compartilhe pedidos de oração"
+    },
+    "voz": {
+      "title": "Voz de Deus",
+      "description": "Receba uma palavra para o dia"
+    },
+    "pulpito": {
+      "title": "Púlpito Compartilhado",
+      "description": "Confira esboços da comunidade"
+    },
+    "biblia": {
+      "title": "Bíblia Sagrada",
+      "description": "Leia a Bíblia em diferentes versões"
+    }
+  },
+  "dashboard": {
+    "lightMode": "Modo claro",
+    "darkMode": "Modo escuro",
+    "install": "Instalar App",
+    "selectLanguage": "Selecionar idioma"
+  },
+  "oficina": {
+    "description": "Crie esboços de sermões completos com introdução, desenvolvimento e conclusão. Personalize o tema, versículo base e duração.",
+    "themeLabel": "Tema do Sermão *",
+    "themePlaceholder": "Tema",
+    "verseLabel": "Versículo Base (Opcional)",
+    "versePlaceholder": "Ex: João 3:16",
+    "timeLabel": "Tempo do Sermão: {{minutes}} minutos",
+    "typeLabel": "Tipo de Esboço",
+    "typePlaceholder": "Tipo de Esboço",
+    "generateButton": "Gerar Sermão",
+    "generating": "Gerando...",
+    "copyButton": "Copiar",
+    "pdfButton": "PDF",
+    "txtButton": "TXT",
+    "editButton": "Editar",
+    "draftButton": "Rascunho",
+    "finalButton": "Finalizar",
+    "backButton": "Voltar",
+    "introduction": "Introdução",
+    "application": "Aplicação Prática",
+    "conclusion": "Conclusão e Apelo",
+    "copiedNotif": "Copiar",
+    "copiedMessage": "Sermão copiado para a área de transferência.",
+    "draftSaved": "Rascunho salvo!",
+    "sermonFinalized": "Sermão finalizado!"
+  },
+  "esbocos": {
+    "description": "Gerencie todos os seus esboços salvos. Edite, compartilhe ou delete conforme necessário.",
+    "searchPlaceholder": "Buscar sermões...",
+    "emptyState": "Nenhum esboço encontrado.",
+    "defaultTitle": "Sem título",
+    "copyButton": "Copiar",
+    "pdfButton": "PDF",
+    "txtButton": "TXT",
+    "deleteButton": "Excluir",
+    "copiedNotif": "Copiar",
+    "deletedNotif": "Excluído",
+    "deletedMessage": "Sermão removido com sucesso."
+  },
+  "raioX": {
+    "description": "Analise versículos bíblicos em profundidade com comparação de versões, etimologia e contexto histórico.",
+    "label": "Referência Bíblica",
+    "placeholder": "Ex: João 3:16",
+    "loading": "Analisando {{reference}}...",
+    "comparative": "Comparativo de Versões",
+    "keywords": "Palavras-Chave no Original",
+    "historical": "Contexto Histórico",
+    "literary": "Contexto Literário",
+    "theological": "Aplicação Teológica"
+  },
+  "devocional": {
+    "description": "Gere devocionais personalizados com leitura, meditação e oração sugerida para crescimento espiritual.",
+    "label": "Tema (opcional)",
+    "placeholder": "Ex: gratidão, perdão, fé...",
+    "loading": "Gerando devocional...",
+    "reading": "Leitura do Dia",
+    "meditation": "Meditação",
+    "prayer": "Oração Sugerida"
+  },
+  "nomes": {
+    "description": "Descubra o significado de nomes bíblicos através da etimologia e história.",
+    "label": "Palavra ou Nome",
+    "placeholder": "Digite um nome...",
+    "loading": "Pesquisando significado de {{name}}...",
+    "result": "Resultado da Tradução",
+    "etymology": "Etimologia",
+    "history": "História do Nome",
+    "variations": "Variações do Nome",
+    "hebrew": "Hebraico",
+    "greek": "Grego",
+    "aramaic": "Aramaico",
+    "latin": "Latim"
+  },
+  "garimpo": {
+    "description": "Busque versículos bíblicos por tema. Descubra o que a Bíblia diz sobre assuntos que você procura.",
+    "label": "Tema para Busca",
+    "placeholder": "Ex: ansiedade, perdão, fé...",
+    "suggestions": "Sugestões",
+    "loading": "Garimpando versículos sobre {{theme}}...",
+    "results": "Versículos Encontrados",
+    "newSearch": "Nova busca",
+    "suggestionAnxiety": "Ansiedade",
+    "suggestionFaith": "Fé",
+    "suggestionStrength": "Força",
+    "suggestionPeace": "Paz",
+    "suggestionForgiveness": "Perdão",
+    "suggestionLove": "Amor",
+    "suggestionHope": "Esperança",
+    "suggestionJoy": "Alegria",
+    "suggestionWisdom": "Sabedoria",
+    "suggestionGratitude": "Gratidão"
+  },
+  "mural": {
+    "description": "Compartilhe seus pedidos de oração com a comunidade e ore pelos pedidos de outros.",
+    "formTitle": "Novo Pedido de Oração",
+    "namePlaceholder": "Seu nome (ou deixe vazio para Anônimo)",
+    "requestPlaceholder": "Seu pedido de oração...",
+    "categoryLabel": "Categoria",
+    "addImage": "Adicionar Imagem",
+    "sending": "Enviando...",
+    "submitButton": "Enviar Pedido",
+    "prayingButton": "Estou Orando ({{count}})",
+    "emptyState": "Nenhum pedido de oração ainda. Seja o primeiro!",
+    "errorEmpty": "Escreva seu pedido de oração.",
+    "errorImageSize": "Imagem muito grande. Máximo 5MB.",
+    "categoryHealth": "Saúde",
+    "categoryFamily": "Família",
+    "categoryFinances": "Finanças",
+    "categoryWork": "Trabalho",
+    "categorySpirituality": "Espiritual",
+    "categoryGeneral": "Geral"
+  },
+  "voz": {
+    "description": "Receba uma palavra de Deus para o dia. Uma promessa bíblica selecionada especialmente para você.",
+    "button": "Receber Palavra"
+  },
+  "pulpito": {
+    "description": "Confira esboços compartilhados por outros pregadores da comunidade.",
+    "cloneButton": "Clonar Esboço",
+    "byAuthor": "por {{author}} • {{date}}",
+    "clonedAlert": "Esboço clonado para sua biblioteca!"
+  },
+  "biblia": {
+    "description": "Leia a Bíblia Sagrada em diferentes versões. Compare versões e aprofunde-se no estudo das Escrituras.",
+    "bookLabel": "Livro",
+    "chapterLabel": "Cap.",
+    "verseLabel": "Vers.",
+    "versionLabel": "Versão",
+    "previousButton": "Anterior",
+    "nextButton": "Próximo",
+    "chapterFormat": "Cap. {{chapter}}",
+    "verseFormat": "v. {{verse}}",
+    "emptyState": "Versão não disponível para este livro. Tente outra.",
+    "error": "Erro",
+    "errorMessage": "Não foi possível carregar o capítulo. Tente outra versão.",
+    "books": [
+      "Gênesis", "Êxodo", "Levítico", "Números", "Deuteronômio",
+      "Josué", "Juízes", "Rute", "1 Samuel", "2 Samuel",
+      "1 Reis", "2 Reis", "1 Crônicas", "2 Crônicas", "Esdras",
+      "Neemias", "Ester", "Jó", "Salmos", "Provérbios",
+      "Eclesiastes", "Cântico dos Cânticos", "Isaías", "Jeremias", "Lamentações",
+      "Ezequiel", "Daniel", "Oséias", "Joel", "Amós",
+      "Obadias", "Jonas", "Miqueias", "Naum", "Habacuque",
+      "Sofonias", "Ageu", "Zacarias", "Malaquias",
+      "Mateus", "Marcos", "Lucas", "João", "Atos",
+      "Romanos", "1 Coríntios", "2 Coríntios", "Gálatas", "Efésios",
+      "Filipenses", "Colossenses", "1 Tessalonicenses", "2 Tessalonicenses", "1 Timóteo",
+      "2 Timóteo", "Tito", "Filemon", "Hebreus", "Tiago",
+      "1 Pedro", "2 Pedro", "1 João", "2 João", "3 João",
+      "Judas", "Apocalipse"
+    ]
+  },
+  "install": {
+    "title": "Instalar FC Sermon",
+    "button": "Instalar",
+    "description": "Instale nosso app para acessar todas as ferramentas offline.",
+    "iosSteps": "Para instalar no iOS, toque o ícone de compartilhamento e depois 'Adicionar à Tela de Início'.",
+    "androidSteps": "Para instalar no Android, toque o menu ⋮ e depois 'Instalar app'."
+  },
+  "fontSize": {
+    "small": "P",
+    "medium": "M",
+    "large": "G",
+    "xlarge": "SG"
+  },
+  "notFound": {
+    "title": "Oops! Página não encontrada",
+    "description": "A página que você está procurando não existe.",
+    "button": "Voltar para Início"
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Deletar",
+    "edit": "Editar",
+    "close": "Fechar"
+  }
+}

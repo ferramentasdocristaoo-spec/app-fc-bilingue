@@ -1,0 +1,269 @@
+{
+  "appName": "Strumenti del Cristiano",
+  "subtitle": "Strumenti del Cristiano",
+  "login": {
+    "title": "Accedi",
+    "subtitle": "Accedi con la tua email approvata per l'acquisto.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "tua@email.com",
+    "button": "Accedi",
+    "footer": "Accesso esclusivo per gli acquirenti. La tua email viene attivata automaticamente dopo la conferma dell'acquisto.",
+    "errorEmpty": "Per favore, inserisci la tua email.",
+    "errorNotApproved": "Questa email non è stata ancora approvata. Per favore, attendi la conferma del tuo acquisto.",
+    "errorBlocked": "Questa email è bloccata. Per favore, contatta il supporto."
+  },
+  "admin": {
+    "title": "Pannello di Amministrazione",
+    "subtitle": "Accesso Limitato",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "button": "Accedi",
+    "errorInvalid": "Email o password non valida.",
+    "dashboard": "Pannello di Controllo",
+    "analytics": "Analitiche",
+    "users": "Utenti",
+    "sermons": "Sermoni",
+    "cache": "Cache del Generatore",
+    "changePassword": "Cambia Password",
+    "logout": "Disconnetti",
+    "changePasswordTitle": "Cambia Password Amministratore",
+    "newPassword": "Nuova Password",
+    "confirmPassword": "Conferma Nuova Password",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "passwordTooShort": "Password troppo breve (min. 6).",
+    "passwordMismatch": "Le password non corrispondono.",
+    "passwordChanged": "Password modificata con successo!"
+  },
+  "sidebar": {
+    "modules": "Moduli",
+    "home": "Home",
+    "logout": "Disconnetti",
+    "oficina": {
+      "title": "Laboratorio di Sermoni",
+      "description": "Crea e organizza i tuoi schemi"
+    },
+    "esbocos": {
+      "title": "I Miei Schemi",
+      "description": "Accedi ai tuoi schemi salvati"
+    },
+    "raioX": {
+      "title": "Radiografia del Versetto",
+      "description": "Analizza i versetti in profondità"
+    },
+    "devocional": {
+      "title": "Genera Devozionale",
+      "description": "Crea devozioni personalizzate"
+    },
+    "nomes": {
+      "title": "Significato dei Nomi",
+      "description": "Scopri il significato dei nomi biblici"
+    },
+    "garimpo": {
+      "title": "Estrazione Biblica",
+      "description": "Cerca versetti per tema"
+    },
+    "mural": {
+      "title": "Muro di Preghiera",
+      "description": "Condividi richieste di preghiera"
+    },
+    "voz": {
+      "title": "Voce di Dio",
+      "description": "Ricevi una parola per il giorno"
+    },
+    "pulpito": {
+      "title": "Pulpito Condiviso",
+      "description": "Consulta schemi della comunità"
+    },
+    "biblia": {
+      "title": "Bibbia Sacra",
+      "description": "Leggi la Bibbia in diverse versioni"
+    }
+  },
+  "dashboard": {
+    "lightMode": "Modalità Chiara",
+    "darkMode": "Modalità Scura",
+    "install": "Installa Applicazione",
+    "selectLanguage": "Seleziona Lingua"
+  },
+  "oficina": {
+    "description": "Crea schemi di sermoni completi con introduzione, sviluppo e conclusione. Personalizza il tema, il versetto base e la durata.",
+    "themeLabel": "Tema del Sermone *",
+    "themePlaceholder": "Tema",
+    "verseLabel": "Versetto Base (Opzionale)",
+    "versePlaceholder": "Es: Giovanni 3:16",
+    "timeLabel": "Durata Sermone: {{minutes}} minuti",
+    "typeLabel": "Tipo di Schema",
+    "typePlaceholder": "Tipo di Schema",
+    "generateButton": "Genera Sermone",
+    "generating": "Generando...",
+    "copyButton": "Copia",
+    "pdfButton": "PDF",
+    "txtButton": "TXT",
+    "editButton": "Modifica",
+    "draftButton": "Bozza",
+    "finalButton": "Finalizza",
+    "backButton": "Indietro",
+    "introduction": "Introduzione",
+    "application": "Applicazione Pratica",
+    "conclusion": "Conclusione e Appello",
+    "copiedNotif": "Copia",
+    "copiedMessage": "Sermone copiato negli appunti.",
+    "draftSaved": "Bozza salvata!",
+    "sermonFinalized": "Sermone finalizzato!"
+  },
+  "esbocos": {
+    "description": "Gestisci tutti i tuoi schemi salvati. Modifica, condividi o elimina secondo le necessità.",
+    "searchPlaceholder": "Cerca sermoni...",
+    "emptyState": "Nessuno schema trovato.",
+    "defaultTitle": "Senza titolo",
+    "copyButton": "Copia",
+    "pdfButton": "PDF",
+    "txtButton": "TXT",
+    "deleteButton": "Elimina",
+    "copiedNotif": "Copia",
+    "deletedNotif": "Eliminato",
+    "deletedMessage": "Sermone rimosso con successo."
+  },
+  "raioX": {
+    "description": "Analizza i versetti biblici in profondità con confronto di versioni, etimologia e contesto storico.",
+    "label": "Riferimento Biblico",
+    "placeholder": "Es: Giovanni 3:16",
+    "loading": "Analizzando {{reference}}...",
+    "comparative": "Confronto delle Versioni",
+    "keywords": "Parole Chiave nell'Originale",
+    "historical": "Contesto Storico",
+    "literary": "Contesto Letterario",
+    "theological": "Applicazione Teologica"
+  },
+  "devocional": {
+    "description": "Genera devozioni personalizzate con lettura, meditazione e preghiera suggerita per la crescita spirituale.",
+    "label": "Tema (opzionale)",
+    "placeholder": "Es: gratitudine, perdono, fede...",
+    "loading": "Generando devozione...",
+    "reading": "Lettura del Giorno",
+    "meditation": "Meditazione",
+    "prayer": "Preghiera Suggerita"
+  },
+  "nomes": {
+    "description": "Scopri il significato dei nomi biblici attraverso l'etimologia e la storia.",
+    "label": "Parola o Nome",
+    "placeholder": "Inserisci un nome...",
+    "loading": "Cercando significato di {{name}}...",
+    "result": "Risultato della Traduzione",
+    "etymology": "Etimologia",
+    "history": "Storia del Nome",
+    "variations": "Variazioni del Nome",
+    "hebrew": "Ebraico",
+    "greek": "Greco",
+    "aramaic": "Aramaico",
+    "latin": "Latino"
+  },
+  "garimpo": {
+    "description": "Cerca versetti biblici per tema. Scopri cosa dice la Bibbia sui soggetti che cerchi.",
+    "label": "Tema di Ricerca",
+    "placeholder": "Es: ansia, perdono, fede...",
+    "suggestions": "Suggerimenti",
+    "loading": "Estraendo versetti su {{theme}}...",
+    "results": "Versetti Trovati",
+    "newSearch": "Nuova Ricerca",
+    "suggestionAnxiety": "Ansia",
+    "suggestionFaith": "Fede",
+    "suggestionStrength": "Forza",
+    "suggestionPeace": "Pace",
+    "suggestionForgiveness": "Perdono",
+    "suggestionLove": "Amore",
+    "suggestionHope": "Speranza",
+    "suggestionJoy": "Gioia",
+    "suggestionWisdom": "Saggezza",
+    "suggestionGratitude": "Gratitudine"
+  },
+  "mural": {
+    "description": "Condividi le tue richieste di preghiera con la comunità e prega per le richieste degli altri.",
+    "formTitle": "Nuova Richiesta di Preghiera",
+    "namePlaceholder": "Il tuo nome (o lascia vuoto per Anonimo)",
+    "requestPlaceholder": "La tua richiesta di preghiera...",
+    "categoryLabel": "Categoria",
+    "addImage": "Aggiungi Immagine",
+    "sending": "Invio...",
+    "submitButton": "Invia Richiesta",
+    "prayingButton": "Sto Pregando ({{count}})",
+    "emptyState": "Nessuna richiesta di preghiera ancora. Sii il primo!",
+    "errorEmpty": "Per favore, scrivi la tua richiesta di preghiera.",
+    "errorImageSize": "Immagine troppo grande. Massimo 5MB.",
+    "categoryHealth": "Salute",
+    "categoryFamily": "Famiglia",
+    "categoryFinances": "Finanze",
+    "categoryWork": "Lavoro",
+    "categorySpirituality": "Spiritualità",
+    "categoryGeneral": "Generale"
+  },
+  "voz": {
+    "description": "Ricevi una parola da Dio per il giorno. Una promessa biblica scelta specialmente per te.",
+    "button": "Ricevi Parola"
+  },
+  "pulpito": {
+    "description": "Consulta schemi condivisi da altri predicatori della comunità.",
+    "cloneButton": "Clona Schema",
+    "byAuthor": "di {{author}} • {{date}}",
+    "clonedAlert": "Schema clonato nella tua biblioteca!"
+  },
+  "biblia": {
+    "description": "Leggi la Bibbia Sacra in diverse versioni. Confronta le versioni e approfondisci lo studio delle Scritture.",
+    "bookLabel": "Libro",
+    "chapterLabel": "Cap.",
+    "verseLabel": "V.",
+    "versionLabel": "Versione",
+    "previousButton": "Precedente",
+    "nextButton": "Successivo",
+    "chapterFormat": "Cap. {{chapter}}",
+    "verseFormat": "v. {{verse}}",
+    "emptyState": "Versione non disponibile per questo libro. Prova un'altra.",
+    "error": "Errore",
+    "errorMessage": "Impossibile caricare il capitolo. Prova un'altra versione.",
+    "books": [
+      "Genesi", "Esodo", "Levitico", "Numeri", "Deuteronomio",
+      "Giosuè", "Giudici", "Rut", "1 Samuele", "2 Samuele",
+      "1 Re", "2 Re", "1 Cronache", "2 Cronache", "Esdra",
+      "Neemia", "Ester", "Giobbe", "Salmi", "Proverbi",
+      "Ecclesiaste", "Cantico dei Cantici", "Isaia", "Geremia", "Lamentazioni",
+      "Ezechiele", "Daniele", "Osea", "Gioele", "Amos",
+      "Abdia", "Giona", "Michea", "Naum", "Abacuc",
+      "Sofonia", "Aggeo", "Zaccaria", "Malachia",
+      "Matteo", "Marco", "Luca", "Giovanni", "Atti",
+      "Romani", "1 Corinzi", "2 Corinzi", "Galati", "Efesini",
+      "Filippesi", "Colossesi", "1 Tessalonicesi", "2 Tessalonicesi", "1 Timoteo",
+      "2 Timoteo", "Tito", "Filemone", "Ebrei", "Giacomo",
+      "1 Pietro", "2 Pietro", "1 Giovanni", "2 Giovanni", "3 Giovanni",
+      "Giuda", "Apocalisse"
+    ]
+  },
+  "install": {
+    "title": "Installa Strumenti del Cristiano",
+    "button": "Installa",
+    "description": "Installa la nostra app per accedere a tutti gli strumenti offline.",
+    "iosSteps": "Per installare su iOS, tocca l'icona di condivisione e poi 'Aggiungi alla schermata Home'.",
+    "androidSteps": "Per installare su Android, tocca il menu ⋮ e poi 'Installa app'."
+  },
+  "fontSize": {
+    "small": "P",
+    "medium": "M",
+    "large": "G",
+    "xlarge": "MG"
+  },
+  "notFound": {
+    "title": "Ops! Pagina non trovata",
+    "description": "La pagina che stai cercando non esiste.",
+    "button": "Torna alla Home"
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "close": "Chiudi"
+  }
+}

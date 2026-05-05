@@ -1,6 +1,8 @@
 import { Outlet } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/hooks/use-theme";
 import { Sun, Moon } from "lucide-react";
@@ -9,6 +11,7 @@ import InstallButton from "@/components/InstallButton";
 import { usePageTracking } from "@/hooks/use-tracking";
 
 const DashboardLayout = () => {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const { theme, toggleTheme } = useTheme();
   usePageTracking();
@@ -25,12 +28,13 @@ const DashboardLayout = () => {
             </div>
             <div className="flex items-center gap-2">
               <InstallButton />
+              <LanguageSwitcher variant="horizontal" />
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
                 className="text-primary hover:bg-primary/10"
-                title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+                title={theme === "dark" ? t("dashboard.lightMode") : t("dashboard.darkMode")}
               >
                 {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </Button>

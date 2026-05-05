@@ -1,0 +1,269 @@
+{
+  "appName": "Christian's Tools",
+  "subtitle": "Christian's Tools",
+  "login": {
+    "title": "Sign In",
+    "subtitle": "Access with your email approved for purchase.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "your@email.com",
+    "button": "Sign In",
+    "footer": "Exclusive access for buyers. Your email is automatically enabled after purchase confirmation.",
+    "errorEmpty": "Please enter your email.",
+    "errorNotApproved": "This email has not been approved yet. Please wait for your purchase confirmation.",
+    "errorBlocked": "This email is blocked. Please contact support."
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "subtitle": "Restricted Access",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "button": "Sign In",
+    "errorInvalid": "Invalid email or password.",
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "users": "Users",
+    "sermons": "Sermons",
+    "cache": "Generator Cache",
+    "changePassword": "Change Password",
+    "logout": "Sign Out",
+    "changePasswordTitle": "Change Admin Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "cancel": "Cancel",
+    "save": "Save",
+    "passwordTooShort": "Password too short (min. 6).",
+    "passwordMismatch": "Passwords do not match.",
+    "passwordChanged": "Password changed successfully!"
+  },
+  "sidebar": {
+    "modules": "Modules",
+    "home": "Home",
+    "logout": "Sign Out",
+    "oficina": {
+      "title": "Sermon Workshop",
+      "description": "Create and organize your outlines"
+    },
+    "esbocos": {
+      "title": "My Outlines",
+      "description": "Access your saved outlines"
+    },
+    "raioX": {
+      "title": "Verse X-Ray",
+      "description": "Analyze verses in depth"
+    },
+    "devocional": {
+      "title": "Generate Devotional",
+      "description": "Create personalized devotionals"
+    },
+    "nomes": {
+      "title": "Name Meaning",
+      "description": "Discover biblical name meanings"
+    },
+    "garimpo": {
+      "title": "Biblical Mining",
+      "description": "Search verses by theme"
+    },
+    "mural": {
+      "title": "Prayer Wall",
+      "description": "Share prayer requests"
+    },
+    "voz": {
+      "title": "God's Voice",
+      "description": "Receive a daily word"
+    },
+    "pulpito": {
+      "title": "Shared Pulpit",
+      "description": "Check community outlines"
+    },
+    "biblia": {
+      "title": "Holy Bible",
+      "description": "Read the Bible in different versions"
+    }
+  },
+  "dashboard": {
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode",
+    "install": "Install App",
+    "selectLanguage": "Select Language"
+  },
+  "oficina": {
+    "description": "Create complete sermon outlines with introduction, development, and conclusion. Customize the theme, base verse, and duration.",
+    "themeLabel": "Sermon Theme *",
+    "themePlaceholder": "Theme",
+    "verseLabel": "Base Verse (Optional)",
+    "versePlaceholder": "Ex: John 3:16",
+    "timeLabel": "Sermon Duration: {{minutes}} minutes",
+    "typeLabel": "Outline Type",
+    "typePlaceholder": "Outline Type",
+    "generateButton": "Generate Sermon",
+    "generating": "Generating...",
+    "copyButton": "Copy",
+    "pdfButton": "PDF",
+    "txtButton": "TXT",
+    "editButton": "Edit",
+    "draftButton": "Draft",
+    "finalButton": "Finalize",
+    "backButton": "Back",
+    "introduction": "Introduction",
+    "application": "Practical Application",
+    "conclusion": "Conclusion and Appeal",
+    "copiedNotif": "Copy",
+    "copiedMessage": "Sermon copied to clipboard.",
+    "draftSaved": "Draft saved!",
+    "sermonFinalized": "Sermon finalized!"
+  },
+  "esbocos": {
+    "description": "Manage all your saved outlines. Edit, share, or delete as needed.",
+    "searchPlaceholder": "Search sermons...",
+    "emptyState": "No outlines found.",
+    "defaultTitle": "Untitled",
+    "copyButton": "Copy",
+    "pdfButton": "PDF",
+    "txtButton": "TXT",
+    "deleteButton": "Delete",
+    "copiedNotif": "Copy",
+    "deletedNotif": "Deleted",
+    "deletedMessage": "Sermon removed successfully."
+  },
+  "raioX": {
+    "description": "Analyze Bible verses in depth with version comparison, etymology, and historical context.",
+    "label": "Bible Reference",
+    "placeholder": "Ex: John 3:16",
+    "loading": "Analyzing {{reference}}...",
+    "comparative": "Version Comparison",
+    "keywords": "Keywords in Original",
+    "historical": "Historical Context",
+    "literary": "Literary Context",
+    "theological": "Theological Application"
+  },
+  "devocional": {
+    "description": "Generate personalized devotionals with reading, meditation, and suggested prayer for spiritual growth.",
+    "label": "Theme (optional)",
+    "placeholder": "Ex: gratitude, forgiveness, faith...",
+    "loading": "Generating devotional...",
+    "reading": "Daily Reading",
+    "meditation": "Meditation",
+    "prayer": "Suggested Prayer"
+  },
+  "nomes": {
+    "description": "Discover the meaning of biblical names through etymology and history.",
+    "label": "Word or Name",
+    "placeholder": "Enter a name...",
+    "loading": "Searching meaning of {{name}}...",
+    "result": "Translation Result",
+    "etymology": "Etymology",
+    "history": "Name History",
+    "variations": "Name Variations",
+    "hebrew": "Hebrew",
+    "greek": "Greek",
+    "aramaic": "Aramaic",
+    "latin": "Latin"
+  },
+  "garimpo": {
+    "description": "Search Bible verses by theme. Discover what the Bible says about subjects you're looking for.",
+    "label": "Search Theme",
+    "placeholder": "Ex: anxiety, forgiveness, faith...",
+    "suggestions": "Suggestions",
+    "loading": "Mining verses about {{theme}}...",
+    "results": "Verses Found",
+    "newSearch": "New Search",
+    "suggestionAnxiety": "Anxiety",
+    "suggestionFaith": "Faith",
+    "suggestionStrength": "Strength",
+    "suggestionPeace": "Peace",
+    "suggestionForgiveness": "Forgiveness",
+    "suggestionLove": "Love",
+    "suggestionHope": "Hope",
+    "suggestionJoy": "Joy",
+    "suggestionWisdom": "Wisdom",
+    "suggestionGratitude": "Gratitude"
+  },
+  "mural": {
+    "description": "Share your prayer requests with the community and pray for others' requests.",
+    "formTitle": "New Prayer Request",
+    "namePlaceholder": "Your name (or leave blank for Anonymous)",
+    "requestPlaceholder": "Your prayer request...",
+    "categoryLabel": "Category",
+    "addImage": "Add Image",
+    "sending": "Sending...",
+    "submitButton": "Submit Request",
+    "prayingButton": "I'm Praying ({{count}})",
+    "emptyState": "No prayer requests yet. Be the first!",
+    "errorEmpty": "Please write your prayer request.",
+    "errorImageSize": "Image too large. Maximum 5MB.",
+    "categoryHealth": "Health",
+    "categoryFamily": "Family",
+    "categoryFinances": "Finances",
+    "categoryWork": "Work",
+    "categorySpirituality": "Spirituality",
+    "categoryGeneral": "General"
+  },
+  "voz": {
+    "description": "Receive a word from God for the day. A Bible promise selected especially for you.",
+    "button": "Receive Word"
+  },
+  "pulpito": {
+    "description": "Check outlines shared by other preachers in the community.",
+    "cloneButton": "Clone Outline",
+    "byAuthor": "by {{author}} • {{date}}",
+    "clonedAlert": "Outline cloned to your library!"
+  },
+  "biblia": {
+    "description": "Read the Holy Bible in different versions. Compare versions and deepen your study of Scripture.",
+    "bookLabel": "Book",
+    "chapterLabel": "Ch.",
+    "verseLabel": "V.",
+    "versionLabel": "Version",
+    "previousButton": "Previous",
+    "nextButton": "Next",
+    "chapterFormat": "Ch. {{chapter}}",
+    "verseFormat": "v. {{verse}}",
+    "emptyState": "Version not available for this book. Try another.",
+    "error": "Error",
+    "errorMessage": "Could not load the chapter. Try another version.",
+    "books": [
+      "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",
+      "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel",
+      "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra",
+      "Nehemiah", "Esther", "Job", "Psalms", "Proverbs",
+      "Ecclesiastes", "Song of Songs", "Isaiah", "Jeremiah", "Lamentations",
+      "Ezekiel", "Daniel", "Hosea", "Joel", "Amos",
+      "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk",
+      "Zephaniah", "Haggai", "Zechariah", "Malachi",
+      "Matthew", "Mark", "Luke", "John", "Acts",
+      "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians",
+      "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy",
+      "2 Timothy", "Titus", "Philemon", "Hebrews", "James",
+      "1 Peter", "2 Peter", "1 John", "2 John", "3 John",
+      "Jude", "Revelation"
+    ]
+  },
+  "install": {
+    "title": "Install Christian's Tools",
+    "button": "Install",
+    "description": "Install our app to access all tools offline.",
+    "iosSteps": "To install on iOS, tap the share icon and then 'Add to Home Screen'.",
+    "androidSteps": "To install on Android, tap the menu ⋮ and then 'Install app'."
+  },
+  "fontSize": {
+    "small": "S",
+    "medium": "M",
+    "large": "L",
+    "xlarge": "XL"
+  },
+  "notFound": {
+    "title": "Oops! Page Not Found",
+    "description": "The page you are looking for does not exist.",
+    "button": "Back to Home"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close"
+  }
+}
