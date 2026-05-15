@@ -10,7 +10,8 @@
     "footer": "Exclusive access for buyers. Your email is automatically enabled after purchase confirmation.",
     "errorEmpty": "Please enter your email.",
     "errorNotApproved": "This email has not been approved yet. Please wait for your purchase confirmation.",
-    "errorBlocked": "This email is blocked. Please contact support."
+    "errorBlocked": "This email is blocked. Please contact support.",
+    "errorExpired": "Your subscription has expired. Please renew your plan to continue accessing."
   },
   "admin": {
     "title": "Admin Panel",

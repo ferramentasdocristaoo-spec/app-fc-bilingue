@@ -10,7 +10,8 @@
     "footer": "Accesso esclusivo per gli acquirenti. La tua email viene attivata automaticamente dopo la conferma dell'acquisto.",
     "errorEmpty": "Per favore, inserisci la tua email.",
     "errorNotApproved": "Questa email non è stata ancora approvata. Per favore, attendi la conferma del tuo acquisto.",
-    "errorBlocked": "Questa email è bloccata. Per favore, contatta il supporto."
+    "errorBlocked": "Questa email è bloccata. Per favore, contatta il supporto.",
+    "errorExpired": "Il tuo abbonamento è scaduto. Rinnova il tuo piano per continuare ad accedere."
   },
   "admin": {
     "title": "Pannello di Amministrazione",

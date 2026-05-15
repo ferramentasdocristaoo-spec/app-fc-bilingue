@@ -27,16 +27,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const { data } = await supabase
       .from("approved_emails")
-      .select("id, bloqueado")
+      .select("id, bloqueado, expires_at")
       .eq("email", normalizedEmail)
       .maybeSingle();
 
     if (!data) {
-      return { error: "Este e-mail ainda não foi liberado. Aguarde a confirmação da sua compra." };
+      return { error: "notApproved" };
     }
 
     if ((data as any).bloqueado) {
-      return { error: "Este e-mail está bloqueado. Entre em contato com o suporte." };
+      return { error: "blocked" };
+    }
+
+    const expiresAt = (data as any).expires_at;
+    if (expiresAt && new Date(expiresAt) < new Date()) {
+      return { error: "expired" };
     }
 
     localStorage.setItem(AUTH_KEY, normalizedEmail);

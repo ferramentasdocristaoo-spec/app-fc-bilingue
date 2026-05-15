@@ -26,7 +26,14 @@ const LoginPage = () => {
 
     setLoading(true);
     const { error } = await signIn(email);
-    if (error) setError(error);
+    if (error) {
+      const msgs: Record<string, string> = {
+        notApproved: t("login.errorNotApproved"),
+        blocked: t("login.errorBlocked"),
+        expired: t("login.errorExpired"),
+      };
+      setError(msgs[error] ?? error);
+    }
     setLoading(false);
   };
 

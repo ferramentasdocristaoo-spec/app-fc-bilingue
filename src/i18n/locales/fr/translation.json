@@ -10,7 +10,8 @@
     "footer": "Accès exclusif aux acheteurs. Votre e-mail est automatiquement activé après la confirmation de l'achat.",
     "errorEmpty": "Veuillez entrer votre e-mail.",
     "errorNotApproved": "Cet e-mail n'a pas encore été approuvé. Veuillez attendre la confirmation de votre achat.",
-    "errorBlocked": "Cet e-mail est bloqué. Veuillez contacter le support."
+    "errorBlocked": "Cet e-mail est bloqué. Veuillez contacter le support.",
+    "errorExpired": "Votre abonnement a expiré. Veuillez renouveler votre plan pour continuer."
   },
   "admin": {
     "title": "Panneau d'administration",

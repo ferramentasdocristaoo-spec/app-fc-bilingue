@@ -10,7 +10,8 @@
     "footer": "Acceso exclusivo para compradores. Tu correo electrónico se activa automáticamente después de la confirmación de la compra.",
     "errorEmpty": "Por favor, ingresa tu correo electrónico.",
     "errorNotApproved": "Este correo electrónico aún no ha sido aprobado. Por favor, espera la confirmación de tu compra.",
-    "errorBlocked": "Este correo electrónico está bloqueado. Por favor, contacta con soporte."
+    "errorBlocked": "Este correo electrónico está bloqueado. Por favor, contacta con soporte.",
+    "errorExpired": "Tu suscripción ha expirado. Renueva tu plan para continuar accediendo."
   },
   "admin": {
     "title": "Panel de Administración",

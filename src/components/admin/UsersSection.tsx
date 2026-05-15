@@ -9,7 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { Loader2, Plus, Pencil, Trash2, Lock, Unlock, ChevronLeft, ChevronRight, Search } from "lucide-react";
 
-type Row = { id: string; email: string; bloqueado: boolean; created_at: string; total_count: number };
+type Row = { id: string; email: string; bloqueado: boolean; plan: string | null; sku: string | null; expires_at: string | null; created_at: string; total_count: number };
 const PAGE_SIZE = 50;
 
 interface Props {
@@ -27,6 +27,13 @@ const UsersSection = ({ creds, onUnauthorized }: Props) => {
 
   const [addOpen, setAddOpen] = useState(false);
   const [newEmail, setNewEmail] = useState("");
+  const [newPlan, setNewPlan] = useState<"FC-3M" | "FC-6M" | "FC-1Y" | "manual">("manual");
+  const PLAN_OPTIONS = [
+    { value: "manual", label: "Manual (sem expiração)", months: null },
+    { value: "FC-3M", label: "3 Meses", months: 3 },
+    { value: "FC-6M", label: "6 Meses", months: 6 },
+    { value: "FC-1Y", label: "Anual (12 meses)", months: 12 },
+  ];
   const [editing, setEditing] = useState<Row | null>(null);
   const [editValue, setEditValue] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<Row | null>(null);
@@ -62,10 +69,17 @@ const UsersSection = ({ creds, onUnauthorized }: Props) => {
 
   const handleAdd = async () => {
     if (!newEmail.trim()) return;
-    const { error } = await supabase.rpc("admin_add_email", { ...creds, _new_email: newEmail });
+    const selected = PLAN_OPTIONS.find((p) => p.value === newPlan);
+    const { error } = await supabase.rpc("admin_add_email", {
+      ...creds,
+      _new_email: newEmail,
+      _plan: newPlan,
+      _months: selected?.months ?? null,
+    });
     if (error) return toast.error("Erro ao adicionar.");
     toast.success("E-mail adicionado.");
     setNewEmail("");
+    setNewPlan("manual");
     setAddOpen(false);
     load();
   };
@@ -124,38 +138,49 @@ const UsersSection = ({ creds, onUnauthorized }: Props) => {
             <TableRow>
               <TableHead>E-mail</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Plano</TableHead>
+              <TableHead>Validade</TableHead>
               <TableHead>Cadastro</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={4} className="text-center py-8"><Loader2 className="w-5 h-5 animate-spin mx-auto text-muted-foreground" /></TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8"><Loader2 className="w-5 h-5 animate-spin mx-auto text-muted-foreground" /></TableCell></TableRow>
             ) : rows.length === 0 ? (
-              <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground text-sm">Nenhum e-mail encontrado.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground text-sm">Nenhum e-mail encontrado.</TableCell></TableRow>
             ) : (
-              rows.map((r) => (
-                <TableRow key={r.id}>
-                  <TableCell className="font-medium break-all">{r.email}</TableCell>
-                  <TableCell>
-                    {r.bloqueado ? (
-                      <span className="text-xs px-2 py-1 rounded-full bg-destructive/15 text-destructive">Bloqueado</span>
-                    ) : (
-                      <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">Ativo</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button size="icon" variant="ghost" onClick={() => { setEditing(r); setEditValue(r.email); }}><Pencil className="w-4 h-4" /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => handleToggle(r)}>
-                        {r.bloqueado ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => setConfirmDelete(r)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+              rows.map((r) => {
+                const expired = r.expires_at && new Date(r.expires_at) < new Date();
+                return (
+                  <TableRow key={r.id}>
+                    <TableCell className="font-medium break-all">{r.email}</TableCell>
+                    <TableCell>
+                      {r.bloqueado ? (
+                        <span className="text-xs px-2 py-1 rounded-full bg-destructive/15 text-destructive">Bloqueado</span>
+                      ) : expired ? (
+                        <span className="text-xs px-2 py-1 rounded-full bg-orange-500/15 text-orange-600">Expirado</span>
+                      ) : (
+                        <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">Ativo</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{r.plan ?? "manual"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {r.expires_at ? new Date(r.expires_at).toLocaleDateString("pt-PT") : "∞"}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-PT")}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button size="icon" variant="ghost" onClick={() => { setEditing(r); setEditValue(r.email); }}><Pencil className="w-4 h-4" /></Button>
+                        <Button size="icon" variant="ghost" onClick={() => handleToggle(r)}>
+                          {r.bloqueado ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => setConfirmDelete(r)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
@@ -177,8 +202,32 @@ const UsersSection = ({ creds, onUnauthorized }: Props) => {
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Adicionar e-mail</DialogTitle></DialogHeader>
-          <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="usuario@email.com" />
+          <DialogHeader><DialogTitle>Adicionar utilizador</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>E-mail</Label>
+              <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="usuario@email.com" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Plano</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {PLAN_OPTIONS.map((p) => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => setNewPlan(p.value as any)}
+                    className={`text-sm px-3 py-2 rounded-lg border transition text-left ${
+                      newPlan === p.value
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "border-border text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancelar</Button>
             <Button onClick={handleAdd}>Adicionar</Button>
