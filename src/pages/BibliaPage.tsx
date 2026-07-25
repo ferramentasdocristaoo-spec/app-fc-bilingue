@@ -161,7 +161,16 @@ const BibliaPage = () => {
     setLoading(true);
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const res = await fetch(`${supabaseUrl}/functions/v1/bible-proxy?version=${version}&bookId=${bookId}&chapter=${chapter}`);
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const res = await fetch(
+        `${supabaseUrl}/functions/v1/bible-proxy?version=${version}&bookId=${bookId}&chapter=${chapter}`,
+        {
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+        },
+      );
       if (!res.ok) throw new Error("Erro ao buscar capítulo");
       const data = await res.json();
       setVerses(data);
