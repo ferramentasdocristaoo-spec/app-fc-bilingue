@@ -106,6 +106,26 @@ Deno.serve(async (req) => {
       });
     }
 
+    // A SKU may unlock a library product. Access is tied to the product,
+    // therefore it remains valid in every language and for every localized cover.
+    if (sku) {
+      const { data: libraryProduct } = await supabase
+        .from("library_sku_products")
+        .select("product_slug")
+        .eq("sku", sku)
+        .maybeSingle();
+
+      if (libraryProduct) {
+        const { error: entitlementError } = await supabase
+          .from("library_entitlements")
+          .upsert(
+            { email: normalizedEmail, product_slug: libraryProduct.product_slug, source_sku: sku },
+            { onConflict: "email,product_slug" }
+          );
+        if (entitlementError) console.error("Error granting library access:", entitlementError);
+      }
+    }
+
     console.log(`Access granted: ${normalizedEmail} | plan: ${planName} | expires: ${expiresAt ?? "never"}`);
     return new Response(JSON.stringify({ success: true, email: normalizedEmail, plan: planName, expires_at: expiresAt }), {
       status: 200,

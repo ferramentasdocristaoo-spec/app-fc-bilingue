@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Home, Mic, LogOut } from "lucide-react";
+import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Home, Mic, LogOut, Library } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -32,6 +32,7 @@ export function AppSidebar() {
     { icon: Mic, title: t("sidebar.voz.title"), description: t("sidebar.voz.description"), path: "/voz-de-deus" },
     { icon: Users, title: t("sidebar.pulpito.title"), description: t("sidebar.pulpito.description"), path: "/pulpito" },
     { icon: BookOpen, title: t("sidebar.biblia.title"), description: t("sidebar.biblia.description"), path: "/biblia" },
+    { icon: Library, title: "Livraria", description: "Livros e coleções", path: "/livraria" },
   ];
 
   return (
@@ -61,7 +62,7 @@ export function AppSidebar() {
               </SidebarMenuItem>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton asChild isActive={location.pathname === item.path}>
+                  <SidebarMenuButton asChild isActive={location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)}>
                     <NavLink to={item.path}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>

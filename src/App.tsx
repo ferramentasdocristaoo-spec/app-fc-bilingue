@@ -21,6 +21,9 @@ import PulpitoPage from "./pages/PulpitoPage.tsx";
 import BibliaPage from "./pages/BibliaPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
+import LivrariaPage from "./pages/LivrariaPage.tsx";
+import ColecaoPage from "./pages/ColecaoPage.tsx";
+import LeitorPage from "./pages/LeitorPage.tsx";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -63,6 +66,9 @@ const ProtectedRoutes = () => {
         <Route path="/voz-de-deus" element={<VozDeDeusPage />} />
         <Route path="/pulpito" element={<PulpitoPage />} />
         <Route path="/biblia" element={<BibliaPage />} />
+        <Route path="/livraria" element={<LivrariaPage />} />
+        <Route path="/livraria/:productSlug" element={<ColecaoPage />} />
+        <Route path="/livraria/:productSlug/:volumeSlug" element={<LeitorPage />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

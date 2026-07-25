@@ -139,6 +139,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_library_access: {
+        Args: { _email: string; _product_slug: string }
+        Returns: boolean
+      }
       admin_add_email: {
         Args: {
           _admin_email: string
