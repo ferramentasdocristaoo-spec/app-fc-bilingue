@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PageShell from "@/components/PageShell";
+import { cleanBibleText } from "@/lib/bible-text";
 
 const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = {
   "pt-PT": [
@@ -136,6 +137,14 @@ interface Verse {
   text: string;
 }
 
+function isVerse(value: unknown): value is Verse {
+  if (!value || typeof value !== "object") return false;
+  const verse = value as Partial<Verse>;
+  return typeof verse.pk === "number"
+    && typeof verse.verse === "number"
+    && typeof verse.text === "string";
+}
+
 const BibliaPage = () => {
   const { t, i18n } = useTranslation();
   const lang = normalizeBibleLanguage(i18n.resolvedLanguage || i18n.language);
@@ -147,6 +156,7 @@ const BibliaPage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const verseRefs = useRef<Record<number, HTMLParagraphElement | null>>({});
+  const requestIdRef = useRef(0);
 
   // Reset version to language default when language changes
   useEffect(() => {
@@ -158,12 +168,13 @@ const BibliaPage = () => {
   const currentBook = BOOKS.find((b) => b.id === bookId)!;
 
   const fetchChapter = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const res = await fetch(
-        `${supabaseUrl}/functions/v1/bible-proxy?version=${version}&bookId=${bookId}&chapter=${chapter}`,
+        `${supabaseUrl}/functions/v1/bible-proxy?version=${encodeURIComponent(version)}&bookId=${bookId}&chapter=${chapter}`,
         {
           headers: {
             apikey: supabaseKey,
@@ -172,15 +183,24 @@ const BibliaPage = () => {
         },
       );
       if (!res.ok) throw new Error("Erro ao buscar capítulo");
-      const data = await res.json();
-      setVerses(data);
+      const data: unknown = await res.json();
+      if (!Array.isArray(data)) throw new Error("Resposta inválida da Bíblia");
+
+      const validVerses = data
+        .filter(isVerse)
+        .map((verse) => ({ ...verse, text: cleanBibleText(verse.text) }));
+
+      if (validVerses.length === 0) throw new Error("Capítulo vazio");
+      if (requestId === requestIdRef.current) setVerses(validVerses);
     } catch {
-      toast({ title: t("biblia.error"), description: t("biblia.errorMessage"), variant: "destructive" });
-      setVerses([]);
+      if (requestId === requestIdRef.current) {
+        toast({ title: t("biblia.error"), description: t("biblia.errorMessage"), variant: "destructive" });
+        setVerses([]);
+      }
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
-  }, [version, bookId, chapter]);
+  }, [version, bookId, chapter, t]);
 
   useEffect(() => {
     fetchChapter();
@@ -214,7 +234,7 @@ const BibliaPage = () => {
     <PageShell title={t("sidebar.biblia.title")}>
       {/* Selectors */}
       <div className="flex flex-wrap gap-2 mb-4">
-        <Select value={String(bookId)} onValueChange={(v) => { setBookId(Number(v)); setChapter(1); }}>
+        <Select value={String(bookId)} onValueChange={(v) => { setBookId(Number(v)); setChapter(1); setSelectedVerse(null); }}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={t("biblia.bookLabel")} />
           </SelectTrigger>
@@ -253,7 +273,7 @@ const BibliaPage = () => {
           </Select>
         )}
 
-        <Select value={version} onValueChange={setVersion}>
+        <Select value={version} onValueChange={(value) => { setVersion(value); setSelectedVerse(null); }}>
           <SelectTrigger className="w-[260px]">
             <SelectValue placeholder={t("biblia.versionLabel")} />
           </SelectTrigger>
@@ -284,7 +304,7 @@ const BibliaPage = () => {
               className={`leading-relaxed text-foreground rounded px-1 transition-colors ${selectedVerse === v.verse ? "bg-primary/15" : ""}`}
             >
               <span className="font-bold text-primary mr-1 text-xs align-super">{v.verse}</span>
-              <span dangerouslySetInnerHTML={{ __html: v.text }} />
+              <span className="whitespace-pre-line">{v.text}</span>
             </p>
           ))}
         </div>
