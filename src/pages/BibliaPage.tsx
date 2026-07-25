@@ -8,58 +8,58 @@ import PageShell from "@/components/PageShell";
 
 const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = {
   "pt-PT": [
-    { id: "ARA", name: "ARA - Almeida Revista e Atualizada" },
-    { id: "ACF11", name: "ACF - Almeida Corrigida Fiel" },
-    { id: "ARC09", name: "ARC - Almeida Revista e Corrigida" },
-    { id: "NVIPT", name: "NVI - Nova Versão Internacional" },
-    { id: "NAA", name: "NAA - Nova Almeida Atualizada" },
-    { id: "NBV07", name: "NBV - Nova Bíblia Viva" },
-    { id: "NTLH", name: "NTLH - Nova Tradução Ling. de Hoje" },
-    { id: "NVT", name: "NVT - Nova Versão Transformadora" },
-    { id: "ALM21", name: "AS21 - Almeida Século 21" },
-    { id: "KJA", name: "KJA - King James Atualizada" },
-    { id: "VFL", name: "VFL - Versão Fácil de Ler" },
-    { id: "MENS", name: "A Mensagem" },
-    { id: "OL", name: "OL - O Livro" },
+    { id: "OL", name: "OL - O Livro (Português Europeu)" },
+    { id: "NVIPT", name: "NVI-PT - Nova Versão Internacional" },
   ],
   "en": [
     { id: "KJV", name: "KJV - King James Version" },
     { id: "NKJV", name: "NKJV - New King James Version" },
+    { id: "NIV2011", name: "NIV - New International Version" },
+    { id: "ESV", name: "ESV - English Standard Version" },
+    { id: "NLT", name: "NLT - New Living Translation" },
     { id: "WEB", name: "WEB - World English Bible" },
     { id: "ASV", name: "ASV - American Standard Version" },
     { id: "YLT", name: "YLT - Young's Literal Translation" },
-    { id: "BBE", name: "BBE - Bible in Basic English" },
-    { id: "DARBY", name: "DARBY - Darby Translation" },
+    { id: "MSG", name: "MSG - The Message" },
   ],
   "es": [
-    { id: "RVR60", name: "RVR60 - Reina-Valera 1960" },
-    { id: "RVR95", name: "RVR95 - Reina-Valera 1995" },
+    { id: "RV1960", name: "RVR60 - Reina-Valera 1960" },
+    { id: "RV2004", name: "RVG - Reina Valera Gómez 2004" },
     { id: "NVI", name: "NVI - Nueva Versión Internacional" },
-    { id: "BTX", name: "BTX - Biblia Textual" },
-    { id: "DHH94", name: "DHH - Dios Habla Hoy" },
+    { id: "BTX3", name: "BTX3 - Biblia Textual 3ª Edición" },
+    { id: "NTV", name: "NTV - Nueva Traducción Viviente" },
+    { id: "PDT", name: "PDT - Palabra de Dios para Todos" },
+    { id: "LBLA", name: "LBLA - La Biblia de las Américas" },
   ],
   "fr": [
-    { id: "LSG", name: "LSG - Louis Segond 1910" },
-    { id: "NEG79", name: "NEG79 - Nouvelle Édition de Genève" },
+    { id: "FRLSG", name: "LSG - Louis Segond 1910" },
     { id: "NBS", name: "NBS - Nouvelle Bible Segond" },
-    { id: "BFC", name: "BFC - Bible en Français Courant" },
-    { id: "PDV2017", name: "PDV - Parole de Vie" },
+    { id: "FRPDV17", name: "PDV - Parole de Vie 2017" },
+    { id: "BDS", name: "BDS - Bible du Semeur" },
+    { id: "FRDBY", name: "DBY - Bible de Darby" },
   ],
   "it": [
-    { id: "CEI", name: "CEI - Conferenza Episcopale Italiana" },
     { id: "NR06", name: "NR06 - Nuova Riveduta 2006" },
-    { id: "TILC", name: "TILC - Traduzione Interconfessionale" },
-    { id: "IEP", name: "IEP - Riveduta 1927" },
   ],
 };
 
 const DEFAULT_VERSION_BY_LANG: Record<string, string> = {
-  "pt-PT": "ARA",
+  "pt-PT": "OL",
   "en": "KJV",
-  "es": "RVR60",
-  "fr": "LSG",
-  "it": "CEI",
+  "es": "RV1960",
+  "fr": "FRLSG",
+  "it": "NR06",
 };
+
+function normalizeBibleLanguage(language: string): keyof typeof VERSIONS_BY_LANG {
+  const normalized = language.toLowerCase();
+
+  if (normalized.startsWith("en")) return "en";
+  if (normalized.startsWith("es")) return "es";
+  if (normalized.startsWith("fr")) return "fr";
+  if (normalized.startsWith("it")) return "it";
+  return "pt-PT";
+}
 
 const BOOKS = [
   { id: 1, name: "Gênesis", chapters: 50 },
@@ -138,9 +138,9 @@ interface Verse {
 
 const BibliaPage = () => {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language;
-  const versions = VERSIONS_BY_LANG[lang] ?? VERSIONS_BY_LANG["pt-PT"];
-  const [version, setVersion] = useState(() => DEFAULT_VERSION_BY_LANG[lang] ?? "ARA");
+  const lang = normalizeBibleLanguage(i18n.resolvedLanguage || i18n.language);
+  const versions = VERSIONS_BY_LANG[lang];
+  const [version, setVersion] = useState(() => DEFAULT_VERSION_BY_LANG[lang]);
   const [bookId, setBookId] = useState(1);
   const [chapter, setChapter] = useState(1);
   const [verses, setVerses] = useState<Verse[]>([]);
@@ -150,7 +150,7 @@ const BibliaPage = () => {
 
   // Reset version to language default when language changes
   useEffect(() => {
-    setVersion(DEFAULT_VERSION_BY_LANG[lang] ?? "ARA");
+    setVersion(DEFAULT_VERSION_BY_LANG[lang]);
     setVerses([]);
   }, [lang]);
 
