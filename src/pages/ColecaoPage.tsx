@@ -9,22 +9,24 @@ import { getVolumeProgress, libraryProduct } from "@/data/library";
 export default function ColecaoPage() {
   const { productSlug } = useParams();
   const { t, i18n } = useTranslation();
-  const product = libraryProduct(i18n.resolvedLanguage || i18n.language);
-  if (productSlug !== product.slug) return <Navigate to="/livraria" replace />;
+  const product = libraryProduct(i18n.resolvedLanguage || i18n.language, productSlug ?? "");
+  if (!product) return <Navigate to="/livraria" replace />;
 
   return (
     <PageShell title={product.title}>
       <Link to="/livraria" className="mb-2 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />{t("livraria.back")}</Link>
-      <p className="mb-6 text-sm text-muted-foreground">{t("livraria.orderNote")}</p>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      {product.slug === "apocalipse-revelado" && (
+        <p className="mb-6 text-sm text-muted-foreground">{t("livraria.orderNote")}</p>
+      )}
+      <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {product.volumes.map((volume) => {
-          const progress = getVolumeProgress(volume.slug);
+          const progress = getVolumeProgress(product.slug, volume.slug);
           return (
             <Link key={volume.slug} to={`/livraria/${product.slug}/${volume.slug}`} className="group">
               <BookCover title={volume.title} volume={volume.number} className="aspect-[2/3] w-full transition group-hover:-translate-y-1 group-hover:shadow-2xl" />
               <div className="mt-3 flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{volume.ref}</p>
+                  {volume.ref && <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{volume.ref}</p>}
                   <h2 className="text-sm font-semibold leading-tight group-hover:text-primary">{volume.title}</h2>
                 </div>
                 {progress >= 100 && <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}

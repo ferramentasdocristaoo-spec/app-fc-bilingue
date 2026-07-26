@@ -72,7 +72,10 @@ function parseChapters(content: string): Chapter[] {
 }
 
 const isSubheading = (line: string) =>
-  line.length < 60 && (/^\d+\.\s/.test(line) || !/[.!?…»”"]\)?$/.test(line));
+  line.length < 60 &&
+  !/^V\.?\s?\d/i.test(line) &&
+  !line.includes(" - ") &&
+  (/^\d+\.\s/.test(line) || /^[IVX]+\.\s/.test(line) || !/[.!?…»”")\]]$/.test(line));
 
 const isQuote = (line: string) => /^["“«]/.test(line);
 
@@ -81,8 +84,8 @@ export default function LeitorPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { email } = useAuth();
-  const product = libraryProduct(i18n.resolvedLanguage || i18n.language);
-  const volume = product.volumes.find((item) => item.slug === volumeSlug);
+  const product = libraryProduct(i18n.resolvedLanguage || i18n.language, productSlug ?? "");
+  const volume = product?.volumes.find((item) => item.slug === volumeSlug);
 
   const [book, setBook] = useState<VolumeContent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -101,7 +104,7 @@ export default function LeitorPage() {
     supabase.functions.invoke("library-content", {
       body: {
         email,
-        product_slug: product.slug,
+        product_slug: productSlug,
         volume_slug: volumeSlug,
         language: libraryLanguage(i18n.resolvedLanguage || i18n.language),
       },
@@ -117,7 +120,7 @@ export default function LeitorPage() {
       if (saved.tema) setTema(saved.tema);
     } catch { /* estado salvo inválido é ignorado */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email, i18n.language, i18n.resolvedLanguage, product.slug, volumeSlug]);
+  }, [email, i18n.language, i18n.resolvedLanguage, productSlug, volumeSlug]);
 
   const chapters = useMemo(() => (book ? parseChapters(book.content) : []), [book]);
   const total = chapters.length;
@@ -127,8 +130,8 @@ export default function LeitorPage() {
     try {
       localStorage.setItem(storageKey, JSON.stringify({ cap, fonte, tema }));
     } catch { /* armazenamento indisponível */ }
-    if (volumeSlug && total > 0) setVolumeProgress(volumeSlug, ((cap + 1) / total) * 100);
-  }, [cap, fonte, tema, storageKey, volumeSlug, total]);
+    if (productSlug && volumeSlug && total > 0) setVolumeProgress(productSlug, volumeSlug, ((cap + 1) / total) * 100);
+  }, [cap, fonte, tema, storageKey, productSlug, volumeSlug, total]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
@@ -136,12 +139,12 @@ export default function LeitorPage() {
 
   const anterior = useCallback(() => setCap((value) => Math.max(0, value - 1)), []);
   const proximo = useCallback(() => setCap((value) => Math.min(total - 1, value + 1)), [total]);
-  const fechar = useCallback(() => navigate(`/livraria/${product.slug}`), [navigate, product.slug]);
+  const fechar = useCallback(() => navigate(`/livraria/${productSlug}`), [navigate, productSlug]);
 
   const concluir = useCallback(() => {
-    if (volumeSlug) setVolumeProgress(volumeSlug, 100);
+    if (productSlug && volumeSlug) setVolumeProgress(productSlug, volumeSlug, 100);
     fechar();
-  }, [volumeSlug, fechar]);
+  }, [productSlug, volumeSlug, fechar]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -153,7 +156,7 @@ export default function LeitorPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [anterior, proximo, fechar]);
 
-  if (productSlug !== product.slug || !volume) return <Navigate to="/livraria" replace />;
+  if (!product || !volume) return <Navigate to="/livraria" replace />;
 
   const theme = THEMES[tema];
   const progresso = total > 0 ? ((cap + 1) / total) * 100 : 0;
