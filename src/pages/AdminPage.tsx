@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,8 @@ const SS_PASS = "fc-admin-pass";
 type Tab = "dashboard" | "analytics" | "users" | "sermons" | "cache" | "livraria";
 
 const AdminPage = () => {
-  const { t } = useTranslation();
+  // O painel admin é sempre exibido em português, independente do idioma do app.
+  const t = i18n.getFixedT("pt-PT");
   const [authed, setAuthed] = useState(false);
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPass, setAdminPass] = useState("");
