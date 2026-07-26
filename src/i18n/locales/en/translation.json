@@ -34,7 +34,8 @@
     "save": "Save",
     "passwordTooShort": "Password too short (min. 6).",
     "passwordMismatch": "Passwords do not match.",
-    "passwordChanged": "Password changed successfully!"
+    "passwordChanged": "Password changed successfully!",
+    "livraria": "Library"
   },
   "sidebar": {
     "modules": "Modules",

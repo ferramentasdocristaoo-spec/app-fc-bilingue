@@ -10,7 +10,32 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
+    PostgrestVersion: "14.5"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -67,21 +92,147 @@ export type Database = {
           bloqueado: boolean
           created_at: string
           email: string
+          expires_at: string | null
           id: string
+          plan: string | null
+          sku: string | null
         }
         Insert: {
           bloqueado?: boolean
           created_at?: string
           email: string
+          expires_at?: string | null
           id?: string
+          plan?: string | null
+          sku?: string | null
         }
         Update: {
           bloqueado?: boolean
           created_at?: string
           email?: string
+          expires_at?: string | null
           id?: string
+          plan?: string | null
+          sku?: string | null
         }
         Relationships: []
+      }
+      library_entitlements: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          product_slug: string
+          source_sku: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          product_slug: string
+          source_sku?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          product_slug?: string
+          source_sku?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_entitlements_product_slug_fkey"
+            columns: ["product_slug"]
+            isOneToOne: false
+            referencedRelation: "library_products"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      library_products: {
+        Row: {
+          active: boolean
+          created_at: string
+          slug: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          slug: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      library_sku_products: {
+        Row: {
+          product_slug: string
+          sku: string
+        }
+        Insert: {
+          product_slug: string
+          sku: string
+        }
+        Update: {
+          product_slug?: string
+          sku?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_sku_products_product_slug_fkey"
+            columns: ["product_slug"]
+            isOneToOne: false
+            referencedRelation: "library_products"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      library_volumes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          language: string
+          product_slug: string
+          title: string
+          updated_at: string
+          volume_slug: string
+          word_count: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          language?: string
+          product_slug: string
+          title: string
+          updated_at?: string
+          volume_slug: string
+          word_count?: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          language?: string
+          product_slug?: string
+          title?: string
+          updated_at?: string
+          volume_slug?: string
+          word_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_volumes_product_slug_fkey"
+            columns: ["product_slug"]
+            isOneToOne: false
+            referencedRelation: "library_products"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       prayer_requests: {
         Row: {
@@ -113,6 +264,27 @@ export type Database = {
         }
         Relationships: []
       }
+      sku_plans: {
+        Row: {
+          created_at: string
+          months: number
+          plan_name: string
+          sku: string
+        }
+        Insert: {
+          created_at?: string
+          months: number
+          plan_name: string
+          sku: string
+        }
+        Update: {
+          created_at?: string
+          months?: number
+          plan_name?: string
+          sku?: string
+        }
+        Relationships: []
+      }
       usage_logs: {
         Row: {
           created_at: string
@@ -139,15 +311,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_library_access: {
-        Args: { _email: string; _product_slug: string }
-        Returns: boolean
-      }
-      admin_add_email: {
+      admin_add_email:
+        | {
+            Args: {
+              _admin_email: string
+              _admin_password: string
+              _new_email: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              _admin_email: string
+              _admin_password: string
+              _months?: number
+              _new_email: string
+              _plan?: string
+            }
+            Returns: undefined
+          }
+      admin_add_library_sku: {
         Args: {
           _admin_email: string
           _admin_password: string
-          _new_email: string
+          _product_slug: string
+          _sku: string
         }
         Returns: undefined
       }
@@ -180,6 +368,23 @@ export type Database = {
       }
       admin_delete_email: {
         Args: { _admin_email: string; _admin_password: string; _id: string }
+        Returns: undefined
+      }
+      admin_delete_library_sku: {
+        Args: { _admin_email: string; _admin_password: string; _sku: string }
+        Returns: undefined
+      }
+      admin_delete_sku_plan: {
+        Args: { _admin_email: string; _admin_password: string; _sku: string }
+        Returns: undefined
+      }
+      admin_grant_library_access: {
+        Args: {
+          _admin_email: string
+          _admin_password: string
+          _email: string
+          _product_slug: string
+        }
         Returns: undefined
       }
       admin_list_cache: {
@@ -220,13 +425,53 @@ export type Database = {
           bloqueado: boolean
           created_at: string
           email: string
+          expires_at: string
           id: string
+          plan: string
+          sku: string
           total_count: number
+        }[]
+      }
+      admin_list_library_entitlements: {
+        Args: {
+          _admin_email: string
+          _admin_password: string
+          _limit?: number
+          _offset?: number
+          _search?: string
+        }
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          product_slug: string
+          source_sku: string
+          total_count: number
+        }[]
+      }
+      admin_list_library_skus: {
+        Args: { _admin_email: string; _admin_password: string }
+        Returns: {
+          product_slug: string
+          sku: string
+        }[]
+      }
+      admin_list_sku_plans: {
+        Args: { _admin_email: string; _admin_password: string }
+        Returns: {
+          created_at: string
+          months: number
+          plan_name: string
+          sku: string
         }[]
       }
       admin_retention_stats: {
         Args: { _admin_email: string; _admin_password: string; _days?: number }
         Returns: Json
+      }
+      admin_revoke_library_access: {
+        Args: { _admin_email: string; _admin_password: string; _id: string }
+        Returns: undefined
       }
       admin_toggle_block: {
         Args: {
@@ -261,6 +506,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_upsert_sku_plan: {
+        Args: {
+          _admin_email: string
+          _admin_password: string
+          _months: number
+          _plan_name: string
+          _sku: string
+        }
+        Returns: undefined
+      }
       admin_usage_by_day: {
         Args: { _admin_email: string; _admin_password: string; _days?: number }
         Returns: {
@@ -288,6 +543,10 @@ export type Database = {
           day: string
           new_users: number
         }[]
+      }
+      has_library_access: {
+        Args: { _email: string; _product_slug: string }
+        Returns: boolean
       }
       log_tool_usage: {
         Args: { _email: string; _tool: string }
@@ -425,6 +684,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
