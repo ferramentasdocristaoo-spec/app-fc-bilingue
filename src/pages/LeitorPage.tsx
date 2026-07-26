@@ -1,9 +1,18 @@
-import { Link, Navigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, BookOpen, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { libraryLanguage, libraryProduct } from "@/data/library";
+import {
+  AArrowDown,
+  AArrowUp,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  List,
+  Loader2,
+  Palette,
+  X,
+} from "lucide-react";
+import { libraryLanguage, libraryProduct, setVolumeProgress } from "@/data/library";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -14,15 +23,77 @@ interface VolumeContent {
   word_count: number;
 }
 
+interface Chapter {
+  title: string;
+  lines: string[];
+}
+
+type ThemeName = "bege" | "sepia" | "noturno";
+
+const THEMES: Record<ThemeName, { bg: string; papel: string; texto: string; sub: string; borda: string }> = {
+  bege: {
+    bg: "hsl(40 35% 90%)",
+    papel: "hsl(42 50% 97%)",
+    texto: "hsl(28 30% 14%)",
+    sub: "hsl(30 15% 40%)",
+    borda: "hsl(38 26% 84%)",
+  },
+  sepia: {
+    bg: "hsl(36 45% 82%)",
+    papel: "hsl(38 55% 90%)",
+    texto: "hsl(28 40% 18%)",
+    sub: "hsl(30 25% 38%)",
+    borda: "hsl(34 30% 72%)",
+  },
+  noturno: {
+    bg: "hsl(28 15% 8%)",
+    papel: "hsl(28 12% 12%)",
+    texto: "hsl(40 25% 82%)",
+    sub: "hsl(38 15% 60%)",
+    borda: "hsl(28 12% 22%)",
+  },
+};
+
+const GOLD = "hsl(42 65% 47%)";
+const GOLD_GRADIENT = "linear-gradient(135deg, #604224, #C6972A)";
+
+// Cada capítulo é um bloco separado por linha em branco; a primeira linha é o título.
+// O bloco inicial (título do livro em maiúsculas) é descartado.
+function parseChapters(content: string): Chapter[] {
+  const blocks = content
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+  while (blocks.length > 1 && blocks[0] === blocks[0].toUpperCase()) blocks.shift();
+  return blocks.map((block) => {
+    const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+    return { title: lines[0] ?? "", lines: lines.slice(1) };
+  });
+}
+
+const isSubheading = (line: string) =>
+  line.length < 60 && (/^\d+\.\s/.test(line) || !/[.!?…»”"]\)?$/.test(line));
+
+const isQuote = (line: string) => /^["“«]/.test(line);
+
 export default function LeitorPage() {
   const { productSlug, volumeSlug } = useParams();
+  const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { email } = useAuth();
   const product = libraryProduct(i18n.resolvedLanguage || i18n.language);
   const volume = product.volumes.find((item) => item.slug === volumeSlug);
+
   const [book, setBook] = useState<VolumeContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [cap, setCap] = useState(0);
+  const [fonte, setFonte] = useState(19);
+  const [tema, setTema] = useState<ThemeName>("bege");
+  const [sumario, setSumario] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const storageKey = `fc-leitura:${productSlug}:${volumeSlug}`;
 
   useEffect(() => {
     if (!email || !volumeSlug) return;
@@ -39,36 +110,225 @@ export default function LeitorPage() {
       else setBook(data as VolumeContent);
       setLoading(false);
     });
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) ?? "{}");
+      if (saved.cap) setCap(saved.cap);
+      if (saved.fonte) setFonte(saved.fonte);
+      if (saved.tema) setTema(saved.tema);
+    } catch { /* estado salvo inválido é ignorado */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, i18n.language, i18n.resolvedLanguage, product.slug, volumeSlug]);
+
+  const chapters = useMemo(() => (book ? parseChapters(book.content) : []), [book]);
+  const total = chapters.length;
+  const chapter = chapters[Math.min(cap, Math.max(total - 1, 0))];
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({ cap, fonte, tema }));
+    } catch { /* armazenamento indisponível */ }
+    if (volumeSlug && total > 0) setVolumeProgress(volumeSlug, ((cap + 1) / total) * 100);
+  }, [cap, fonte, tema, storageKey, volumeSlug, total]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [cap]);
+
+  const anterior = useCallback(() => setCap((value) => Math.max(0, value - 1)), []);
+  const proximo = useCallback(() => setCap((value) => Math.min(total - 1, value + 1)), [total]);
+  const fechar = useCallback(() => navigate(`/livraria/${product.slug}`), [navigate, product.slug]);
+
+  const concluir = useCallback(() => {
+    if (volumeSlug) setVolumeProgress(volumeSlug, 100);
+    fechar();
+  }, [volumeSlug, fechar]);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") anterior();
+      if (event.key === "ArrowRight") proximo();
+      if (event.key === "Escape") fechar();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [anterior, proximo, fechar]);
 
   if (productSlug !== product.slug || !volume) return <Navigate to="/livraria" replace />;
 
+  const theme = THEMES[tema];
+  const progresso = total > 0 ? ((cap + 1) / total) * 100 : 0;
+
+  const iconButton = "w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70";
+
   return (
-    <div className="min-h-full bg-[#f4efe5] text-stone-900 dark:bg-stone-950 dark:text-stone-100">
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-stone-300/60 bg-[#f4efe5]/95 px-4 py-3 backdrop-blur dark:border-stone-800 dark:bg-stone-950/95">
-        <Button variant="ghost" size="sm" asChild><Link to={`/livraria/${product.slug}`}><ArrowLeft className="mr-2 h-4 w-4" />Coleção</Link></Button>
-        <span className="max-w-[50vw] truncate text-sm font-semibold">{volume.title}</span>
-        <span className="text-xs text-muted-foreground">{volume.number}/8</span>
+    <div
+      className="fixed inset-0 z-[100] flex flex-col"
+      style={{ background: theme.bg, height: "100dvh" }}
+      role="dialog"
+      aria-label={`Lendo: ${volume.title}`}
+    >
+      <header
+        className="flex items-center justify-between px-3 py-2 shrink-0"
+        style={{ borderBottom: `1px solid ${theme.borda}` }}
+      >
+        <button onClick={() => setSumario((open) => !open)} aria-label="Sumário" className={iconButton} style={{ color: theme.sub }}>
+          <List className="h-5 w-5" />
+        </button>
+        <div
+          className="flex-1 truncate px-2 text-center font-mono text-[10px] uppercase tracking-[0.2em]"
+          style={{ color: theme.sub }}
+        >
+          {chapter?.title ?? volume.title}
+        </div>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setFonte((size) => Math.max(15, size - 2))} aria-label="Diminuir letra" className={iconButton} style={{ color: theme.sub }}>
+            <AArrowDown className="h-5 w-5" />
+          </button>
+          <button onClick={() => setFonte((size) => Math.min(29, size + 2))} aria-label="Aumentar letra" className={iconButton} style={{ color: theme.sub }}>
+            <AArrowUp className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setTema((current) => (current === "bege" ? "sepia" : current === "sepia" ? "noturno" : "bege"))}
+            aria-label="Mudar tema"
+            className={iconButton}
+            style={{ color: theme.sub }}
+          >
+            <Palette className="h-5 w-5" />
+          </button>
+          <button onClick={fechar} aria-label="Fechar leitura" className={iconButton} style={{ color: theme.sub }}>
+            <X className="h-5 w-5" />
+          </button>
+        </div>
       </header>
-      <main className="mx-auto max-w-2xl px-6 py-16">
-        {loading ? <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /> : error || !book ? (
-          <div className="text-center"><BookOpen className="mx-auto mb-5 h-12 w-12 text-primary" /><p>Não foi possível abrir este conteúdo.</p></div>
+
+      <div className="h-[3px] shrink-0" style={{ background: theme.borda }}>
+        <div
+          className="h-full transition-all duration-300"
+          style={{ width: `${progresso}%`, background: GOLD }}
+        />
+      </div>
+
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+        {loading ? (
+          <div className="flex h-full items-center justify-center">
+            <Loader2 className="h-9 w-9 animate-spin" style={{ color: GOLD }} />
+          </div>
+        ) : error || !book ? (
+          <div className="flex h-full flex-col items-center justify-center px-8 text-center">
+            <BookOpen className="mb-3 h-8 w-8" style={{ color: theme.sub }} />
+            <p style={{ color: theme.sub }}>Não foi possível carregar o livro.</p>
+          </div>
         ) : (
-          <>
-            <div className="text-center">
-              <p className="mb-2 text-xs uppercase tracking-[0.25em] text-primary">Volume {volume.number}</p>
-              <h1 className="font-display text-3xl font-bold">{book.title}</h1>
-              <p className="mt-3 text-xs text-stone-500">{book.word_count.toLocaleString()} palavras</p>
-              <div className="mx-auto my-8 h-px w-24 bg-primary/40" />
+          <article
+            className="mx-auto px-6 py-10 sm:px-8"
+            style={{
+              maxWidth: 680,
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              fontSize: fonte,
+              lineHeight: 1.75,
+              color: theme.texto,
+            }}
+          >
+            <h2 className="font-display mb-8 font-bold" style={{ fontSize: fonte * 1.6, lineHeight: 1.2 }}>
+              {chapter?.title}
+            </h2>
+            {chapter?.lines.map((line, index) =>
+              isQuote(line) ? (
+                <blockquote
+                  key={index}
+                  className="my-6 border-l-2 pl-4 italic"
+                  style={{ borderColor: GOLD, color: theme.sub }}
+                >
+                  {line}
+                </blockquote>
+              ) : isSubheading(line) ? (
+                <h3
+                  key={index}
+                  className="font-display mb-3 mt-8 font-semibold"
+                  style={{ fontSize: fonte * 1.15, lineHeight: 1.3 }}
+                >
+                  {line}
+                </h3>
+              ) : (
+                <p key={index} className="mb-5 text-justify">
+                  {line}
+                </p>
+              ),
+            )}
+
+            <div className="mb-6 mt-12 flex items-center justify-between gap-3">
+              {cap > 0 ? (
+                <button
+                  onClick={anterior}
+                  className="inline-flex items-center gap-1.5 rounded-xl px-4 py-3 font-sans text-sm font-semibold transition-opacity hover:opacity-80"
+                  style={{ border: `1px solid ${theme.borda}`, color: theme.sub }}
+                >
+                  <ChevronLeft className="h-4 w-4" /> Anterior
+                </button>
+              ) : (
+                <span />
+              )}
+              {cap < total - 1 ? (
+                <button
+                  onClick={proximo}
+                  className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3 font-sans text-sm font-semibold text-white transition-transform hover:-translate-y-px"
+                  style={{ background: GOLD_GRADIENT, boxShadow: "0 8px 24px -8px rgba(198,151,42,0.55)" }}
+                >
+                  Próximo capítulo <ChevronRight className="h-4 w-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={concluir}
+                  className="rounded-xl px-5 py-3 font-sans text-sm font-semibold text-white transition-transform hover:-translate-y-px"
+                  style={{ background: GOLD_GRADIENT, boxShadow: "0 8px 24px -8px rgba(198,151,42,0.55)" }}
+                >
+                  Concluir leitura ✓
+                </button>
+              )}
             </div>
-            <article className="space-y-5 text-[1.08rem] leading-8">
-              {book.content.split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => (
-                <p key={index} className="whitespace-pre-line">{paragraph.trim()}</p>
-              ))}
-            </article>
-          </>
+            <p className="mb-4 text-center font-mono text-[11px]" style={{ color: theme.sub }}>
+              Capítulo {cap + 1} de {total}
+            </p>
+          </article>
         )}
-      </main>
+      </div>
+
+      {sumario && book && (
+        <div className="absolute inset-0 z-10 flex" style={{ top: 49 }}>
+          <div
+            className="h-full w-[300px] max-w-[85vw] overflow-y-auto p-4"
+            style={{ background: theme.papel, borderRight: `1px solid ${theme.borda}` }}
+          >
+            <p className="font-display mb-1 text-lg font-bold" style={{ color: theme.texto }}>
+              {volume.title}
+            </p>
+            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em]" style={{ color: theme.sub }}>
+              {total} capítulos
+            </p>
+            {chapters.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setCap(index);
+                  setSumario(false);
+                }}
+                className="mb-1 block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors"
+                style={
+                  index === cap
+                    ? { background: GOLD_GRADIENT, color: "#fff", fontWeight: 600 }
+                    : { color: theme.texto }
+                }
+              >
+                <span className="mr-2 font-mono text-[10px]" style={index === cap ? undefined : { color: theme.sub }}>
+                  {index + 1}
+                </span>
+                {item.title}
+              </button>
+            ))}
+          </div>
+          <button aria-label="Fechar sumário" className="flex-1" onClick={() => setSumario(false)} style={{ background: "rgba(0,0,0,0.25)" }} />
+        </div>
+      )}
     </div>
   );
 }
