@@ -79,7 +79,7 @@ const isQuote = (line: string) => /^["“«]/.test(line);
 export default function LeitorPage() {
   const { productSlug, volumeSlug } = useParams();
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { email } = useAuth();
   const product = libraryProduct(i18n.resolvedLanguage || i18n.language);
   const volume = product.volumes.find((item) => item.slug === volumeSlug);
@@ -171,7 +171,7 @@ export default function LeitorPage() {
         className="flex items-center justify-between px-3 py-2 shrink-0"
         style={{ borderBottom: `1px solid ${theme.borda}` }}
       >
-        <button onClick={() => setSumario((open) => !open)} aria-label="Sumário" className={iconButton} style={{ color: theme.sub }}>
+        <button onClick={() => setSumario((open) => !open)} aria-label={t("livraria.reader.toc")} className={iconButton} style={{ color: theme.sub }}>
           <List className="h-5 w-5" />
         </button>
         <div
@@ -181,21 +181,21 @@ export default function LeitorPage() {
           {chapter?.title ?? volume.title}
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={() => setFonte((size) => Math.max(15, size - 2))} aria-label="Diminuir letra" className={iconButton} style={{ color: theme.sub }}>
+          <button onClick={() => setFonte((size) => Math.max(15, size - 2))} aria-label={t("livraria.reader.decreaseFont")} className={iconButton} style={{ color: theme.sub }}>
             <AArrowDown className="h-5 w-5" />
           </button>
-          <button onClick={() => setFonte((size) => Math.min(29, size + 2))} aria-label="Aumentar letra" className={iconButton} style={{ color: theme.sub }}>
+          <button onClick={() => setFonte((size) => Math.min(29, size + 2))} aria-label={t("livraria.reader.increaseFont")} className={iconButton} style={{ color: theme.sub }}>
             <AArrowUp className="h-5 w-5" />
           </button>
           <button
             onClick={() => setTema((current) => (current === "bege" ? "sepia" : current === "sepia" ? "noturno" : "bege"))}
-            aria-label="Mudar tema"
+            aria-label={t("livraria.reader.changeTheme")}
             className={iconButton}
             style={{ color: theme.sub }}
           >
             <Palette className="h-5 w-5" />
           </button>
-          <button onClick={fechar} aria-label="Fechar leitura" className={iconButton} style={{ color: theme.sub }}>
+          <button onClick={fechar} aria-label={t("livraria.reader.close")} className={iconButton} style={{ color: theme.sub }}>
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -216,7 +216,7 @@ export default function LeitorPage() {
         ) : error || !book ? (
           <div className="flex h-full flex-col items-center justify-center px-8 text-center">
             <BookOpen className="mb-3 h-8 w-8" style={{ color: theme.sub }} />
-            <p style={{ color: theme.sub }}>Não foi possível carregar o livro.</p>
+            <p style={{ color: theme.sub }}>{t("livraria.reader.loadError")}</p>
           </div>
         ) : (
           <article
@@ -263,7 +263,7 @@ export default function LeitorPage() {
                   className="inline-flex items-center gap-1.5 rounded-xl px-4 py-3 font-sans text-sm font-semibold transition-opacity hover:opacity-80"
                   style={{ border: `1px solid ${theme.borda}`, color: theme.sub }}
                 >
-                  <ChevronLeft className="h-4 w-4" /> Anterior
+                  <ChevronLeft className="h-4 w-4" /> {t("livraria.reader.prev")}
                 </button>
               ) : (
                 <span />
@@ -274,7 +274,7 @@ export default function LeitorPage() {
                   className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3 font-sans text-sm font-semibold text-white transition-transform hover:-translate-y-px"
                   style={{ background: GOLD_GRADIENT, boxShadow: "0 8px 24px -8px rgba(198,151,42,0.55)" }}
                 >
-                  Próximo capítulo <ChevronRight className="h-4 w-4" />
+                  {t("livraria.reader.next")} <ChevronRight className="h-4 w-4" />
                 </button>
               ) : (
                 <button
@@ -282,12 +282,12 @@ export default function LeitorPage() {
                   className="rounded-xl px-5 py-3 font-sans text-sm font-semibold text-white transition-transform hover:-translate-y-px"
                   style={{ background: GOLD_GRADIENT, boxShadow: "0 8px 24px -8px rgba(198,151,42,0.55)" }}
                 >
-                  Concluir leitura ✓
+                  {t("livraria.reader.finish")}
                 </button>
               )}
             </div>
             <p className="mb-4 text-center font-mono text-[11px]" style={{ color: theme.sub }}>
-              Capítulo {cap + 1} de {total}
+              {t("livraria.reader.chapterOf", { current: cap + 1, total })}
             </p>
           </article>
         )}
@@ -303,7 +303,7 @@ export default function LeitorPage() {
               {volume.title}
             </p>
             <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em]" style={{ color: theme.sub }}>
-              {total} capítulos
+              {t("livraria.reader.chaptersCount", { count: total })}
             </p>
             {chapters.map((item, index) => (
               <button
@@ -326,7 +326,7 @@ export default function LeitorPage() {
               </button>
             ))}
           </div>
-          <button aria-label="Fechar sumário" className="flex-1" onClick={() => setSumario(false)} style={{ background: "rgba(0,0,0,0.25)" }} />
+          <button aria-label={t("livraria.reader.toc")} className="flex-1" onClick={() => setSumario(false)} style={{ background: "rgba(0,0,0,0.25)" }} />
         </div>
       )}
     </div>

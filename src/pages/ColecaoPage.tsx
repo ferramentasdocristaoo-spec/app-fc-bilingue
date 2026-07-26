@@ -8,14 +8,14 @@ import { getVolumeProgress, libraryProduct } from "@/data/library";
 
 export default function ColecaoPage() {
   const { productSlug } = useParams();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const product = libraryProduct(i18n.resolvedLanguage || i18n.language);
   if (productSlug !== product.slug) return <Navigate to="/livraria" replace />;
 
   return (
     <PageShell title={product.title}>
-      <Link to="/livraria" className="mb-2 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />Voltar à Livraria</Link>
-      <p className="mb-6 text-sm text-muted-foreground">Os volumes seguem a ordem dos acontecimentos no livro de Apocalipse.</p>
+      <Link to="/livraria" className="mb-2 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />{t("livraria.back")}</Link>
+      <p className="mb-6 text-sm text-muted-foreground">{t("livraria.orderNote")}</p>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {product.volumes.map((volume) => {
           const progress = getVolumeProgress(volume.slug);

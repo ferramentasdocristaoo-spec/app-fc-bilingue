@@ -7,7 +7,7 @@ export const LIBRARY_PRODUCT_SLUG = "apocalipse-revelado";
 const VOLUMES: { slug: string; ref: string; titles: Record<LibraryLanguage, string> }[] = [
   {
     slug: "volume-2",
-    ref: "Apocalipse 6",
+    ref: "6",
     titles: {
       "pt-PT": "Os Quatro Cavaleiros",
       en: "The Four Horsemen",
@@ -18,7 +18,7 @@ const VOLUMES: { slug: string; ref: string; titles: Record<LibraryLanguage, stri
   },
   {
     slug: "volume-3",
-    ref: "Apocalipse 7",
+    ref: "7",
     titles: {
       "pt-PT": "A Grande Tribulação",
       en: "The Great Tribulation",
@@ -29,7 +29,7 @@ const VOLUMES: { slug: string; ref: string; titles: Record<LibraryLanguage, stri
   },
   {
     slug: "volume-5",
-    ref: "Apocalipse 8–11",
+    ref: "8–11",
     titles: {
       "pt-PT": "As Sete Trombetas",
       en: "The Seven Trumpets",
@@ -40,7 +40,7 @@ const VOLUMES: { slug: string; ref: string; titles: Record<LibraryLanguage, stri
   },
   {
     slug: "volume-6",
-    ref: "Apocalipse 12",
+    ref: "12",
     titles: {
       "pt-PT": "A Mulher Vestida de Sol",
       en: "The Woman Clothed with the Sun",
@@ -51,7 +51,7 @@ const VOLUMES: { slug: string; ref: string; titles: Record<LibraryLanguage, stri
   },
   {
     slug: "volume-1",
-    ref: "Apocalipse 13",
+    ref: "13",
     titles: {
       "pt-PT": "A Besta e o Falso Profeta",
       en: "The Beast and the False Prophet",
@@ -62,7 +62,7 @@ const VOLUMES: { slug: string; ref: string; titles: Record<LibraryLanguage, stri
   },
   {
     slug: "volume-7",
-    ref: "Apocalipse 13",
+    ref: "13",
     titles: {
       "pt-PT": "O Anticristo",
       en: "The Antichrist",
@@ -73,7 +73,7 @@ const VOLUMES: { slug: string; ref: string; titles: Record<LibraryLanguage, stri
   },
   {
     slug: "volume-4",
-    ref: "Apocalipse 17–18",
+    ref: "17–18",
     titles: {
       "pt-PT": "A Grande Prostituta",
       en: "The Great Prostitute",
@@ -84,7 +84,7 @@ const VOLUMES: { slug: string; ref: string; titles: Record<LibraryLanguage, stri
   },
   {
     slug: "volume-8",
-    ref: "Apocalipse 21–22",
+    ref: "21–22",
     titles: {
       "pt-PT": "A Nova Jerusalém",
       en: "The New Jerusalem",
@@ -94,6 +94,14 @@ const VOLUMES: { slug: string; ref: string; titles: Record<LibraryLanguage, stri
     },
   },
 ];
+
+const REF_BOOK: Record<LibraryLanguage, string> = {
+  "pt-PT": "Apocalipse",
+  en: "Revelation",
+  es: "Apocalipsis",
+  fr: "Apocalypse",
+  it: "Apocalisse",
+};
 
 const PRODUCT_TITLE: Record<LibraryLanguage, string> = {
   "pt-PT": "Apocalipse Revelado",
@@ -120,7 +128,7 @@ export function libraryProduct(language: string) {
     volumes: VOLUMES.map((volume, index) => ({
       slug: volume.slug,
       number: index + 1,
-      ref: volume.ref,
+      ref: `${REF_BOOK[lang]} ${volume.ref}`,
       title: volume.titles[lang],
     })),
   };
