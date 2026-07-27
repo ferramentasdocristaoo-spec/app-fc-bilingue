@@ -10,6 +10,10 @@ import {
   List,
   Loader2,
   Palette,
+  Pause,
+  Play,
+  Square,
+  Volume2,
   X,
 } from "lucide-react";
 import { libraryLanguage, libraryProduct, setVolumeProgress } from "@/data/library";
@@ -54,6 +58,14 @@ const THEMES: Record<ThemeName, { bg: string; papel: string; texto: string; sub:
   },
 };
 
+const SPEECH_LANG: Record<string, string> = {
+  "pt-PT": "pt-BR",
+  en: "en-US",
+  es: "es-ES",
+  fr: "fr-FR",
+  it: "it-IT",
+};
+
 const GOLD = "hsl(42 65% 47%)";
 const GOLD_GRADIENT = "linear-gradient(135deg, #604224, #C6972A)";
 
@@ -94,6 +106,9 @@ export default function LeitorPage() {
   const [fonte, setFonte] = useState(19);
   const [tema, setTema] = useState<ThemeName>("bege");
   const [sumario, setSumario] = useState(false);
+  const [lendo, setLendo] = useState(false);
+  const [pausado, setPausado] = useState(false);
+  const [linhaAtual, setLinhaAtual] = useState(-2);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const storageKey = `fc-leitura:${productSlug}:${volumeSlug}`;
@@ -137,6 +152,51 @@ export default function LeitorPage() {
     scrollRef.current?.scrollTo({ top: 0 });
   }, [cap]);
 
+  const pararLeitura = useCallback(() => {
+    window.speechSynthesis?.cancel();
+    setLendo(false);
+    setPausado(false);
+    setLinhaAtual(-2);
+  }, []);
+
+  const iniciarLeitura = useCallback(() => {
+    const synth = window.speechSynthesis;
+    if (!synth || !chapter) return;
+    synth.cancel();
+    const speechLang = SPEECH_LANG[libraryLanguage(i18n.resolvedLanguage || i18n.language)] ?? "pt-BR";
+    const voices = synth.getVoices().filter((v) => v.lang.replace("_", "-").toLowerCase().startsWith(speechLang.slice(0, 2)));
+    const voice = voices.find((v) => v.lang.replace("_", "-").toLowerCase() === speechLang.toLowerCase()) ?? voices[0];
+    const textos = [chapter.title, ...chapter.lines];
+    textos.forEach((texto, idx) => {
+      const fala = new SpeechSynthesisUtterance(texto);
+      fala.lang = speechLang;
+      if (voice) fala.voice = voice;
+      fala.rate = 0.95;
+      fala.onstart = () => {
+        setLinhaAtual(idx - 1);
+        document.getElementById(`leitura-linha-${idx - 1}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      };
+      if (idx === textos.length - 1) fala.onend = () => { setLendo(false); setPausado(false); setLinhaAtual(-2); };
+      synth.speak(fala);
+    });
+    setLendo(true);
+    setPausado(false);
+  }, [chapter, i18n.language, i18n.resolvedLanguage]);
+
+  const alternarLeitura = useCallback(() => {
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    if (!lendo) return iniciarLeitura();
+    if (pausado) { synth.resume(); setPausado(false); }
+    else { synth.pause(); setPausado(true); }
+  }, [lendo, pausado, iniciarLeitura]);
+
+  useEffect(() => {
+    pararLeitura();
+  }, [cap, volumeSlug, pararLeitura]);
+
+  useEffect(() => () => { window.speechSynthesis?.cancel(); }, []);
+
   const anterior = useCallback(() => setCap((value) => Math.max(0, value - 1)), []);
   const proximo = useCallback(() => setCap((value) => Math.min(total - 1, value + 1)), [total]);
   const fechar = useCallback(() => navigate(`/livraria/${productSlug}`), [navigate, productSlug]);
@@ -162,6 +222,8 @@ export default function LeitorPage() {
   const progresso = total > 0 ? ((cap + 1) / total) * 100 : 0;
 
   const iconButton = "w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70";
+  const realce = (index: number) =>
+    index === linhaAtual ? { background: "hsl(42 65% 47% / 0.18)", borderRadius: 6 } : undefined;
 
   return (
     <div
@@ -184,6 +246,14 @@ export default function LeitorPage() {
           {chapter?.title ?? volume.title}
         </div>
         <div className="flex items-center gap-1">
+          <button onClick={alternarLeitura} aria-label={t("livraria.reader.listen")} className={iconButton} style={{ color: lendo ? GOLD : theme.sub }}>
+            {!lendo ? <Volume2 className="h-5 w-5" /> : pausado ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
+          </button>
+          {lendo && (
+            <button onClick={pararLeitura} aria-label={t("livraria.reader.stopListening")} className={iconButton} style={{ color: theme.sub }}>
+              <Square className="h-4 w-4" />
+            </button>
+          )}
           <button onClick={() => setFonte((size) => Math.max(15, size - 2))} aria-label={t("livraria.reader.decreaseFont")} className={iconButton} style={{ color: theme.sub }}>
             <AArrowDown className="h-5 w-5" />
           </button>
@@ -232,28 +302,30 @@ export default function LeitorPage() {
               color: theme.texto,
             }}
           >
-            <h2 className="font-display mb-8 font-bold" style={{ fontSize: fonte * 1.6, lineHeight: 1.2 }}>
+            <h2 id="leitura-linha--1" className="font-display mb-8 font-bold" style={{ fontSize: fonte * 1.6, lineHeight: 1.2, ...realce(-1) }}>
               {chapter?.title}
             </h2>
             {chapter?.lines.map((line, index) =>
               isQuote(line) ? (
                 <blockquote
                   key={index}
+                  id={`leitura-linha-${index}`}
                   className="my-6 border-l-2 pl-4 italic"
-                  style={{ borderColor: GOLD, color: theme.sub }}
+                  style={{ borderColor: GOLD, color: theme.sub, ...realce(index) }}
                 >
                   {line}
                 </blockquote>
               ) : isSubheading(line) ? (
                 <h3
                   key={index}
+                  id={`leitura-linha-${index}`}
                   className="font-display mb-3 mt-8 font-semibold"
-                  style={{ fontSize: fonte * 1.15, lineHeight: 1.3 }}
+                  style={{ fontSize: fonte * 1.15, lineHeight: 1.3, ...realce(index) }}
                 >
                   {line}
                 </h3>
               ) : (
-                <p key={index} className="mb-5 text-justify">
+                <p key={index} id={`leitura-linha-${index}`} className="mb-5 text-justify" style={realce(index)}>
                   {line}
                 </p>
               ),

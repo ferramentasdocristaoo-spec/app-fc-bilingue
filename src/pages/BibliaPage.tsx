@@ -2,10 +2,18 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, BookOpen, Volume2, Pause, Play, Square } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PageShell from "@/components/PageShell";
 import { cleanBibleText } from "@/lib/bible-text";
+
+const SPEECH_LANG: Record<string, string> = {
+  "pt-PT": "pt-PT",
+  en: "en-US",
+  es: "es-ES",
+  fr: "fr-FR",
+  it: "it-IT",
+};
 
 const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = {
   "pt-PT": [
@@ -155,6 +163,9 @@ const BibliaPage = () => {
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
+  const [lendo, setLendo] = useState(false);
+  const [pausado, setPausado] = useState(false);
+  const [versoAtual, setVersoAtual] = useState<number | null>(null);
   const verseRefs = useRef<Record<number, HTMLParagraphElement | null>>({});
   const requestIdRef = useRef(0);
 
@@ -205,6 +216,49 @@ const BibliaPage = () => {
   useEffect(() => {
     fetchChapter();
   }, [fetchChapter]);
+
+  const pararLeitura = useCallback(() => {
+    window.speechSynthesis?.cancel();
+    setLendo(false);
+    setPausado(false);
+    setVersoAtual(null);
+  }, []);
+
+  const iniciarLeitura = useCallback(() => {
+    const synth = window.speechSynthesis;
+    if (!synth || verses.length === 0) return;
+    synth.cancel();
+    const speechLang = SPEECH_LANG[lang] ?? "pt-PT";
+    const voices = synth.getVoices().filter((v) => v.lang.replace("_", "-").toLowerCase().startsWith(speechLang.slice(0, 2)));
+    const voice = voices.find((v) => v.lang.replace("_", "-").toLowerCase() === speechLang.toLowerCase()) ?? voices[0];
+    const inicio = selectedVerse ? verses.findIndex((v) => v.verse === selectedVerse) : 0;
+    const fila = verses.slice(Math.max(0, inicio));
+    fila.forEach((verso, idx) => {
+      const fala = new SpeechSynthesisUtterance(verso.text);
+      fala.lang = speechLang;
+      if (voice) fala.voice = voice;
+      fala.rate = 0.95;
+      fala.onstart = () => {
+        setVersoAtual(verso.verse);
+        verseRefs.current[verso.verse]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      };
+      if (idx === fila.length - 1) fala.onend = () => { setLendo(false); setPausado(false); setVersoAtual(null); };
+      synth.speak(fala);
+    });
+    setLendo(true);
+    setPausado(false);
+  }, [verses, lang, selectedVerse]);
+
+  const alternarLeitura = useCallback(() => {
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    if (!lendo) return iniciarLeitura();
+    if (pausado) { synth.resume(); setPausado(false); }
+    else { synth.pause(); setPausado(true); }
+  }, [lendo, pausado, iniciarLeitura]);
+
+  useEffect(() => { pararLeitura(); }, [version, bookId, chapter, pararLeitura]);
+  useEffect(() => () => { window.speechSynthesis?.cancel(); }, []);
 
   const goToPrevChapter = () => {
     if (chapter > 1) {
@@ -257,6 +311,18 @@ const BibliaPage = () => {
         </Select>
 
         {verses.length > 0 && (
+          <>
+            <Button variant="outline" size="icon" onClick={alternarLeitura} aria-label={t("livraria.reader.listen")} className={lendo ? "text-primary border-primary" : ""}>
+              {!lendo ? <Volume2 className="h-4 w-4" /> : pausado ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+            </Button>
+            {lendo && (
+              <Button variant="outline" size="icon" onClick={pararLeitura} aria-label={t("livraria.reader.stopListening")}>
+                <Square className="h-3.5 w-3.5" />
+              </Button>
+            )}
+          </>
+        )}
+        {verses.length > 0 && (
           <Select value={selectedVerse ? String(selectedVerse) : ""} onValueChange={(v) => {
             const num = Number(v);
             setSelectedVerse(num);
@@ -301,7 +367,7 @@ const BibliaPage = () => {
             <p
               key={v.pk}
               ref={(el) => { verseRefs.current[v.verse] = el; }}
-              className={`leading-relaxed text-foreground rounded px-1 transition-colors ${selectedVerse === v.verse ? "bg-primary/15" : ""}`}
+              className={`leading-relaxed text-foreground rounded px-1 transition-colors ${versoAtual === v.verse ? "bg-primary/25" : selectedVerse === v.verse ? "bg-primary/15" : ""}`}
             >
               <span className="font-bold text-primary mr-1 text-xs align-super">{v.verse}</span>
               <span className="whitespace-pre-line">{v.text}</span>

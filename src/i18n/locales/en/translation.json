@@ -346,7 +346,9 @@
       "decreaseFont": "Decrease font size",
       "increaseFont": "Increase font size",
       "changeTheme": "Change theme",
-      "close": "Close reader"
+      "close": "Close reader",
+      "listen": "Listen to chapter",
+      "stopListening": "Stop listening"
     },
     "badge_one": "1 book • 1 product",
     "badge_other": "{{count}} volumes • 1 product",
