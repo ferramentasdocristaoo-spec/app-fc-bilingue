@@ -10,6 +10,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
   es: "Spanish (neutral Latin American)",
   fr: "French",
   it: "Italian",
+  de: "German",
 };
 
 function json(body: unknown, status = 200) {

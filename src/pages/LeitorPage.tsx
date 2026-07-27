@@ -64,6 +64,7 @@ const SPEECH_LANG: Record<string, string> = {
   es: "es-ES",
   fr: "fr-FR",
   it: "it-IT",
+  de: "de-DE",
 };
 
 const GOLD = "hsl(42 65% 47%)";

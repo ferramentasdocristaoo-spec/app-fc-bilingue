@@ -1,4 +1,4 @@
-export type LibraryLanguage = "pt-PT" | "en" | "es" | "fr" | "it";
+export type LibraryLanguage = "pt-PT" | "en" | "es" | "fr" | "it" | "de";
 
 type Localized = Record<LibraryLanguage, string>;
 
@@ -23,6 +23,7 @@ const REF_BOOK: Localized = {
   es: "Apocalipsis",
   fr: "Apocalypse",
   it: "Apocalisse",
+  de: "Offenbarung",
 };
 
 const OUTLINES_SUBTITLE: Localized = {
@@ -31,6 +32,7 @@ const OUTLINES_SUBTITLE: Localized = {
   es: "30 bosquejos",
   fr: "30 plans",
   it: "30 schemi",
+  de: "30 Predigtentwürfe",
 };
 
 // Volumes do Apocalipse na ordem narrativa do livro de Apocalipse.
@@ -44,6 +46,7 @@ const PRODUCTS: ProductDef[] = [
       es: "Apocalipsis Revelado",
       fr: "L’Apocalypse Révélée",
       it: "Apocalisse Rivelata",
+      de: "Offenbarung Enthüllt",
     },
     descriptions: {
       "pt-PT": "Uma coleção completa para compreender os principais acontecimentos e personagens do livro de Apocalipse.",
@@ -51,6 +54,7 @@ const PRODUCTS: ProductDef[] = [
       es: "Una colección completa para comprender los principales acontecimientos y personajes del libro de Apocalipsis.",
       fr: "Une collection complète pour comprendre les principaux événements et personnages du livre de l’Apocalypse.",
       it: "Una collezione completa per comprendere i principali avvenimenti e personaggi del libro dell’Apocalisse.",
+      de: "Eine vollständige Sammlung zum Verständnis der wichtigsten Ereignisse und Gestalten des Buches der Offenbarung.",
     },
     volumes: [
       {
@@ -62,6 +66,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Los Cuatro Jinetes",
           fr: "Les Quatre Cavaliers",
           it: "I Quattro Cavalieri",
+          de: "Die Vier Reiter",
         },
       },
       {
@@ -73,6 +78,7 @@ const PRODUCTS: ProductDef[] = [
           es: "La Gran Tribulación",
           fr: "La Grande Tribulation",
           it: "La Grande Tribolazione",
+          de: "Die Große Trübsal",
         },
       },
       {
@@ -84,6 +90,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Las Siete Trompetas",
           fr: "Les Sept Trompettes",
           it: "Le Sette Trombe",
+          de: "Die Sieben Posaunen",
         },
       },
       {
@@ -95,6 +102,7 @@ const PRODUCTS: ProductDef[] = [
           es: "La Mujer Vestida del Sol",
           fr: "La Femme Revêtue du Soleil",
           it: "La Donna Vestita di Sole",
+          de: "Die Frau, mit der Sonne bekleidet",
         },
       },
       {
@@ -106,6 +114,7 @@ const PRODUCTS: ProductDef[] = [
           es: "La Bestia y el Falso Profeta",
           fr: "La Bête et le Faux Prophète",
           it: "La Bestia e il Falso Profeta",
+          de: "Das Tier und der Falsche Prophet",
         },
       },
       {
@@ -117,6 +126,7 @@ const PRODUCTS: ProductDef[] = [
           es: "El Anticristo",
           fr: "L’Antéchrist",
           it: "L’Anticristo",
+          de: "Der Antichrist",
         },
       },
       {
@@ -128,6 +138,7 @@ const PRODUCTS: ProductDef[] = [
           es: "La Gran Prostituta",
           fr: "La Grande Prostituée",
           it: "La Grande Prostituta",
+          de: "Die Große Hure",
         },
       },
       {
@@ -139,6 +150,7 @@ const PRODUCTS: ProductDef[] = [
           es: "La Nueva Jerusalén",
           fr: "La Nouvelle Jérusalem",
           it: "La Nuova Gerusalemme",
+          de: "Das Neue Jerusalem",
         },
       },
     ],
@@ -151,6 +163,7 @@ const PRODUCTS: ProductDef[] = [
       es: "Trilogía de Bosquejos",
       fr: "Trilogie de Plans de Sermon",
       it: "Trilogia di Schemi",
+      de: "Predigtentwurf-Trilogie",
     },
     descriptions: {
       "pt-PT": "Três volumes com 90 esboços de sermão — expositivos, temáticos e textuais — prontos para a preparação de mensagens.",
@@ -158,6 +171,7 @@ const PRODUCTS: ProductDef[] = [
       es: "Tres volúmenes con 90 bosquejos de sermón — expositivos, temáticos y textuales — listos para la preparación de mensajes.",
       fr: "Trois volumes avec 90 plans de sermon — expositifs, thématiques et textuels — prêts pour la préparation de messages.",
       it: "Tre volumi con 90 schemi di sermone — espositivi, tematici e testuali — pronti per la preparazione dei messaggi.",
+      de: "Drei Bände mit 90 Predigtentwürfen — auslegend, thematisch und textbezogen — bereit für die Predigtvorbereitung.",
     },
     volumes: [
       {
@@ -169,6 +183,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Bosquejos Expositivos",
           fr: "Plans Expositifs",
           it: "Schemi Espositivi",
+          de: "Auslegende Predigtentwürfe",
         },
       },
       {
@@ -180,6 +195,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Bosquejos Temáticos",
           fr: "Plans Thématiques",
           it: "Schemi Tematici",
+          de: "Thematische Predigtentwürfe",
         },
       },
       {
@@ -191,6 +207,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Bosquejos Textuales",
           fr: "Plans Textuels",
           it: "Schemi Testuali",
+          de: "Textbezogene Predigtentwürfe",
         },
       },
     ],
@@ -203,6 +220,7 @@ const PRODUCTS: ProductDef[] = [
       es: "Kit del Predicador",
       fr: "Kit du Prédicateur",
       it: "Kit del Predicatore",
+      de: "Das Prediger-Set",
     },
     descriptions: {
       "pt-PT": "Sete livros de formação ministerial: da vida espiritual do pregador à comunicação no púlpito.",
@@ -210,6 +228,7 @@ const PRODUCTS: ProductDef[] = [
       es: "Siete libros de formación ministerial: de la vida espiritual del predicador a la comunicación en el púlpito.",
       fr: "Sept livres de formation ministérielle : de la vie spirituelle du prédicateur à la communication en chaire.",
       it: "Sette libri di formazione ministeriale: dalla vita spirituale del predicatore alla comunicazione dal pulpito.",
+      de: "Sieben Bücher zur Ausbildung im Predigtdienst: vom geistlichen Leben des Predigers bis zur Kommunikation auf der Kanzel.",
     },
     volumes: [
       {
@@ -220,6 +239,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Desarrollo Espiritual del Predicador",
           fr: "Le Développement Spirituel du Prédicateur",
           it: "Lo Sviluppo Spirituale del Predicatore",
+          de: "Die Geistliche Entwicklung des Predigers",
         },
       },
       {
@@ -230,6 +250,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Exégesis y Hermenéutica Bíblica",
           fr: "Exégèse et Herméneutique Bibliques",
           it: "Esegesi ed Ermeneutica Biblica",
+          de: "Biblische Exegese und Hermeneutik",
         },
       },
       {
@@ -240,6 +261,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Historia de la Predicación Cristiana",
           fr: "Histoire de la Prédication Chrétienne",
           it: "Storia della Predicazione Cristiana",
+          de: "Geschichte der Christlichen Predigt",
         },
       },
       {
@@ -250,6 +272,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Preparación de Sermones — Guía Práctica",
           fr: "Préparation de Sermons — Guide Pratique",
           it: "Preparazione di Sermoni — Guida Pratica",
+          de: "Predigtvorbereitung — Ein Praktischer Leitfaden",
         },
       },
       {
@@ -260,6 +283,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Predicación Temática",
           fr: "Prédication Thématique",
           it: "Predicazione Tematica",
+          de: "Thematische Predigt",
         },
       },
       {
@@ -270,6 +294,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Predicación Expositiva",
           fr: "Prédication Expositive",
           it: "Predicazione Espositiva",
+          de: "Auslegungspredigt",
         },
       },
       {
@@ -280,6 +305,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Comunicación Eficaz en el Púlpito",
           fr: "Communication Efficace en Chaire",
           it: "Comunicazione Efficace dal Pulpito",
+          de: "Wirksame Kommunikation auf der Kanzel",
         },
       },
     ],
@@ -292,6 +318,7 @@ const PRODUCTS: ProductDef[] = [
       es: "Panorama Teológico",
       fr: "Panorama Théologique",
       it: "Panorama Teologico",
+      de: "Theologischer Überblick",
     },
     descriptions: {
       "pt-PT": "Dois volumes com os grandes temas teológicos do Antigo e do Novo Testamento.",
@@ -299,6 +326,7 @@ const PRODUCTS: ProductDef[] = [
       es: "Dos volúmenes con los grandes temas teológicos del Antiguo y del Nuevo Testamento.",
       fr: "Deux volumes couvrant les grands thèmes théologiques de l’Ancien et du Nouveau Testament.",
       it: "Due volumi con i grandi temi teologici dell’Antico e del Nuovo Testamento.",
+      de: "Zwei Bände mit den großen theologischen Themen des Alten und Neuen Testaments.",
     },
     volumes: [
       {
@@ -309,6 +337,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Panorama Teológico del Antiguo Testamento",
           fr: "Panorama Théologique de l’Ancien Testament",
           it: "Panorama Teologico dell’Antico Testamento",
+          de: "Theologischer Überblick über das Alte Testament",
         },
       },
       {
@@ -319,6 +348,7 @@ const PRODUCTS: ProductDef[] = [
           es: "Panorama Teológico del Nuevo Testamento",
           fr: "Panorama Théologique du Nouveau Testament",
           it: "Panorama Teologico del Nuovo Testamento",
+          de: "Theologischer Überblick über das Neue Testament",
         },
       },
     ],
@@ -331,6 +361,7 @@ export function libraryLanguage(language: string): LibraryLanguage {
   if (lang.startsWith("es")) return "es";
   if (lang.startsWith("fr")) return "fr";
   if (lang.startsWith("it")) return "it";
+  if (lang.startsWith("de")) return "de";
   return "pt-PT";
 }
 

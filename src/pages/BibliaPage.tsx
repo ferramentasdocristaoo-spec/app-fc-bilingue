@@ -13,6 +13,7 @@ const SPEECH_LANG: Record<string, string> = {
   es: "es-ES",
   fr: "fr-FR",
   it: "it-IT",
+  de: "de-DE",
 };
 
 const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = {
@@ -50,6 +51,12 @@ const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = {
   "it": [
     { id: "NR06", name: "NR06 - Nuova Riveduta 2006" },
   ],
+  "de": [
+    { id: "LUT", name: "LUT - Luther 1912" },
+    { id: "S00", name: "SCH2000 - Schlachter 2000" },
+    { id: "HFA", name: "HFA - Hoffnung für Alle" },
+    { id: "ELB", name: "ELB - Elberfelder" },
+  ],
 };
 
 const DEFAULT_VERSION_BY_LANG: Record<string, string> = {
@@ -58,12 +65,14 @@ const DEFAULT_VERSION_BY_LANG: Record<string, string> = {
   "es": "RV1960",
   "fr": "FRLSG",
   "it": "NR06",
+  "de": "LUT",
 };
 
 function normalizeBibleLanguage(language: string): keyof typeof VERSIONS_BY_LANG {
   const normalized = language.toLowerCase();
 
   if (normalized.startsWith("en")) return "en";
+  if (normalized.startsWith("de")) return "de";
   if (normalized.startsWith("es")) return "es";
   if (normalized.startsWith("fr")) return "fr";
   if (normalized.startsWith("it")) return "it";

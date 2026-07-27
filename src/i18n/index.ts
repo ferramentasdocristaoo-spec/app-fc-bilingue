@@ -7,6 +7,7 @@ import enTranslation from './locales/en/translation.json';
 import frTranslation from './locales/fr/translation.json';
 import esTranslation from './locales/es/translation.json';
 import itTranslation from './locales/it/translation.json';
+import deTranslation from './locales/de/translation.json';
 
 const resources = {
   'pt-PT': { translation: ptPtTranslation },
@@ -14,6 +15,7 @@ const resources = {
   fr: { translation: frTranslation },
   es: { translation: esTranslation },
   it: { translation: itTranslation },
+  de: { translation: deTranslation },
 };
 
 i18n
