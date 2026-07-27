@@ -33,6 +33,11 @@ const OUTLINES_SUBTITLE: Localized = {
   it: "30 schemi",
 };
 
+// Produto de livro único: um volume com o mesmo título do produto.
+function singleBookProduct(slug: string, titles: Localized, descriptions: Localized): ProductDef[] {
+  return [{ slug, titles, descriptions, volumes: [{ slug: "volume-1", titles }] }];
+}
+
 // Volumes do Apocalipse na ordem narrativa do livro de Apocalipse.
 // O slug identifica o conteúdo no banco e não muda com a reordenação.
 const PRODUCTS: ProductDef[] = [
@@ -195,6 +200,108 @@ const PRODUCTS: ProductDef[] = [
       },
     ],
   },
+  ...singleBookProduct(
+    "desenvolvimento-espiritual-do-pregador",
+    {
+      "pt-PT": "Desenvolvimento Espiritual do Pregador",
+      en: "The Preacher’s Spiritual Development",
+      es: "Desarrollo Espiritual del Predicador",
+      fr: "Le Développement Spirituel du Prédicateur",
+      it: "Lo Sviluppo Spirituale del Predicatore",
+    },
+    {
+      "pt-PT": "Vida de oração, disciplina espiritual e integridade no ministério.",
+      en: "A life of prayer, spiritual discipline and integrity in ministry.",
+      es: "Vida de oración, disciplina espiritual e integridad en el ministerio.",
+      fr: "Vie de prière, discipline spirituelle et intégrité dans le ministère.",
+      it: "Vita di preghiera, disciplina spirituale e integrità nel ministero.",
+    },
+  ),
+  ...singleBookProduct(
+    "exegese-e-hermeneutica-biblica",
+    {
+      "pt-PT": "Exegese e Hermenêutica Bíblica",
+      en: "Biblical Exegesis and Hermeneutics",
+      es: "Exégesis y Hermenéutica Bíblica",
+      fr: "Exégèse et Herméneutique Bibliques",
+      it: "Esegesi ed Ermeneutica Biblica",
+    },
+    {
+      "pt-PT": "Princípios, métodos e aplicações para a interpretação bíblica.",
+      en: "Principles, methods and applications for biblical interpretation.",
+      es: "Principios, métodos y aplicaciones para la interpretación bíblica.",
+      fr: "Principes, méthodes et applications pour l’interprétation biblique.",
+      it: "Principi, metodi e applicazioni per l’interpretazione biblica.",
+    },
+  ),
+  ...singleBookProduct(
+    "historia-da-pregacao-crista",
+    {
+      "pt-PT": "História da Pregação Cristã",
+      en: "History of Christian Preaching",
+      es: "Historia de la Predicación Cristiana",
+      fr: "Histoire de la Prédication Chrétienne",
+      it: "Storia della Predicazione Cristiana",
+    },
+    {
+      "pt-PT": "Pregadores, movimentos e lições ao longo dos séculos.",
+      en: "Preachers, movements and lessons across the centuries.",
+      es: "Predicadores, movimientos y lecciones a lo largo de los siglos.",
+      fr: "Prédicateurs, mouvements et leçons à travers les siècles.",
+      it: "Predicatori, movimenti e lezioni attraverso i secoli.",
+    },
+  ),
+  ...singleBookProduct(
+    "preparacao-de-sermoes",
+    {
+      "pt-PT": "Preparação de Sermões — Guia Prático",
+      en: "Sermon Preparation — A Practical Guide",
+      es: "Preparación de Sermones — Guía Práctica",
+      fr: "Préparation de Sermons — Guide Pratique",
+      it: "Preparazione di Sermoni — Guida Pratica",
+    },
+    {
+      "pt-PT": "Da pesquisa bíblica à comunicação no púlpito.",
+      en: "From biblical research to communication in the pulpit.",
+      es: "De la investigación bíblica a la comunicación en el púlpito.",
+      fr: "De la recherche biblique à la communication en chaire.",
+      it: "Dalla ricerca biblica alla comunicazione dal pulpito.",
+    },
+  ),
+  ...singleBookProduct(
+    "pregacao-tematica",
+    {
+      "pt-PT": "Pregação Temática",
+      en: "Topical Preaching",
+      es: "Predicación Temática",
+      fr: "Prédication Thématique",
+      it: "Predicazione Tematica",
+    },
+    {
+      "pt-PT": "Escolha de temas, estrutura e modelos práticos de sermão.",
+      en: "Choosing themes, structure and practical sermon models.",
+      es: "Elección de temas, estructura y modelos prácticos de sermón.",
+      fr: "Choix des thèmes, structure et modèles pratiques de sermon.",
+      it: "Scelta dei temi, struttura e modelli pratici di sermone.",
+    },
+  ),
+  ...singleBookProduct(
+    "pregacao-expositiva",
+    {
+      "pt-PT": "Pregação Expositiva",
+      en: "Expository Preaching",
+      es: "Predicación Expositiva",
+      fr: "Prédication Expositive",
+      it: "Predicazione Espositiva",
+    },
+    {
+      "pt-PT": "Interpretação, estrutura e aplicação fiel do texto bíblico.",
+      en: "Interpretation, structure and faithful application of the biblical text.",
+      es: "Interpretación, estructura y aplicación fiel del texto bíblico.",
+      fr: "Interprétation, structure et application fidèle du texte biblique.",
+      it: "Interpretazione, struttura e applicazione fedele del testo biblico.",
+    },
+  ),
 ];
 
 export function libraryLanguage(language: string): LibraryLanguage {

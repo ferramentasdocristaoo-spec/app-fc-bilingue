@@ -328,7 +328,6 @@
     "title": "Librería",
     "header": "Colecciones de estudio y lectura",
     "headerDescription": "La compra de una colección da acceso a todos los volúmenes en cualquier idioma disponible.",
-    "badge": "{{count}} volúmenes • 1 producto",
     "productDescription": "Una colección completa para comprender los principales acontecimientos y personajes del libro de Apocalipsis.",
     "progress": "Progreso",
     "continueReading": "Continuar lectura",
@@ -348,6 +347,9 @@
       "increaseFont": "Aumentar letra",
       "changeTheme": "Cambiar tema",
       "close": "Cerrar lectura"
-    }
+    },
+    "badge_one": "1 libro • 1 producto",
+    "badge_other": "{{count}} volúmenes • 1 producto",
+    "readNow": "Leer ahora"
   }
 }

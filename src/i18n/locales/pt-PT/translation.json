@@ -16,25 +16,25 @@
   "admin": {
     "title": "Painel de Administração",
     "subtitle": "Acesso Restrito",
-    "emailLabel": "Email",
-    "passwordLabel": "Palavra-passe",
+    "emailLabel": "E-mail",
+    "passwordLabel": "Senha",
     "button": "Entrar",
-    "errorInvalid": "Email ou palavra-passe inválidos.",
-    "dashboard": "Painel de Controlo",
+    "errorInvalid": "E-mail ou senha inválidos.",
+    "dashboard": "Painel de Controle",
     "analytics": "Análises",
-    "users": "Utilizadores",
+    "users": "Usuários",
     "sermons": "Sermões",
     "cache": "Cache do Gerador",
-    "changePassword": "Alterar Palavra-passe",
+    "changePassword": "Alterar Senha",
     "logout": "Sair",
-    "changePasswordTitle": "Alterar Palavra-passe de Administrador",
-    "newPassword": "Nova Palavra-passe",
-    "confirmPassword": "Confirmar Nova Palavra-passe",
+    "changePasswordTitle": "Alterar Senha de Administrador",
+    "newPassword": "Nova Senha",
+    "confirmPassword": "Confirmar Nova Senha",
     "cancel": "Cancelar",
-    "save": "Guardar",
-    "passwordTooShort": "Palavra-passe demasiado curta (mín. 6).",
-    "passwordMismatch": "As palavras-passe não coincidem.",
-    "passwordChanged": "Palavra-passe alterada com sucesso!",
+    "save": "Salvar",
+    "passwordTooShort": "Senha muito curta (mín. 6).",
+    "passwordMismatch": "As senhas não coincidem.",
+    "passwordChanged": "Senha alterada com sucesso!",
     "livraria": "Livraria"
   },
   "sidebar": {
@@ -328,7 +328,6 @@
     "title": "Livraria",
     "header": "Coleções de estudo e leitura",
     "headerDescription": "A compra de uma coleção dá acesso a todos os volumes em qualquer idioma disponível.",
-    "badge": "{{count}} volumes • 1 produto",
     "productDescription": "Uma coleção completa para compreender os principais acontecimentos e personagens do livro de Apocalipse.",
     "progress": "Progresso",
     "continueReading": "Continuar leitura",
@@ -348,6 +347,9 @@
       "increaseFont": "Aumentar letra",
       "changeTheme": "Mudar tema",
       "close": "Fechar leitura"
-    }
+    },
+    "badge_one": "1 livro • 1 produto",
+    "badge_other": "{{count}} volumes • 1 produto",
+    "readNow": "Ler agora"
   }
 }

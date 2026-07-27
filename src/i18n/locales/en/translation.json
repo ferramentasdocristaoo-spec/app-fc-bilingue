@@ -328,7 +328,6 @@
     "title": "Library",
     "header": "Study and reading collections",
     "headerDescription": "Purchasing a collection gives access to every volume in any available language.",
-    "badge": "{{count}} volumes • 1 product",
     "productDescription": "A complete collection to understand the main events and characters of the book of Revelation.",
     "progress": "Progress",
     "continueReading": "Continue reading",
@@ -348,6 +347,9 @@
       "increaseFont": "Increase font size",
       "changeTheme": "Change theme",
       "close": "Close reader"
-    }
+    },
+    "badge_one": "1 book • 1 product",
+    "badge_other": "{{count}} volumes • 1 product",
+    "readNow": "Read now"
   }
 }

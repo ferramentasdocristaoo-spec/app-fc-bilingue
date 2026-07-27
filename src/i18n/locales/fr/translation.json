@@ -328,7 +328,6 @@
     "title": "Librairie",
     "header": "Collections d’étude et de lecture",
     "headerDescription": "L’achat d’une collection donne accès à tous les volumes dans toutes les langues disponibles.",
-    "badge": "{{count}} volumes • 1 produit",
     "productDescription": "Une collection complète pour comprendre les principaux événements et personnages du livre de l’Apocalypse.",
     "progress": "Progression",
     "continueReading": "Continuer la lecture",
@@ -348,6 +347,9 @@
       "increaseFont": "Agrandir la taille du texte",
       "changeTheme": "Changer de thème",
       "close": "Fermer la lecture"
-    }
+    },
+    "badge_one": "1 livre • 1 produit",
+    "badge_other": "{{count}} volumes • 1 produit",
+    "readNow": "Lire maintenant"
   }
 }

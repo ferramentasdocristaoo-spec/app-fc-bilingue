@@ -41,6 +41,8 @@ export default function LivrariaPage() {
         {products.map((product) => {
           const progress = getProductProgress(product.slug);
           const hasAccess = access[product.slug];
+          const singleVolume = product.volumes.length === 1;
+          const target = singleVolume ? `/livraria/${product.slug}/${product.volumes[0].slug}` : `/livraria/${product.slug}`;
           return (
             <article key={product.slug} className="max-w-3xl overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
               <div className="grid gap-6 p-5 sm:grid-cols-[150px_1fr]">
@@ -52,7 +54,7 @@ export default function LivrariaPage() {
                   {progress > 0 && <div className="mt-4"><div className="mb-1 flex justify-between text-xs text-muted-foreground"><span>{t("livraria.progress")}</span><span>{progress}%</span></div><Progress value={progress} className="h-2" /></div>}
                   <div className="mt-5">
                     {hasAccess === undefined || hasAccess === null ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : hasAccess ? (
-                      <Button asChild><Link to={`/livraria/${product.slug}`}>{progress ? t("livraria.continueReading") : t("livraria.openCollection")}</Link></Button>
+                      <Button asChild><Link to={target}>{progress ? t("livraria.continueReading") : singleVolume ? t("livraria.readNow") : t("livraria.openCollection")}</Link></Button>
                     ) : (
                       <Button variant="outline" className="gap-2" disabled><Lock className="h-4 w-4" />{t("livraria.locked")}</Button>
                     )}
