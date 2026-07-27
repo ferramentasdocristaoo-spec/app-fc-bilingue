@@ -284,6 +284,45 @@ const PRODUCTS: ProductDef[] = [
       },
     ],
   },
+  {
+    slug: "panorama-teologico",
+    titles: {
+      "pt-PT": "Panorama Teológico",
+      en: "Theological Survey",
+      es: "Panorama Teológico",
+      fr: "Panorama Théologique",
+      it: "Panorama Teologico",
+    },
+    descriptions: {
+      "pt-PT": "Dois volumes com os grandes temas teológicos do Antigo e do Novo Testamento.",
+      en: "Two volumes covering the great theological themes of the Old and New Testaments.",
+      es: "Dos volúmenes con los grandes temas teológicos del Antiguo y del Nuevo Testamento.",
+      fr: "Deux volumes couvrant les grands thèmes théologiques de l’Ancien et du Nouveau Testament.",
+      it: "Due volumi con i grandi temi teologici dell’Antico e del Nuovo Testamento.",
+    },
+    volumes: [
+      {
+        slug: "volume-1",
+        titles: {
+          "pt-PT": "Panorama Teológico do Velho Testamento",
+          en: "Theological Survey of the Old Testament",
+          es: "Panorama Teológico del Antiguo Testamento",
+          fr: "Panorama Théologique de l’Ancien Testament",
+          it: "Panorama Teologico dell’Antico Testamento",
+        },
+      },
+      {
+        slug: "volume-2",
+        titles: {
+          "pt-PT": "Panorama Teológico do Novo Testamento",
+          en: "Theological Survey of the New Testament",
+          es: "Panorama Teológico del Nuevo Testamento",
+          fr: "Panorama Théologique du Nouveau Testament",
+          it: "Panorama Teologico del Nuovo Testamento",
+        },
+      },
+    ],
+  },
 ];
 
 export function libraryLanguage(language: string): LibraryLanguage {
