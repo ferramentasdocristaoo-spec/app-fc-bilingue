@@ -205,11 +205,11 @@ const PRODUCTS: ProductDef[] = [
       it: "Kit del Predicatore",
     },
     descriptions: {
-      "pt-PT": "Seis livros de formação ministerial: da vida espiritual do pregador à comunicação no púlpito.",
-      en: "Six ministry-training books: from the preacher’s spiritual life to communication in the pulpit.",
-      es: "Seis libros de formación ministerial: de la vida espiritual del predicador a la comunicación en el púlpito.",
-      fr: "Six livres de formation ministérielle : de la vie spirituelle du prédicateur à la communication en chaire.",
-      it: "Sei libri di formazione ministeriale: dalla vita spirituale del predicatore alla comunicazione dal pulpito.",
+      "pt-PT": "Sete livros de formação ministerial: da vida espiritual do pregador à comunicação no púlpito.",
+      en: "Seven ministry-training books: from the preacher’s spiritual life to communication in the pulpit.",
+      es: "Siete libros de formación ministerial: de la vida espiritual del predicador a la comunicación en el púlpito.",
+      fr: "Sept livres de formation ministérielle : de la vie spirituelle du prédicateur à la communication en chaire.",
+      it: "Sette libri di formazione ministeriale: dalla vita spirituale del predicatore alla comunicazione dal pulpito.",
     },
     volumes: [
       {
@@ -270,6 +270,16 @@ const PRODUCTS: ProductDef[] = [
           es: "Predicación Expositiva",
           fr: "Prédication Expositive",
           it: "Predicazione Espositiva",
+        },
+      },
+      {
+        slug: "volume-7",
+        titles: {
+          "pt-PT": "Comunicação Eficaz no Púlpito",
+          en: "Effective Communication in the Pulpit",
+          es: "Comunicación Eficaz en el Púlpito",
+          fr: "Communication Efficace en Chaire",
+          it: "Comunicazione Efficace dal Pulpito",
         },
       },
     ],
