@@ -21,4 +21,19 @@ describe("cleanBibleText", () => {
     expect(cleanBibleText('<img src=x onerror="alert(1)">Safe text'))
       .toBe("Safe text");
   });
+
+  it("removes Schlachter 2000 footnote references", () => {
+    expect(cleanBibleText("Denn so [sehr]<f> [27]</f> hat Gott die Welt geliebt"))
+      .toBe("Denn so [sehr] hat Gott die Welt geliebt");
+  });
+
+  it("removes loose numeric footnote markers", () => {
+    expect(cleanBibleText("Am Anfang schuf Gott[1] Himmel und Erde. [ 2 ]"))
+      .toBe("Am Anfang schuf Gott Himmel und Erde.");
+  });
+
+  it("keeps bold and italic content as plain text", () => {
+    expect(cleanBibleText("<b>Jesus</b> dit: <i>Je suis</i> le chemin[4]."))
+      .toBe("Jesus dit: Je suis le chemin.");
+  });
 });
