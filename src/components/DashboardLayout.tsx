@@ -1,14 +1,29 @@
 import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/hooks/use-theme";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import InstallButton from "@/components/InstallButton";
 import { usePageTracking } from "@/hooks/use-tracking";
+
+const MenuButton = () => {
+  const { toggleSidebar } = useSidebar();
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleSidebar}
+      className="h-9 w-9 text-primary hover:bg-primary/10"
+      aria-label="Menu"
+    >
+      <Menu className="!h-6 !w-6" strokeWidth={2.4} />
+    </Button>
+  );
+};
 
 const DashboardLayout = () => {
   const { t } = useTranslation();
@@ -23,7 +38,7 @@ const DashboardLayout = () => {
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-12 flex items-center justify-between border-b border-border px-4 shrink-0 md:px-6">
             <div className="flex items-center">
-              <SidebarTrigger className="text-primary" />
+              <MenuButton />
               <span className="ml-3 font-display text-sm font-bold text-primary md:hidden">{t("appName")}</span>
             </div>
             <div className="flex items-center gap-2">
