@@ -94,7 +94,16 @@
     "continueReading": "Continue de onde parou",
     "growth": "O seu crescimento",
     "booksCompleted": "{{done}} de {{total}} livros concluídos",
-    "open": "Continuar"
+    "open": "Continuar",
+    "goodMorning": "Bom dia",
+    "goodAfternoon": "Boa tarde",
+    "goodEvening": "Boa noite",
+    "verseOfDay": "Versículo do dia",
+    "readInBible": "Ler na Bíblia",
+    "recentOutlines": "Os seus últimos esboços",
+    "noOutlines": "Ainda não tem esboços guardados.",
+    "createSermon": "Criar sermão",
+    "discover": "Materiais para si"
   },
   "oficina": {
     "description": "Cria esboços de sermões completos com introdução, desenvolvimento e conclusão. Personaliza o tema, versículo base e duração.",

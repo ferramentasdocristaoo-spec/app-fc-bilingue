@@ -94,7 +94,16 @@
     "continueReading": "Continúa donde lo dejaste",
     "growth": "Tu crecimiento",
     "booksCompleted": "{{done}} de {{total}} libros completados",
-    "open": "Continuar"
+    "open": "Continuar",
+    "goodMorning": "Buenos días",
+    "goodAfternoon": "Buenas tardes",
+    "goodEvening": "Buenas noches",
+    "verseOfDay": "Versículo del día",
+    "readInBible": "Leer en la Biblia",
+    "recentOutlines": "Tus últimos bosquejos",
+    "noOutlines": "Aún no tienes bosquejos guardados.",
+    "createSermon": "Crear sermón",
+    "discover": "Materiales para ti"
   },
   "oficina": {
     "description": "Crea esquemas de sermones completos con introducción, desarrollo y conclusión. Personaliza el tema, versículo base y duración.",

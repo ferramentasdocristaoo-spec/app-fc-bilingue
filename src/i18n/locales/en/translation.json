@@ -94,7 +94,16 @@
     "continueReading": "Pick up where you left off",
     "growth": "Your growth",
     "booksCompleted": "{{done}} of {{total}} books completed",
-    "open": "Continue"
+    "open": "Continue",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "verseOfDay": "Verse of the day",
+    "readInBible": "Read in the Bible",
+    "recentOutlines": "Your recent outlines",
+    "noOutlines": "No saved outlines yet.",
+    "createSermon": "Create sermon",
+    "discover": "Materials for you"
   },
   "oficina": {
     "description": "Create complete sermon outlines with introduction, development, and conclusion. Customize the theme, base verse, and duration.",

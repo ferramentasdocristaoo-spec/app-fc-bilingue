@@ -94,7 +94,16 @@
     "continueReading": "Riprendi da dove avevi lasciato",
     "growth": "La tua crescita",
     "booksCompleted": "{{done}} libri completati su {{total}}",
-    "open": "Continua"
+    "open": "Continua",
+    "goodMorning": "Buongiorno",
+    "goodAfternoon": "Buon pomeriggio",
+    "goodEvening": "Buonasera",
+    "verseOfDay": "Versetto del giorno",
+    "readInBible": "Leggi nella Bibbia",
+    "recentOutlines": "I tuoi ultimi schemi",
+    "noOutlines": "Non hai ancora schemi salvati.",
+    "createSermon": "Crea sermone",
+    "discover": "Materiali per te"
   },
   "oficina": {
     "description": "Crea schemi di sermoni completi con introduzione, sviluppo e conclusione. Personalizza il tema, il versetto base e la durata.",

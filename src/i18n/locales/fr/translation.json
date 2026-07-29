@@ -94,7 +94,16 @@
     "continueReading": "Reprenez où vous vous êtes arrêté",
     "growth": "Votre progression",
     "booksCompleted": "{{done}} livres terminés sur {{total}}",
-    "open": "Continuer"
+    "open": "Continuer",
+    "goodMorning": "Bonjour",
+    "goodAfternoon": "Bon après-midi",
+    "goodEvening": "Bonsoir",
+    "verseOfDay": "Verset du jour",
+    "readInBible": "Lire dans la Bible",
+    "recentOutlines": "Vos derniers plans",
+    "noOutlines": "Aucun plan enregistré pour l’instant.",
+    "createSermon": "Créer un sermon",
+    "discover": "Matériels pour vous"
   },
   "oficina": {
     "description": "Créez des plans de sermon complets avec introduction, développement et conclusion. Personnalisez le thème, le verset de base et la durée.",

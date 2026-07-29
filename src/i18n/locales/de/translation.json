@@ -94,7 +94,16 @@
     "continueReading": "Machen Sie weiter, wo Sie aufgehört haben",
     "growth": "Ihr Wachstum",
     "booksCompleted": "{{done}} von {{total}} Büchern abgeschlossen",
-    "open": "Weiterlesen"
+    "open": "Weiterlesen",
+    "goodMorning": "Guten Morgen",
+    "goodAfternoon": "Guten Tag",
+    "goodEvening": "Guten Abend",
+    "verseOfDay": "Vers des Tages",
+    "readInBible": "In der Bibel lesen",
+    "recentOutlines": "Ihre letzten Gliederungen",
+    "noOutlines": "Noch keine gespeicherten Gliederungen.",
+    "createSermon": "Predigt erstellen",
+    "discover": "Materialien für Sie"
   },
   "oficina": {
     "description": "Erstellen Sie vollständige Predigtgliederungen mit Einleitung, Hauptteil und Schluss. Passen Sie Thema, Bibelstelle und Dauer an.",
