@@ -353,6 +353,115 @@ const PRODUCTS: ProductDef[] = [
       },
     ],
   },
+  {
+    slug: "a-uncao-do-leao",
+    titles: {
+      "pt-PT": "A Unção do Leão",
+      en: "The Lion’s Anointing",
+      es: "La Unción del León",
+      fr: "L’Onction du Lion",
+      it: "L’Unzione del Leone",
+      de: "Die Salbung des Löwen",
+    },
+    descriptions: {
+      "pt-PT": "Oito estudos sobre autoridade espiritual: de Jesus, o modelo, ao crescimento na unção.",
+      en: "Eight studies on spiritual authority: from Jesus, the model, to growing in the anointing.",
+      es: "Ocho estudios sobre autoridad espiritual: de Jesús, el modelo, al crecimiento en la unción.",
+      fr: "Huit études sur l’autorité spirituelle : de Jésus, le modèle, à la croissance dans l’onction.",
+      it: "Otto studi sull’autorità spirituale: da Gesù, il modello, alla crescita nell’unzione.",
+      de: "Acht Studien über geistliche Autorität: von Jesus, dem Vorbild, bis zum Wachstum in der Salbung.",
+    },
+    volumes: [
+      {
+        slug: "volume-1",
+        titles: {
+          "pt-PT": "Jesus, o Modelo de Autoridade",
+          en: "Jesus, the Model of Authority",
+          es: "Jesús, el Modelo de Autoridad",
+          fr: "Jésus, le Modèle d’Autorité",
+          it: "Gesù, il Modello di Autorità",
+          de: "Jesus, das Vorbild der Autorität",
+        },
+      },
+      {
+        slug: "volume-2",
+        titles: {
+          "pt-PT": "Autoridade Espiritual",
+          en: "Spiritual Authority",
+          es: "Autoridad Espiritual",
+          fr: "Autorité Spirituelle",
+          it: "Autorità Spirituale",
+          de: "Geistliche Autorität",
+        },
+      },
+      {
+        slug: "volume-3",
+        titles: {
+          "pt-PT": "A Unção do Espírito Santo",
+          en: "The Anointing of the Holy Spirit",
+          es: "La Unción del Espíritu Santo",
+          fr: "L’Onction du Saint-Esprit",
+          it: "L’Unzione dello Spirito Santo",
+          de: "Die Salbung des Heiligen Geistes",
+        },
+      },
+      {
+        slug: "volume-4",
+        titles: {
+          "pt-PT": "Autoridade na Oração e Intercessão",
+          en: "Authority in Prayer and Intercession",
+          es: "Autoridad en la Oración y la Intercesión",
+          fr: "Autorité dans la Prière et l’Intercession",
+          it: "Autorità nella Preghiera e nell’Intercessione",
+          de: "Autorität im Gebet und in der Fürbitte",
+        },
+      },
+      {
+        slug: "volume-5",
+        titles: {
+          "pt-PT": "Autoridade da Fé",
+          en: "The Authority of Faith",
+          es: "La Autoridad de la Fe",
+          fr: "L’Autorité de la Foi",
+          it: "L’Autorità della Fede",
+          de: "Die Autorität des Glaubens",
+        },
+      },
+      {
+        slug: "volume-6",
+        titles: {
+          "pt-PT": "Autoridade na Pregação e no Ensino",
+          en: "Authority in Preaching and Teaching",
+          es: "Autoridad en la Predicación y la Enseñanza",
+          fr: "Autorité dans la Prédication et l’Enseignement",
+          it: "Autorità nella Predicazione e nell’Insegnamento",
+          de: "Autorität in Predigt und Lehre",
+        },
+      },
+      {
+        slug: "volume-7",
+        titles: {
+          "pt-PT": "Autoridade sobre as Potestades das Trevas",
+          en: "Authority over the Powers of Darkness",
+          es: "Autoridad sobre las Potestades de las Tinieblas",
+          fr: "Autorité sur les Puissances des Ténèbres",
+          it: "Autorità sulle Potestà delle Tenebre",
+          de: "Autorität über die Mächte der Finsternis",
+        },
+      },
+      {
+        slug: "volume-8",
+        titles: {
+          "pt-PT": "Crescendo na Autoridade Espiritual",
+          en: "Growing in Spiritual Authority",
+          es: "Creciendo en Autoridad Espiritual",
+          fr: "Grandir dans l’Autorité Spirituelle",
+          it: "Crescere nell’Autorità Spirituale",
+          de: "Wachsen in Geistlicher Autorität",
+        },
+      },
+    ],
+  },
 ];
 
 export function libraryLanguage(language: string): LibraryLanguage {
