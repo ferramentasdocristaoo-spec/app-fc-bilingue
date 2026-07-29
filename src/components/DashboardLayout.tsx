@@ -17,7 +17,7 @@ const MenuButton = () => {
       variant="ghost"
       size="icon"
       onClick={toggleSidebar}
-      className="h-9 w-9 text-primary hover:bg-primary/10"
+      className="menu-toggle h-9 w-9 hover:bg-primary/10"
       aria-label="Menu"
     >
       <Menu className="!h-6 !w-6" strokeWidth={2.4} />

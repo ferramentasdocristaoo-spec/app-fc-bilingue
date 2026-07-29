@@ -115,6 +115,14 @@
 }
 
 @layer utilities {
+  /* Hambúrguer: dourado no modo escuro, azul marinho no modo claro */
+  .menu-toggle {
+    color: hsl(43 65% 55%);
+  }
+  .light .menu-toggle {
+    color: hsl(214 60% 18%);
+  }
+
   .gold-border {
     border: 1px solid hsl(var(--border));
   }
