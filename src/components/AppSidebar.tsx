@@ -41,13 +41,13 @@ export function AppSidebar() {
         <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-10 h-10 object-contain shrink-0" />
         <div className="overflow-hidden group-data-[collapsible=icon]:hidden">
           <h2 className="font-display text-sm font-bold text-primary leading-tight">{t("appName")}</h2>
-          <p className="text-[10px] text-muted-foreground">{t("subtitle")}</p>
+          <p className="text-[10px] text-sidebar-foreground/60">{t("subtitle")}</p>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-muted-foreground text-[10px] uppercase tracking-wider">
+          <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] uppercase tracking-wider">
             {t("sidebar.modules")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -78,14 +78,14 @@ export function AppSidebar() {
       <SidebarFooter className="p-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={signOut} className="text-muted-foreground hover:text-destructive">
+            <SidebarMenuButton onClick={signOut} className="text-sidebar-foreground/70 hover:text-destructive">
               <LogOut className="h-4 w-4" />
               <span>{t("sidebar.logout")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
         {email && (
-          <p className="text-[10px] text-muted-foreground truncate px-2 group-data-[collapsible=icon]:hidden">
+          <p className="text-[10px] text-sidebar-foreground/60 truncate px-2 group-data-[collapsible=icon]:hidden">
             {email}
           </p>
         )}
