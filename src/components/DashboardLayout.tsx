@@ -24,7 +24,7 @@ const DashboardLayout = () => {
           <header className="h-12 flex items-center justify-between border-b border-border px-4 shrink-0 md:px-6">
             <div className="flex items-center">
               <SidebarTrigger className="text-primary" />
-              <span className="ml-3 font-display text-sm font-bold text-primary md:hidden">FC Sermon</span>
+              <span className="ml-3 font-display text-sm font-bold text-primary md:hidden">{t("appName")}</span>
             </div>
             <div className="flex items-center gap-2">
               <InstallButton />

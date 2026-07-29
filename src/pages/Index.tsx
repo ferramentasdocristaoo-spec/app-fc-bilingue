@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Mic } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { appLogo } from "@/lib/branding";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
 
   const menuItems = [
@@ -25,7 +25,7 @@ const Index = () => {
     <div className="flex flex-col items-center px-4 py-8 md:py-12 md:px-8">
       {/* Logo */}
       <div className="w-28 h-28 md:w-36 md:h-36 mb-3 animate-fade-in">
-        <img src={logo} alt="FC Sermon" className="w-full h-full object-contain" />
+        <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-full h-full object-contain" />
       </div>
 
       {/* Tagline */}

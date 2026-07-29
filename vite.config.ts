@@ -26,8 +26,8 @@ export default defineConfig(() => ({
         navigateFallbackDenylist: [/^\/~oauth/],
       },
       manifest: {
-        name: "FC Sermon - Ferramentas do Cristão",
-        short_name: "FC Sermon",
+        name: "Ferramentas do Cristão",
+        short_name: "Ferramentas do Cristão",
         description: "Sua oficina completa para a Palavra e o Reino.",
         id: "/fc-sermon",
         theme_color: "#161b26",

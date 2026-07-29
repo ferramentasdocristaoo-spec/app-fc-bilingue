@@ -6,10 +6,10 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Loader2, LogIn } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { appLogo } from "@/lib/branding";
 
 const LoginPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -41,7 +41,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm flex flex-col items-center gap-6">
         <div className="w-24 h-24 animate-fade-in">
-          <img src={logo} alt="FC Sermon" className="w-full h-full object-contain" />
+          <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-full h-full object-contain" />
         </div>
 
         <div className="w-full rounded-xl border border-border bg-card p-6 space-y-5">

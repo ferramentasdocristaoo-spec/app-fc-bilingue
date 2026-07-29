@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Home, Mic, LogOut, Library } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { appLogo } from "@/lib/branding";
 import { useAuth } from "@/hooks/use-auth";
 import {
   Sidebar,
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 
 export function AppSidebar() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const { signOut, email } = useAuth();
 
@@ -38,10 +38,10 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarHeader className="p-4 flex items-center gap-3">
-        <img src={logo} alt="FC Sermon" className="w-10 h-10 object-contain shrink-0" />
+        <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-10 h-10 object-contain shrink-0" />
         <div className="overflow-hidden group-data-[collapsible=icon]:hidden">
-          <h2 className="font-display text-sm font-bold text-primary leading-tight">FC Sermon</h2>
-          <p className="text-[10px] text-muted-foreground">{t("appName")}</p>
+          <h2 className="font-display text-sm font-bold text-primary leading-tight">{t("appName")}</h2>
+          <p className="text-[10px] text-muted-foreground">{t("subtitle")}</p>
         </div>
       </SidebarHeader>
 

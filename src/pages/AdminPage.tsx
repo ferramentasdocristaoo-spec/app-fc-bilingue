@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Loader2, LogIn, LogOut, KeyRound, Shield, LayoutDashboard, Users, Brain, ScrollText, Menu, BarChart3, Library } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-pt.png";
 import DashboardSection from "@/components/admin/DashboardSection";
 import UsersSection from "@/components/admin/UsersSection";
 import CacheSection from "@/components/admin/CacheSection";
@@ -97,7 +97,7 @@ const AdminPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="w-full max-w-sm flex flex-col items-center gap-6">
-          <div className="w-20 h-20"><img src={logo} alt="FC Sermon" className="w-full h-full object-contain" /></div>
+          <div className="w-20 h-20"><img src={logo} alt="Ferramentas do Cristão" className="w-full h-full object-contain" /></div>
           <div className="w-full rounded-xl border border-border bg-card p-6 space-y-5">
             <div className="text-center space-y-1">
               <Shield className="w-8 h-8 mx-auto text-primary" />
@@ -149,7 +149,7 @@ const AdminPage = () => {
           <div className="w-9 h-9"><img src={logo} alt="" className="w-full h-full object-contain" /></div>
           <div>
             <h1 className="font-display text-base font-bold text-primary leading-tight">{t("admin.title")}</h1>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">FC Sermon</p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Ferramentas do Cristão</p>
           </div>
         </div>
 
