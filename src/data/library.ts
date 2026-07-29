@@ -462,6 +462,70 @@ const PRODUCTS: ProductDef[] = [
       },
     ],
   },
+  {
+    slug: "as-sete-dispensacoes",
+    titles: {
+      "pt-PT": "As Sete Dispensações",
+      en: "The Seven Dispensations",
+      es: "Las Siete Dispensaciones",
+      fr: "Les Sept Dispensations",
+      it: "Le Sette Dispensazioni",
+      de: "Die Sieben Dispensationen",
+    },
+    descriptions: {
+      "pt-PT": "Uma jornada através do plano divino de salvação ao longo das épocas.",
+      en: "A journey through God’s divine plan of salvation across the ages.",
+      es: "Un viaje a través del plan divino de salvación a lo largo de las épocas.",
+      fr: "Un voyage à travers le plan divin du salut à travers les âges.",
+      it: "Un viaggio attraverso il piano divino di salvezza attraverso le epoche.",
+      de: "Eine Reise durch Gottes göttlichen Heilsplan durch die Zeitalter.",
+    },
+    volumes: [
+      {
+        slug: "volume-1",
+        titles: {
+          "pt-PT": "As Sete Dispensações",
+          en: "The Seven Dispensations",
+          es: "Las Siete Dispensaciones",
+          fr: "Les Sept Dispensations",
+          it: "Le Sette Dispensazioni",
+          de: "Die Sieben Dispensationen",
+        },
+      },
+    ],
+  },
+  {
+    slug: "tesouros-de-conhecimento-biblico",
+    titles: {
+      "pt-PT": "Tesouros de Conhecimento Bíblico",
+      en: "Treasures of Biblical Knowledge",
+      es: "Tesoros de Conocimiento Bíblico",
+      fr: "Trésors de Connaissance Biblique",
+      it: "Tesori di Conoscenza Biblica",
+      de: "Schätze Biblischen Wissens",
+    },
+    descriptions: {
+      "pt-PT": "História, cultura e arqueologia reveladas sob a luz das Escrituras.",
+      en: "History, culture and archaeology revealed in the light of Scripture.",
+      es: "Historia, cultura y arqueología reveladas a la luz de las Escrituras.",
+      fr: "Histoire, culture et archéologie révélées à la lumière des Écritures.",
+      it: "Storia, cultura e archeologia rivelate alla luce delle Scritture.",
+      de: "Geschichte, Kultur und Archäologie im Licht der Heiligen Schrift.",
+    },
+    volumes: [
+      {
+        slug: "volume-1",
+        titles: {
+          "pt-PT": "Tesouros de Conhecimento Bíblico",
+          en: "Treasures of Biblical Knowledge",
+          es: "Tesoros de Conocimiento Bíblico",
+          fr: "Trésors de Connaissance Biblique",
+          it: "Tesori di Conoscenza Biblica",
+          de: "Schätze Biblischen Wissens",
+        },
+      },
+    ],
+  },
 ];
 
 export function libraryLanguage(language: string): LibraryLanguage {
