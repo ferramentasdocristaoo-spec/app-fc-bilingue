@@ -90,7 +90,11 @@
     "lightMode": "Light Mode",
     "darkMode": "Dark Mode",
     "install": "Install App",
-    "selectLanguage": "Select Language"
+    "selectLanguage": "Select Language",
+    "continueReading": "Pick up where you left off",
+    "growth": "Your growth",
+    "booksCompleted": "{{done}} of {{total}} books completed",
+    "open": "Continue"
   },
   "oficina": {
     "description": "Create complete sermon outlines with introduction, development, and conclusion. Customize the theme, base verse, and duration.",

@@ -90,7 +90,11 @@
     "lightMode": "Modo Claro",
     "darkMode": "Modo Escuro",
     "install": "Instalar Aplicação",
-    "selectLanguage": "Seleccionar Idioma"
+    "selectLanguage": "Seleccionar Idioma",
+    "continueReading": "Continue de onde parou",
+    "growth": "O seu crescimento",
+    "booksCompleted": "{{done}} de {{total}} livros concluídos",
+    "open": "Continuar"
   },
   "oficina": {
     "description": "Cria esboços de sermões completos com introdução, desenvolvimento e conclusão. Personaliza o tema, versículo base e duração.",

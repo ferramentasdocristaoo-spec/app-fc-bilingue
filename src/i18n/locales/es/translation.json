@@ -90,7 +90,11 @@
     "lightMode": "Modo Claro",
     "darkMode": "Modo Oscuro",
     "install": "Instalar Aplicación",
-    "selectLanguage": "Seleccionar Idioma"
+    "selectLanguage": "Seleccionar Idioma",
+    "continueReading": "Continúa donde lo dejaste",
+    "growth": "Tu crecimiento",
+    "booksCompleted": "{{done}} de {{total}} libros completados",
+    "open": "Continuar"
   },
   "oficina": {
     "description": "Crea esquemas de sermones completos con introducción, desarrollo y conclusión. Personaliza el tema, versículo base y duración.",

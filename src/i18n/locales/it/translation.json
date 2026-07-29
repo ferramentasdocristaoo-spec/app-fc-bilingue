@@ -90,7 +90,11 @@
     "lightMode": "Modalità Chiara",
     "darkMode": "Modalità Scura",
     "install": "Installa Applicazione",
-    "selectLanguage": "Seleziona Lingua"
+    "selectLanguage": "Seleziona Lingua",
+    "continueReading": "Riprendi da dove avevi lasciato",
+    "growth": "La tua crescita",
+    "booksCompleted": "{{done}} libri completati su {{total}}",
+    "open": "Continua"
   },
   "oficina": {
     "description": "Crea schemi di sermoni completi con introduzione, sviluppo e conclusione. Personalizza il tema, il versetto base e la durata.",

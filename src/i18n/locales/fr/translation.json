@@ -90,7 +90,11 @@
     "lightMode": "Mode clair",
     "darkMode": "Mode sombre",
     "install": "Installer l'application",
-    "selectLanguage": "Sélectionner la langue"
+    "selectLanguage": "Sélectionner la langue",
+    "continueReading": "Reprenez où vous vous êtes arrêté",
+    "growth": "Votre progression",
+    "booksCompleted": "{{done}} livres terminés sur {{total}}",
+    "open": "Continuer"
   },
   "oficina": {
     "description": "Créez des plans de sermon complets avec introduction, développement et conclusion. Personnalisez le thème, le verset de base et la durée.",

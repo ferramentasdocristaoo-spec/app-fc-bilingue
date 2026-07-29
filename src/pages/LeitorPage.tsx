@@ -16,7 +16,7 @@ import {
   Volume2,
   X,
 } from "lucide-react";
-import { libraryLanguage, libraryProduct, setVolumeProgress } from "@/data/library";
+import { libraryLanguage, libraryProduct, setLastRead, setVolumeProgress } from "@/data/library";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -146,7 +146,10 @@ export default function LeitorPage() {
     try {
       localStorage.setItem(storageKey, JSON.stringify({ cap, fonte, tema }));
     } catch { /* armazenamento indisponível */ }
-    if (productSlug && volumeSlug && total > 0) setVolumeProgress(productSlug, volumeSlug, ((cap + 1) / total) * 100);
+    if (productSlug && volumeSlug && total > 0) {
+      setVolumeProgress(productSlug, volumeSlug, ((cap + 1) / total) * 100);
+      setLastRead(productSlug, volumeSlug, cap + 1, total);
+    }
   }, [cap, fonte, tema, storageKey, productSlug, volumeSlug, total]);
 
   useEffect(() => {

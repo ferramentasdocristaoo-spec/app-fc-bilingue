@@ -90,7 +90,11 @@
     "lightMode": "Heller Modus",
     "darkMode": "Dunkler Modus",
     "install": "App installieren",
-    "selectLanguage": "Sprache wählen"
+    "selectLanguage": "Sprache wählen",
+    "continueReading": "Machen Sie weiter, wo Sie aufgehört haben",
+    "growth": "Ihr Wachstum",
+    "booksCompleted": "{{done}} von {{total}} Büchern abgeschlossen",
+    "open": "Weiterlesen"
   },
   "oficina": {
     "description": "Erstellen Sie vollständige Predigtgliederungen mit Einleitung, Hauptteil und Schluss. Passen Sie Thema, Bibelstelle und Dauer an.",

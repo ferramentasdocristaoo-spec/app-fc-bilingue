@@ -1,12 +1,18 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Mic } from "lucide-react";
+import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Mic, Library, TrendingUp, Play } from "lucide-react";
 import { appLogo } from "@/lib/branding";
+import { getLastRead, libraryStats } from "@/data/library";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
+  const language = i18n.resolvedLanguage || i18n.language;
+  const lastRead = getLastRead(language);
+  const stats = libraryStats();
 
   const menuItems = [
     { icon: BookOpen, title: t("sidebar.oficina.title"), description: t("sidebar.oficina.description"), path: "/oficina" },
@@ -19,13 +25,14 @@ const Index = () => {
     { icon: Mic, title: t("sidebar.voz.title"), description: t("sidebar.voz.description"), path: "/voz-de-deus" },
     { icon: Users, title: t("sidebar.pulpito.title"), description: t("sidebar.pulpito.description"), path: "/pulpito" },
     { icon: BookOpen, title: t("sidebar.biblia.title"), description: t("sidebar.biblia.description"), path: "/biblia" },
+    { icon: Library, title: t("sidebar.livraria.title"), description: t("sidebar.livraria.description"), path: "/livraria" },
   ];
 
   return (
     <div className="flex flex-col items-center px-4 py-8 md:py-12 md:px-8">
       {/* Logo */}
       <div className="w-28 h-28 md:w-36 md:h-36 mb-3 animate-fade-in">
-        <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-full h-full object-contain" />
+        <img src={appLogo(language)} alt={t("appName")} className="w-full h-full object-contain" />
       </div>
 
       {/* Tagline */}
@@ -36,6 +43,39 @@ const Index = () => {
           </p>
         </div>
       </div>
+
+      {/* Progresso do leitor */}
+      {(lastRead || stats.completed > 0) && (
+        <div className="w-full max-w-3xl mb-8 grid gap-4 md:grid-cols-2 animate-fade-in">
+          {lastRead && (
+            <div className={`rounded-xl border border-border bg-card p-5 ${!stats.completed ? "md:col-span-2" : ""}`}>
+              <p className="mb-1 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary">
+                <Play className="h-3.5 w-3.5" />{t("dashboard.continueReading")}
+              </p>
+              <h3 className="font-display text-lg font-bold text-foreground">{lastRead.volumeTitle}</h3>
+              <p className="mb-3 text-xs text-muted-foreground">
+                {lastRead.productTitle} • {t("livraria.reader.chapterOf", { current: lastRead.chapter, total: lastRead.totalChapters })}
+              </p>
+              <Progress value={lastRead.progress} className="mb-4 h-2" />
+              <Button asChild size="sm">
+                <Link to={`/livraria/${lastRead.productSlug}/${lastRead.volumeSlug}`}>{t("dashboard.open")}</Link>
+              </Button>
+            </div>
+          )}
+          {stats.completed > 0 && (
+            <div className={`rounded-xl border border-border bg-card p-5 ${!lastRead ? "md:col-span-2" : ""}`}>
+              <p className="mb-1 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary">
+                <TrendingUp className="h-3.5 w-3.5" />{t("dashboard.growth")}
+              </p>
+              <h3 className="font-display text-lg font-bold text-foreground">
+                {t("dashboard.booksCompleted", { done: stats.completed, total: stats.total })}
+              </h3>
+              <p className="mb-3 text-xs text-muted-foreground">{Math.round((stats.completed / stats.total) * 100)}%</p>
+              <Progress value={(stats.completed / stats.total) * 100} className="h-2" />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Menu Items - grid on desktop, list on mobile */}
       <div className={`w-full ${isMobile ? "max-w-sm flex flex-col gap-3" : "max-w-3xl grid grid-cols-2 lg:grid-cols-3 gap-4"}`}>

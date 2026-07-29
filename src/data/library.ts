@@ -588,3 +588,44 @@ export function setVolumeProgress(productSlug: string, volumeSlug: string, perce
     String(Math.round(total / product.volumes.length)),
   );
 }
+
+// Última leitura (para o "continuar de onde parou" da tela inicial).
+const LAST_READ_KEY = "library-last-read";
+
+export function setLastRead(productSlug: string, volumeSlug: string, chapter: number, totalChapters: number) {
+  localStorage.setItem(LAST_READ_KEY, JSON.stringify({ productSlug, volumeSlug, chapter, totalChapters }));
+}
+
+export function getLastRead(language: string) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LAST_READ_KEY) ?? "null");
+    if (!saved?.productSlug) return null;
+    const product = libraryProduct(language, saved.productSlug);
+    const volume = product?.volumes.find((v) => v.slug === saved.volumeSlug);
+    if (!product || !volume) return null;
+    return {
+      productSlug: saved.productSlug as string,
+      volumeSlug: saved.volumeSlug as string,
+      chapter: Number(saved.chapter) || 1,
+      totalChapters: Number(saved.totalChapters) || 0,
+      productTitle: product.title,
+      volumeTitle: volume.title,
+      progress: getVolumeProgress(saved.productSlug, saved.volumeSlug),
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Crescimento do leitor: livros concluídos no total da biblioteca.
+export function libraryStats() {
+  let total = 0;
+  let completed = 0;
+  for (const product of PRODUCTS) {
+    for (const volume of product.volumes) {
+      total += 1;
+      if (getVolumeProgress(product.slug, volume.slug) >= 100) completed += 1;
+    }
+  }
+  return { total, completed };
+}
