@@ -215,9 +215,20 @@ export default function LeitorPage() {
       if (event.key === "ArrowLeft") anterior();
       if (event.key === "ArrowRight") proximo();
       if (event.key === "Escape") fechar();
+      // proteção do conteúdo: copiar, selecionar tudo, recortar, salvar e imprimir
+      if ((event.ctrlKey || event.metaKey) && ["c", "a", "x", "s", "p"].includes(event.key.toLowerCase())) {
+        event.preventDefault();
+      }
     };
+    const bloquear = (event: Event) => event.preventDefault();
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    document.addEventListener("copy", bloquear);
+    document.addEventListener("cut", bloquear);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("copy", bloquear);
+      document.removeEventListener("cut", bloquear);
+    };
   }, [anterior, proximo, fechar]);
 
   if (!product || !volume) return <Navigate to="/livraria" replace />;
@@ -231,10 +242,11 @@ export default function LeitorPage() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex flex-col"
-      style={{ background: theme.bg, height: "100dvh" }}
+      className="fixed inset-0 z-[100] flex flex-col select-none"
+      style={{ background: theme.bg, height: "100dvh", WebkitTouchCallout: "none" } as React.CSSProperties}
       role="dialog"
       aria-label={`Lendo: ${volume.title}`}
+      onContextMenu={(event) => event.preventDefault()}
     >
       <header
         className="flex items-center justify-between px-3 py-2 shrink-0"
@@ -277,6 +289,28 @@ export default function LeitorPage() {
           </button>
         </div>
       </header>
+
+      {email && (
+        <div aria-hidden className="pointer-events-none fixed inset-0 z-[5] overflow-hidden">
+          {Array.from({ length: 9 }).map((_, index) => (
+            <span
+              key={index}
+              className="absolute whitespace-nowrap font-mono"
+              style={{
+                left: `${(index % 3) * 34 + 4}%`,
+                top: `${Math.floor(index / 3) * 30 + 12}%`,
+                transform: "rotate(-28deg)",
+                fontSize: 12,
+                letterSpacing: "0.08em",
+                color: theme.texto,
+                opacity: 0.055,
+              }}
+            >
+              {email}
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="h-[3px] shrink-0" style={{ background: theme.borda }}>
         <div
