@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useAi } from "@/hooks/use-ai";
 import { Sparkles, Save, Loader2, BookOpen, Lightbulb, MessageCircle, Copy, Download, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import "./WorkspaceDesign.css";
 
 const tempoMarks = [5, 10, 15, 20, 30, 45, 60, 90, 120];
 
@@ -48,8 +49,9 @@ const OficinaPage = () => {
   const [conteudoEditavel, setConteudoEditavel] = useState("");
   const { callAi, loading } = useAi();
 
-  const temas = [t("garimpo.suggestionAnxiety"), t("mural.categoryFamily"), t("garimpo.suggestionFaith"), t("garimpo.suggestionLove"), t("garimpo.suggestionHope"), t("garimpo.suggestionForgiveness"), "Santidade", "Missões"];
-  const tipos = ["Expositivo", "Temático", "Textual"];
+  const temas = [t("garimpo.suggestionAnxiety"), t("mural.categoryFamily"), t("garimpo.suggestionFaith"), t("garimpo.suggestionLove"), t("garimpo.suggestionHope"), t("garimpo.suggestionForgiveness"), t("workspace.holiness"), t("workspace.missions")];
+  const tipos = t("workspace.types", { returnObjects: true }) as string[];
+  const journeySteps = t("workspace.journey.steps", { returnObjects: true }) as string[];
 
   const minutos = sliderToMinutes(tempoIdx[0]);
 
@@ -125,11 +127,16 @@ const OficinaPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.oficina.title")}>
-      <div className="flex flex-col gap-4 max-w-2xl mx-auto">
-        <p className="text-sm text-muted-foreground leading-relaxed">{t("oficina.description")}</p>
+    <PageShell title={resultado || modoEdicao ? t("workspace.studio.title") : t("sidebar.oficina.title")}>
+      <div className={`sermon-workflow ${resultado || modoEdicao ? "studio-active" : "journey-active"}`}>
+        {!resultado && !modoEdicao && <>
+          <div className="journey-rail">
+            {journeySteps.map((step, index) => <div className={index === 0 ? "active" : ""} key={step}><span>{index + 1}</span><small>{step}</small></div>)}
+          </div>
+          <div className="journey-heading"><span>{t("workspace.journey.kicker")}</span><h2>{t("workspace.journey.title")}</h2><p>{t("oficina.description")}</p></div>
+        </>}
 
-        <div className="rounded-xl border border-border bg-card/50 p-5 space-y-5">
+        {!resultado && !modoEdicao && <div className="journey-form rounded-xl border border-border bg-card/50 p-5 space-y-5">
           <div className="space-y-1.5">
             <Label className="text-sm font-semibold text-foreground">{t("oficina.themeLabel")}</Label>
             <Input placeholder={t("oficina.themePlaceholder")} value={titulo} onChange={(e) => setTitulo(e.target.value)} />
@@ -169,7 +176,7 @@ const OficinaPage = () => {
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {loading ? t("oficina.generating") : t("oficina.generateButton")}
           </Button>
-        </div>
+        </div>}
 
         {loading && (
           <div className="flex items-center justify-center py-12 gap-3 text-muted-foreground">
@@ -179,7 +186,15 @@ const OficinaPage = () => {
         )}
 
         {resultado && !loading && !modoEdicao && (
-          <div className="flex flex-col gap-4 animate-fade-in">
+          <div className="studio-shell animate-fade-in">
+            <aside className="studio-outline">
+              <span className="studio-panel-label">{t("workspace.studio.message")}</span>
+              <button className="active"><b>01</b>{t("oficina.introduction")}</button>
+              {resultado.pontos.map((p, i) => <button key={p.titulo}><b>0{i + 2}</b>{p.titulo}</button>)}
+              <button><b>0{resultado.pontos.length + 2}</b>{t("oficina.conclusion")}</button>
+              <div className="studio-sources"><span>{t("workspace.studio.sources")}</span><p><BookOpen />{resultado.texto_base}</p><p><Lightbulb />{tema || tipo}</p></div>
+            </aside>
+            <div className="studio-document">
             <div className="text-center space-y-1">
               <h2 className="font-display text-2xl font-bold text-primary">{resultado.titulo}</h2>
               {resultado.texto_base && <p className="text-sm text-muted-foreground">{resultado.texto_base}</p>}
@@ -229,6 +244,17 @@ const OficinaPage = () => {
               </Button>
               <Button className="flex-1" onClick={() => handleSave("finalizado")}>{t("oficina.finalButton")}</Button>
             </div>
+            </div>
+            <aside className="studio-assistant">
+              <div className="studio-assistant-title"><Sparkles /> <strong>{t("workspace.studio.assistant")}</strong></div>
+              <span>{t("workspace.studio.working")}</span>
+              <h3>{resultado.pontos[0]?.titulo || resultado.titulo}</h3>
+              <p>{t("workspace.studio.help")}</p>
+              <button><Sparkles /> {t("workspace.studio.develop")}</button>
+              <button><BookOpen /> {t("workspace.studio.supportTexts")}</button>
+              <button><Lightbulb /> {t("workspace.studio.illustration")}</button>
+              <button onClick={handleEditar}>✏️ {t("workspace.studio.fullEditor")}</button>
+            </aside>
           </div>
         )}
 

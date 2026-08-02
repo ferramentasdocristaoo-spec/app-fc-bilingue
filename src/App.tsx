@@ -24,6 +24,7 @@ import AdminPage from "./pages/AdminPage.tsx";
 import LivrariaPage from "./pages/LivrariaPage.tsx";
 import ColecaoPage from "./pages/ColecaoPage.tsx";
 import LeitorPage from "./pages/LeitorPage.tsx";
+import LayoutDemoPage from "./pages/LayoutDemoPage.tsx";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,11 @@ const queryClient = new QueryClient();
 const ProtectedRoutes = () => {
   const { email, loading } = useAuth();
   const isAdminRoute = typeof window !== "undefined" && window.location.pathname.startsWith("/fc-control-panel");
+  const isLayoutDemo = typeof window !== "undefined" && window.location.pathname.startsWith("/layout-demo");
+
+  if (isLayoutDemo) {
+    return <Routes><Route path="/layout-demo" element={<LayoutDemoPage />} /></Routes>;
+  }
   if (isAdminRoute) {
     return (
       <Routes>
