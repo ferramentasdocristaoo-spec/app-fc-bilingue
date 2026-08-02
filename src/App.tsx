@@ -24,7 +24,6 @@ import AdminPage from "./pages/AdminPage.tsx";
 import LivrariaPage from "./pages/LivrariaPage.tsx";
 import ColecaoPage from "./pages/ColecaoPage.tsx";
 import LeitorPage from "./pages/LeitorPage.tsx";
-import DesignLabPage from "./pages/DesignLabPage.tsx";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -32,16 +31,6 @@ const queryClient = new QueryClient();
 const ProtectedRoutes = () => {
   const { email, loading } = useAuth();
   const isAdminRoute = typeof window !== "undefined" && window.location.pathname.startsWith("/fc-control-panel");
-  const isDesignLab = typeof window !== "undefined" && window.location.pathname.startsWith("/design-lab");
-
-  if (isDesignLab) {
-    return (
-      <Routes>
-        <Route path="/design-lab" element={<DesignLabPage />} />
-      </Routes>
-    );
-  }
-
   if (isAdminRoute) {
     return (
       <Routes>
