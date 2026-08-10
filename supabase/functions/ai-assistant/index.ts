@@ -13,6 +13,7 @@ const LANG_NAMES: Record<string, string> = {
   "fr": "French",
   "es": "Spanish",
   "it": "Italian",
+  "de": "German",
 };
 
 function getLangName(lang: string): string {
@@ -87,20 +88,46 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const sb = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { action, payload } = await req.json();
+    const { action, payload, adminCredentials } = await req.json();
 
     // Extract and validate language
     const lang = payload.lang || "pt-PT";
     const langName = getLangName(lang);
 
+    // Editorial generation is an admin-only operation because it consumes paid AI tokens.
+    // Credentials are validated before cache access and are never included in cache keys.
+    if (action === "jornada-capitulo" || action === "jornada-uso") {
+      const { data: isAdmin, error: adminError } = await sb.rpc("verify_admin", {
+        _email: adminCredentials?._admin_email || "",
+        _password: adminCredentials?._admin_password || "",
+      });
+      if (adminError || !isAdmin) throw { status: 401, message: "Apenas o administrador pode gerar conteúdo da Jornada." };
+    }
+
+    const journeyDailyLimit = 50;
+    const journeyDayStart = new Date();
+    journeyDayStart.setUTCHours(0, 0, 0, 0);
+    const getJourneyDailyUsage = async () => {
+      const { count } = await sb.from("ai_cache").select("id", { count: "exact", head: true })
+        .eq("action", "jornada-capitulo").gte("created_at", journeyDayStart.toISOString());
+      return count ?? 0;
+    };
+    if (action === "jornada-uso") {
+      const used = await getJourneyDailyUsage();
+      return new Response(JSON.stringify({ result: { used, limit: journeyDailyLimit, remaining: Math.max(0, journeyDailyLimit - used) } }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // --- Rate limiting: max 10 AI calls per IP per minute ---
     const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString();
-    const rateLimitKey = `rate:${clientIp}`;
+    const ipDigest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(clientIp));
+    const rateLimitKey = Array.from(new Uint8Array(ipDigest)).map(byte => byte.toString(16).padStart(2, "0")).join("");
     const { count: recentCalls } = await sb
-      .from("ai_cache")
+      .from("ai_request_log")
       .select("id", { count: "exact", head: true })
-      .eq("cache_key", rateLimitKey)
+      .eq("request_key", rateLimitKey)
       .gte("created_at", oneMinuteAgo);
 
     if ((recentCalls ?? 0) >= 10) {
@@ -109,6 +136,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    await sb.from("ai_request_log").insert({ request_key: rateLimitKey, action });
 
     // Build cache key from action + sorted payload values (includes lang)
     const cacheKey = JSON.stringify(payload, Object.keys(payload).sort());
@@ -124,15 +152,48 @@ serve(async (req) => {
 
     if (cached) {
       console.log(`Cache HIT for ${action} [${lang}]: ${cacheKey}`);
-      return new Response(JSON.stringify({ result: cached.result }), {
+      return new Response(JSON.stringify({ result: cached.result, cacheHit: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     console.log(`Cache MISS for ${action} [${lang}]: ${cacheKey}`);
+    if (action === "jornada-capitulo" && await getJourneyDailyUsage() >= journeyDailyLimit) {
+      throw { status: 429, message: `Limite diário de ${journeyDailyLimit} gerações da Jornada atingido.` };
+    }
     let result: any;
 
     switch (action) {
+      case "jornada-capitulo": {
+        const { bookName, chapter, scriptureText, previousChapterTitle, nextChapterTitle } = payload;
+        if (!bookName || !chapter || !scriptureText) throw { status: 400, message: "Livro, capítulo e texto bíblico são obrigatórios." };
+        result = await callAiStructured(
+          OPENAI_API_KEY,
+          `You are a careful evangelical Bible editor. Respond entirely in ${langName}. Remain strictly grounded in the supplied biblical text. Never invent people, places, events, quotations or cross-references. Distinguish explicit information from reasonable literary connections.`,
+          `Create the editorial guide for ${bookName} ${chapter}.
+Previous chapter: ${previousChapterTitle || "none"}.
+Next chapter: ${nextChapterTitle || "none"}.
+Return a specific title, a concise 2-3 sentence summary, the central theme, named characters, explicit places, 2-5 valid related Bible references, one reflective question, and short connections to the adjacent chapters.
+
+BIBLICAL TEXT:
+${scriptureText}`,
+          {
+            name: "journey_chapter_editorial",
+            description: "Returns a grounded chapter guide for the Bible Journey",
+            parameters: {
+              type: "object",
+              properties: {
+                title: { type: "string" }, summary: { type: "string" }, keyTheme: { type: "string" },
+                characters: { type: "array", items: { type: "string" } }, places: { type: "array", items: { type: "string" } },
+                relatedReferences: { type: "array", items: { type: "string" }, minItems: 2, maxItems: 5 },
+                reflectionPrompt: { type: "string" }, previousConnection: { type: "string" }, nextConnection: { type: "string" },
+              },
+              required: ["title", "summary", "keyTheme", "characters", "places", "relatedReferences", "reflectionPrompt", "previousConnection", "nextConnection"],
+            },
+          },
+        );
+        break;
+      }
       case "gerar-esboco": {
         const { titulo, textoBase, tema, tipo, tempo } = payload;
         const minutos = parseInt(tempo) || 15;
@@ -377,11 +438,14 @@ serve(async (req) => {
 
     // Save to cache
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    const { error: cacheErr } = await sb.from("ai_cache").insert({ action, cache_key: cacheKey, result, expires_at: expiresAt });
+    const { error: cacheErr } = await sb.from("ai_cache").upsert(
+      { action, cache_key: cacheKey, result, expires_at: expiresAt, created_at: new Date().toISOString() },
+      { onConflict: "action,cache_key" },
+    );
     if (cacheErr) console.warn("Cache save error:", cacheErr.message);
     else console.log(`Cache SAVED for ${action} [${lang}]: ${cacheKey}`);
 
-    return new Response(JSON.stringify({ result }), {
+    return new Response(JSON.stringify({ result, cacheHit: false }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {

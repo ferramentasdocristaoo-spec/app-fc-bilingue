@@ -1,0 +1,10 @@
+import type { JourneyLanguage } from "./types";
+const labels:Record<JourneyLanguage,Record<string,string>>={
+  "pt-PT":{pentateuch:"Pentateuco",historical:"Livros históricos",wisdom:"Poéticos e sapienciais",major_prophet:"Profetas maiores",minor_prophet:"Profetas menores",gospel:"Evangelhos",history:"História da Igreja",pauline:"Cartas de Paulo",general:"Cartas gerais",apocalyptic:"Literatura apocalíptica"},
+  en:{pentateuch:"Pentateuch",historical:"Historical books",wisdom:"Poetry and wisdom",major_prophet:"Major prophets",minor_prophet:"Minor prophets",gospel:"Gospels",history:"Church history",pauline:"Pauline letters",general:"General letters",apocalyptic:"Apocalyptic literature"},
+  es:{pentateuch:"Pentateuco",historical:"Libros históricos",wisdom:"Poéticos y sapienciales",major_prophet:"Profetas mayores",minor_prophet:"Profetas menores",gospel:"Evangelios",history:"Historia de la Iglesia",pauline:"Cartas de Pablo",general:"Cartas generales",apocalyptic:"Literatura apocalíptica"},
+  fr:{pentateuch:"Pentateuque",historical:"Livres historiques",wisdom:"Poésie et sagesse",major_prophet:"Grands prophètes",minor_prophet:"Petits prophètes",gospel:"Évangiles",history:"Histoire de l'Église",pauline:"Lettres de Paul",general:"Épîtres générales",apocalyptic:"Littérature apocalyptique"},
+  it:{pentateuch:"Pentateuco",historical:"Libri storici",wisdom:"Poetici e sapienziali",major_prophet:"Profeti maggiori",minor_prophet:"Profeti minori",gospel:"Vangeli",history:"Storia della Chiesa",pauline:"Lettere di Paolo",general:"Lettere generali",apocalyptic:"Letteratura apocalittica"},
+  de:{pentateuch:"Pentateuch",historical:"Geschichtsbücher",wisdom:"Dichtung und Weisheit",major_prophet:"Große Propheten",minor_prophet:"Kleine Propheten",gospel:"Evangelien",history:"Kirchengeschichte",pauline:"Paulusbriefe",general:"Allgemeine Briefe",apocalyptic:"Apokalyptische Literatur"},
+};
+export const journeyCategoryLabel=(category:string,language:JourneyLanguage)=>labels[language][category]??category;

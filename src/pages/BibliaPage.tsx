@@ -6,6 +6,7 @@ import { Loader2, ChevronLeft, ChevronRight, BookOpen, Volume2, Pause, Play, Squ
 import { toast } from "@/hooks/use-toast";
 import PageShell from "@/components/PageShell";
 import { cleanBibleText } from "@/lib/bible-text";
+import { useSearchParams } from "react-router-dom";
 
 const SPEECH_LANG: Record<string, string> = {
   "pt-PT": "pt-PT",
@@ -164,11 +165,18 @@ function isVerse(value: unknown): value is Verse {
 
 const BibliaPage = () => {
   const { t, i18n } = useTranslation();
+  const [searchParams] = useSearchParams();
   const lang = normalizeBibleLanguage(i18n.resolvedLanguage || i18n.language);
   const versions = VERSIONS_BY_LANG[lang];
   const [version, setVersion] = useState(() => DEFAULT_VERSION_BY_LANG[lang]);
-  const [bookId, setBookId] = useState(1);
-  const [chapter, setChapter] = useState(1);
+  const [bookId, setBookId] = useState(() => {
+    const requested = Number(searchParams.get("bookId"));
+    return BOOKS.some((book) => book.id === requested) ? requested : 1;
+  });
+  const [chapter, setChapter] = useState(() => {
+    const requested = Number(searchParams.get("chapter"));
+    return Number.isInteger(requested) && requested > 0 ? requested : 1;
+  });
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);

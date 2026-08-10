@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Loader2, LogIn, LogOut, KeyRound, Shield, LayoutDashboard, Users, Brain, ScrollText, Menu, BarChart3, Library } from "lucide-react";
+import { Loader2, LogIn, LogOut, KeyRound, Shield, LayoutDashboard, Users, Brain, ScrollText, Menu, BarChart3, Library, BookMarked } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import logo from "@/assets/logo-pt.png";
 import DashboardSection from "@/components/admin/DashboardSection";
 import UsersSection from "@/components/admin/UsersSection";
@@ -14,11 +15,12 @@ import CacheSection from "@/components/admin/CacheSection";
 import SermonsSection from "@/components/admin/SermonsSection";
 import AnalyticsSection from "@/components/admin/AnalyticsSection";
 import LibrarySection from "@/components/admin/LibrarySection";
+import JourneyEditorialSection from "@/components/admin/JourneyEditorialSection";
 
 const SS_EMAIL = "fc-admin-email";
 const SS_PASS = "fc-admin-pass";
 
-type Tab = "dashboard" | "analytics" | "users" | "sermons" | "cache" | "livraria";
+type Tab = "dashboard" | "analytics" | "users" | "sermons" | "cache" | "livraria" | "jornada";
 
 const AdminPage = () => {
   // O painel admin é sempre exibido em português, independente do idioma do app.
@@ -36,11 +38,12 @@ const AdminPage = () => {
   const [newPw, setNewPw] = useState("");
   const [newPw2, setNewPw2] = useState("");
 
-  const NAV: { id: Tab; label: string; icon: any }[] = [
+  const NAV: { id: Tab; label: string; icon: LucideIcon }[] = [
     { id: "dashboard", label: t("admin.dashboard"), icon: LayoutDashboard },
     { id: "analytics", label: t("admin.analytics"), icon: BarChart3 },
     { id: "users", label: t("admin.users"), icon: Users },
     { id: "livraria", label: t("admin.livraria"), icon: Library },
+    { id: "jornada", label: "Jornada Bíblica", icon: BookMarked },
     { id: "sermons", label: t("admin.sermons"), icon: ScrollText },
     { id: "cache", label: t("admin.cache"), icon: Brain },
   ];
@@ -125,6 +128,7 @@ const AdminPage = () => {
       case "analytics": return <AnalyticsSection creds={creds} />;
       case "users": return <UsersSection creds={creds} onUnauthorized={handleLogout} />;
       case "livraria": return <LibrarySection creds={creds} onUnauthorized={handleLogout} />;
+      case "jornada": return <JourneyEditorialSection credentials={creds} />;
       case "sermons": return <SermonsSection />;
       case "cache": return <CacheSection creds={creds} />;
     }

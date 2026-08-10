@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Home, Mic, LogOut, Library } from "lucide-react";
+import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Home, Mic, LogOut, Library, Map } from "lucide-react";
 import { appLogo } from "@/lib/branding";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -28,6 +28,7 @@ export function AppSidebar() {
   ];
   const studyItems = [
     { icon: BookOpen, title: t("sidebar.biblia.title"), description: t("sidebar.biblia.description"), path: "/biblia" },
+    { icon: Map, title: t("journey.title"), description: t("journey.sidebarDescription"), path: "/jornada" },
     { icon: Zap, title: t("sidebar.raioX.title"), description: t("sidebar.raioX.description"), path: "/raio-x" },
     { icon: Search, title: t("sidebar.nomes.title"), description: t("sidebar.nomes.description"), path: "/nomes" },
     { icon: Sparkles, title: t("sidebar.garimpo.title"), description: t("sidebar.garimpo.description"), path: "/garimpo" },
