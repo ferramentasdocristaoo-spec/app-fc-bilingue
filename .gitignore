@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 .lovable/
 supabase/.temp/
+
+# Cloudflare / segredos locais
+.dev.vars
+.wrangler/
+.export/
