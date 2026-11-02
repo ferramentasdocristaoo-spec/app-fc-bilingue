@@ -24,6 +24,8 @@ export default defineConfig(() => ({
       includeAssets: ["favicon.ico", "pwa-icon-192.png", "pwa-icon-512.png"],
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
+        // Fontes auto-hospedadas (só latin/latin-ext) entram no precache para uso offline
+        globPatterns: ["**/*.{js,wasm,css,html}", "**/*latin*.woff2"],
       },
       manifest: {
         name: "Ferramentas do Cristão",

@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,94 +6,131 @@
   /* Dark theme (default) */
   :root {
     /* Modo escuro: azul marinho profundo com dourado (paleta da marca) */
-    --background: 214 62% 5%;
-    --foreground: 42 35% 92%;
+    --background: 216 53% 8%;
+    --foreground: 41 42% 88%;
 
-    --card: 214 52% 9%;
-    --card-foreground: 42 35% 92%;
+    --card: 216 48% 11%;
+    --card-foreground: 41 42% 88%;
 
-    --popover: 214 52% 9%;
-    --popover-foreground: 42 35% 92%;
+    --popover: 216 48% 11%;
+    --popover-foreground: 41 42% 88%;
 
-    --primary: 43 65% 55%;
-    --primary-foreground: 214 55% 10%;
+    --primary: 41 52% 60%;
+    --primary-foreground: 216 55% 10%;
 
-    --secondary: 214 45% 13%;
-    --secondary-foreground: 42 30% 88%;
+    --secondary: 216 42% 14%;
+    --secondary-foreground: 41 30% 86%;
 
-    --muted: 214 42% 11%;
-    --muted-foreground: 214 18% 62%;
+    --muted: 216 42% 12%;
+    --muted-foreground: 218 14% 66%;
 
-    --accent: 43 55% 48%;
-    --accent-foreground: 42 30% 96%;
+    --accent: 216 40% 16%;
+    --accent-foreground: 41 42% 90%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 62% 52%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214 35% 18%;
-    --input: 214 42% 13%;
-    --ring: 43 65% 55%;
+    --border: 216 36% 20%;
+    --input: 216 36% 22%;
+    --ring: 41 52% 60%;
 
-    --radius: 0.75rem;
+    /* Raio base: 8px. md = 4px (botões e campos), sm = 2px (superfícies) */
+    --radius: 0.5rem;
 
-    --gold-gradient: linear-gradient(135deg, hsl(43, 65%, 55%), hsl(38, 70%, 42%));
-    --gold-shimmer: linear-gradient(90deg, hsl(43, 55%, 45%), hsl(43, 75%, 60%), hsl(43, 55%, 45%));
-    --dark-texture: radial-gradient(ellipse at 20% 50%, hsl(214, 55%, 8%) 0%, hsl(214, 65%, 4%) 100%);
+    /* Tokens editoriais "Livro de Estudo" */
+    --paper: 216 53% 8%;
+    --paper-2: 216 48% 13%;
+    --ink: 41 42% 88%;
+    --ink-2: 41 12% 70%;
+    --ink-3: 218 12% 62%;
+    --gold: 40 50% 57%;
+    --gold-ink: 41 55% 67%;
+    --gold-soft: 40 30% 26%;
+    --rule: 216 36% 22%;
+    --rule-soft: 216 42% 16%;
+    --navy: 216 62% 6%;
+    --oxblood: 0 44% 29%;
+    --shadow-page: 0 1px 0 hsl(216 60% 2% / .3), 0 14px 34px -18px hsl(216 60% 2% / .7);
 
-    --sidebar-background: 214 62% 6%;
-    --sidebar-foreground: 42 30% 92%;
-    --sidebar-primary: 43 65% 55%;
-    --sidebar-primary-foreground: 214 55% 10%;
-    --sidebar-accent: 214 45% 13%;
-    --sidebar-accent-foreground: 42 30% 92%;
-    --sidebar-border: 214 35% 16%;
-    --sidebar-ring: 43 65% 55%;
+    --font-display: "Cormorant Garamond", Georgia, serif;
+    --font-text: "Source Serif 4 Variable", "Source Serif 4", Georgia, serif;
+    --font-ui: "Inter Variable", Inter, system-ui, sans-serif;
+    --font-brand: Cinzel, "Cormorant Garamond", serif;
+
+    /* Mantidos por compatibilidade; sem gradiente nem brilho */
+    --gold-gradient: hsl(var(--ink));
+    --gold-shimmer: linear-gradient(90deg, hsl(var(--gold)), hsl(var(--gold)));
+    --dark-texture: none;
+
+    --sidebar-background: 216 62% 6%;
+    --sidebar-foreground: 41 30% 84%;
+    --sidebar-primary: 40 50% 57%;
+    --sidebar-primary-foreground: 216 55% 10%;
+    --sidebar-accent: 216 45% 11%;
+    --sidebar-accent-foreground: 41 42% 92%;
+    --sidebar-border: 216 36% 15%;
+    --sidebar-ring: 40 50% 57%;
   }
 
   /* Light theme - warm earthy palette */
   .light {
-    /* Modo claro: bege e branco, texto marinho, dourado como destaque */
-    --background: 40 32% 95%;
-    --foreground: 214 45% 18%;
+    /* Modo claro: papel bege, tinta marinho, dourado só como acento */
+    --background: 40 47% 94%;
+    --foreground: 216 45% 16%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 214 45% 18%;
+    --card: 40 50% 97%;
+    --card-foreground: 216 45% 16%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 214 45% 18%;
+    --popover: 40 50% 97%;
+    --popover-foreground: 216 45% 16%;
 
-    --primary: 42 62% 45%;
-    --primary-foreground: 214 55% 12%;
+    /* Dourado escurecido para ter contraste AA como texto sobre o papel */
+    --primary: 40 52% 35%;
+    --primary-foreground: 40 47% 96%;
 
-    --secondary: 40 26% 89%;
-    --secondary-foreground: 214 38% 24%;
+    --secondary: 41 38% 89%;
+    --secondary-foreground: 216 40% 20%;
 
-    --muted: 40 22% 91%;
-    --muted-foreground: 214 18% 42%;
+    --muted: 41 35% 90%;
+    --muted-foreground: 218 14% 40%;
 
-    --accent: 40 30% 87%;
-    --accent-foreground: 214 40% 20%;
+    --accent: 41 38% 88%;
+    --accent-foreground: 216 45% 16%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 42%;
+    --destructive-foreground: 40 47% 96%;
 
-    --border: 40 22% 83%;
-    --input: 40 24% 90%;
-    --ring: 42 62% 45%;
+    --border: 41 39% 80%;
+    --input: 41 30% 76%;
+    --ring: 40 52% 35%;
 
-    --gold-gradient: linear-gradient(135deg, hsl(42, 62%, 48%), hsl(38, 66%, 38%));
-    --gold-shimmer: linear-gradient(90deg, hsl(42, 50%, 42%), hsl(42, 68%, 56%), hsl(42, 50%, 42%));
+    --paper: 40 47% 94%;
+    --paper-2: 41 42% 89%;
+    --ink: 216 45% 16%;
+    --ink-2: 218 17% 35%;
+    --ink-3: 218 13% 42%;
+    --gold: 40 48% 47%;
+    --gold-ink: 40 52% 35%;
+    --gold-soft: 40 45% 84%;
+    --rule: 41 39% 78%;
+    --rule-soft: 41 40% 86%;
+    --navy: 215 54% 12%;
+    --oxblood: 0 44% 29%;
+    --shadow-page: 0 1px 0 hsl(216 45% 16% / .04), 0 12px 32px -18px hsl(216 45% 16% / .25);
+
+    --gold-gradient: hsl(var(--ink));
+    --gold-shimmer: linear-gradient(90deg, hsl(var(--gold-ink)), hsl(var(--gold-ink)));
     --dark-texture: none;
 
-    /* Sidebar em marinho também no modo claro: identidade da marca */
-    --sidebar-background: 214 60% 8%;
-    --sidebar-foreground: 42 28% 92%;
-    --sidebar-primary: 43 65% 55%;
-    --sidebar-primary-foreground: 214 55% 10%;
-    --sidebar-accent: 214 45% 15%;
-    --sidebar-accent-foreground: 42 28% 92%;
-    --sidebar-border: 214 35% 18%;
-    --sidebar-ring: 43 65% 55%;
+    /* Menu lateral em marinho também no modo claro: identidade da marca */
+    --sidebar-background: 215 54% 12%;
+    --sidebar-foreground: 41 25% 80%;
+    --sidebar-primary: 40 48% 55%;
+    --sidebar-primary-foreground: 216 55% 10%;
+    --sidebar-accent: 215 45% 16%;
+    --sidebar-accent-foreground: 41 42% 92%;
+    --sidebar-border: 215 35% 19%;
+    --sidebar-ring: 40 48% 55%;
   }
 }
 
@@ -107,6 +142,16 @@
   body {
     @apply bg-background text-foreground font-body antialiased;
     min-height: 100vh;
+    font-feature-settings: "kern", "liga";
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: hsl(var(--gold) / .3);
   }
 
   :root:not(.light) body {
@@ -127,8 +172,9 @@
     border: 1px solid hsl(var(--border));
   }
 
+  /* Antigo brilho dourado: substituído pela sombra única "de página" */
   .gold-glow {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.15);
+    box-shadow: var(--shadow-page);
   }
 
   .gold-text {
@@ -139,12 +185,11 @@
   }
 
   .menu-card {
-    @apply gold-border rounded-xl p-4 flex items-center gap-4 transition-all duration-300 bg-card;
+    @apply gold-border rounded-md p-4 flex items-center gap-4 transition-all duration-300 bg-card;
   }
 
   .menu-card:active {
-    @apply scale-[0.98];
-    box-shadow: 0 0 15px hsl(var(--primary) / 0.2);
+    background: hsl(var(--secondary));
   }
 }
 

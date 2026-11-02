@@ -3,6 +3,7 @@
 import './i18n';
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+import "./styles/fonts.css";
 import "./index.css";
 
 // Prevent the service worker from interfering when the app is embedded in an iframe.
