@@ -2,6 +2,7 @@
   "appName": "Christian Tools",
   "subtitle": "Your workshop for the Word and the Kingdom",
   "login": {
+    "checkEmail": "We sent a sign-in link to your email. Open it on this device to log in.",
     "title": "Sign In",
     "subtitle": "Access with your email approved for purchase.",
     "emailLabel": "Email",

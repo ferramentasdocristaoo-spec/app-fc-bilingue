@@ -2,6 +2,7 @@
   "appName": "Herramientas del Cristiano",
   "subtitle": "Tu taller para la Palabra y el Reino",
   "login": {
+    "checkEmail": "Te enviamos un enlace de acceso a tu correo. Ábrelo en este dispositivo para entrar.",
     "title": "Iniciar Sesión",
     "subtitle": "Accede con tu correo electrónico aprobado para la compra.",
     "emailLabel": "Correo Electrónico",

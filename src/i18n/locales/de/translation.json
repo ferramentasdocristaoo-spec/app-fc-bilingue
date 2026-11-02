@@ -2,6 +2,7 @@
   "appName": "Werkzeuge des Christen",
   "subtitle": "Ihre Werkstatt für das Wort und das Reich",
   "login": {
+    "checkEmail": "Wir haben dir einen Anmeldelink per E-Mail geschickt. Öffne ihn auf diesem Gerät, um dich anzumelden.",
     "title": "Anmelden",
     "subtitle": "Zugang mit Ihrer beim Kauf bestätigten E-Mail-Adresse.",
     "emailLabel": "E-Mail",

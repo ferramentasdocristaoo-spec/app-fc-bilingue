@@ -2,6 +2,7 @@
   "appName": "Strumenti del Cristiano",
   "subtitle": "La tua officina per la Parola e il Regno",
   "login": {
+    "checkEmail": "Ti abbiamo inviato un link di accesso via e-mail. Aprilo su questo dispositivo per entrare.",
     "title": "Accedi",
     "subtitle": "Accedi con la tua email approvata per l'acquisto.",
     "emailLabel": "Email",

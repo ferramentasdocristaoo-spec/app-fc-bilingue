@@ -2,6 +2,7 @@
   "appName": "Ferramentas do Cristão",
   "subtitle": "A sua oficina para a Palavra e o Reino",
   "login": {
+    "checkEmail": "Enviámos um link de acesso para o seu e-mail. Abra-o neste dispositivo para entrar.",
     "title": "Entrar",
     "subtitle": "Acede com o teu email aprovado para a compra.",
     "emailLabel": "Email",

@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Loader2, LogIn } from "lucide-react";
 import { appLogo } from "@/lib/branding";
+import { toast } from "@/hooks/use-toast";
 
 const LoginPage = () => {
   const { t, i18n } = useTranslation();
@@ -25,7 +26,8 @@ const LoginPage = () => {
     }
 
     setLoading(true);
-    const { error } = await signIn(email);
+    const { error, pending } = await signIn(email);
+    if (pending === "checkEmail") toast({ title: t("login.checkEmail") });
     if (error) {
       const msgs: Record<string, string> = {
         notApproved: t("login.errorNotApproved"),

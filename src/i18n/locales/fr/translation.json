@@ -2,6 +2,7 @@
   "appName": "Outils du Chrétien",
   "subtitle": "Votre atelier pour la Parole et le Royaume",
   "login": {
+    "checkEmail": "Nous avons envoyé un lien de connexion à votre e-mail. Ouvrez-le sur cet appareil pour vous connecter.",
     "title": "Se connecter",
     "subtitle": "Accédez avec votre e-mail approuvé pour l'achat.",
     "emailLabel": "E-mail",
