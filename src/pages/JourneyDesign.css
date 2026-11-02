@@ -203,9 +203,9 @@
 .chapter-reading>span{font-size:0.75rem;letter-spacing:.14em;color:hsl(var(--primary))}
 .chapter-reading h2{font:600 2rem/1.15 var(--font-display)}
 .chapter-reading>p{font-family:var(--font-text);font-size:1.0625rem;line-height:1.75;color:hsl(var(--ink-2))}
-.chapter-reading>a{display:inline-flex;align-items:center;gap:9px;margin-top:12px;padding:10px 13px;border-radius:4px;background:hsl(var(--primary));color:hsl(var(--primary-foreground));text-decoration:none;font-size:0.75rem;font-weight:700}
+.chapter-reading>a{display:inline-flex;align-items:center;gap:9px;margin-top:12px;padding:10px 13px;border-radius:4px;background:hsl(var(--ink));color:hsl(var(--paper));text-decoration:none;font-size:0.875rem;font-weight:500}
 .chapter-reading>a svg{width:14px}
-.chapter-reading blockquote{margin:28px 0 0;padding:18px;border-left:2px solid hsl(var(--primary));background:hsl(var(--primary)/.06);font:600 0.78rem/1.6 var(--font-display)}
+.chapter-reading blockquote{margin:28px 0 0;padding:18px;border-left:2px solid hsl(var(--primary));background:hsl(var(--primary)/.06);font:italic 400 1.0625rem/1.6 var(--font-text)}
 .chapter-reading blockquote small{display:block;font:500 0.75rem var(--font-ui);letter-spacing:.13em;color:hsl(var(--primary));margin-bottom:7px}
 .chapter-journey-page aside{display:flex;flex-direction:column}
 .chapter-journey-page aside label{display:flex;align-items:center;gap:8px;font-size:0.75rem;font-weight:700}
