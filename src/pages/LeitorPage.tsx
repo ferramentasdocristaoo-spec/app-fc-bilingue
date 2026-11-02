@@ -68,7 +68,7 @@ const SPEECH_LANG: Record<string, string> = {
 };
 
 const GOLD = "hsl(42 65% 47%)";
-const GOLD_GRADIENT = "linear-gradient(135deg, #604224, #C6972A)";
+const READER_SERIF = "'Source Serif 4 Variable', 'Source Serif 4', Georgia, serif";
 
 // Cada capítulo é um bloco separado por linha em branco; a primeira linha é o título.
 // O bloco inicial (título do livro em maiúsculas) é descartado.
@@ -256,7 +256,7 @@ export default function LeitorPage() {
           <List className="h-5 w-5" />
         </button>
         <div
-          className="flex-1 truncate px-2 text-center font-mono text-[10px] uppercase tracking-[0.2em]"
+          className="flex-1 truncate px-2 text-center font-body text-xs font-medium uppercase tracking-[0.14em]"
           style={{ color: theme.sub }}
         >
           {chapter?.title ?? volume.title}
@@ -295,7 +295,7 @@ export default function LeitorPage() {
           {Array.from({ length: 9 }).map((_, index) => (
             <span
               key={index}
-              className="absolute whitespace-nowrap font-mono"
+              className="absolute whitespace-nowrap font-body"
               style={{
                 left: `${(index % 3) * 34 + 4}%`,
                 top: `${Math.floor(index / 3) * 30 + 12}%`,
@@ -331,16 +331,17 @@ export default function LeitorPage() {
           </div>
         ) : (
           <article
+            lang={i18n.resolvedLanguage || i18n.language}
             className="mx-auto px-6 py-10 sm:px-8"
             style={{
               maxWidth: 680,
-              fontFamily: "Georgia, 'Times New Roman', serif",
+              fontFamily: READER_SERIF,
               fontSize: fonte,
               lineHeight: 1.75,
               color: theme.texto,
             }}
           >
-            <h2 id="leitura-linha--1" className="font-display mb-8 font-bold" style={{ fontSize: fonte * 1.6, lineHeight: 1.2, ...realce(-1) }}>
+            <h2 id="leitura-linha--1" className="font-display mb-8 font-semibold" style={{ fontSize: fonte * 1.75, lineHeight: 1.15, ...realce(-1) }}>
               {chapter?.title}
             </h2>
             {chapter?.lines.map((line, index) =>
@@ -358,12 +359,12 @@ export default function LeitorPage() {
                   key={index}
                   id={`leitura-linha-${index}`}
                   className="font-display mb-3 mt-8 font-semibold"
-                  style={{ fontSize: fonte * 1.15, lineHeight: 1.3, ...realce(index) }}
+                  style={{ fontSize: fonte * 1.3, lineHeight: 1.3, ...realce(index) }}
                 >
                   {line}
                 </h3>
               ) : (
-                <p key={index} id={`leitura-linha-${index}`} className="mb-5 text-justify" style={realce(index)}>
+                <p key={index} id={`leitura-linha-${index}`} className="mb-5 text-left" style={{ hyphens: "auto", WebkitHyphens: "auto", ...realce(index) }}>
                   {line}
                 </p>
               ),
@@ -373,7 +374,7 @@ export default function LeitorPage() {
               {cap > 0 ? (
                 <button
                   onClick={anterior}
-                  className="inline-flex items-center gap-1.5 rounded-xl px-4 py-3 font-sans text-sm font-semibold transition-opacity hover:opacity-80"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded px-4 py-3 font-body text-sm font-medium transition-opacity hover:opacity-80"
                   style={{ border: `1px solid ${theme.borda}`, color: theme.sub }}
                 >
                   <ChevronLeft className="h-4 w-4" /> {t("livraria.reader.prev")}
@@ -384,22 +385,22 @@ export default function LeitorPage() {
               {cap < total - 1 ? (
                 <button
                   onClick={proximo}
-                  className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3 font-sans text-sm font-semibold text-white transition-transform hover:-translate-y-px"
-                  style={{ background: GOLD_GRADIENT, boxShadow: "0 8px 24px -8px rgba(198,151,42,0.55)" }}
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded px-5 py-3 font-body text-sm font-medium transition-opacity hover:opacity-90"
+                  style={{ background: theme.texto, color: theme.papel }}
                 >
                   {t("livraria.reader.next")} <ChevronRight className="h-4 w-4" />
                 </button>
               ) : (
                 <button
                   onClick={concluir}
-                  className="rounded-xl px-5 py-3 font-sans text-sm font-semibold text-white transition-transform hover:-translate-y-px"
-                  style={{ background: GOLD_GRADIENT, boxShadow: "0 8px 24px -8px rgba(198,151,42,0.55)" }}
+                  className="min-h-[44px] rounded px-5 py-3 font-body text-sm font-medium transition-opacity hover:opacity-90"
+                  style={{ background: theme.texto, color: theme.papel }}
                 >
                   {t("livraria.reader.finish")}
                 </button>
               )}
             </div>
-            <p className="mb-4 text-center font-mono text-[11px]" style={{ color: theme.sub }}>
+            <p className="mb-4 text-center font-body text-xs" style={{ color: theme.sub }}>
               {t("livraria.reader.chapterOf", { current: cap + 1, total })}
             </p>
           </article>
@@ -412,10 +413,10 @@ export default function LeitorPage() {
             className="h-full w-[300px] max-w-[85vw] overflow-y-auto p-4"
             style={{ background: theme.papel, borderRight: `1px solid ${theme.borda}` }}
           >
-            <p className="font-display mb-1 text-lg font-bold" style={{ color: theme.texto }}>
+            <p className="font-display mb-1 text-xl font-semibold" style={{ color: theme.texto }}>
               {volume.title}
             </p>
-            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em]" style={{ color: theme.sub }}>
+            <p className="mb-4 font-body text-xs font-medium uppercase tracking-[0.14em]" style={{ color: theme.sub }}>
               {t("livraria.reader.chaptersCount", { count: total })}
             </p>
             {chapters.map((item, index) => (
@@ -425,14 +426,14 @@ export default function LeitorPage() {
                   setCap(index);
                   setSumario(false);
                 }}
-                className="mb-1 block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors"
+                className="mb-0.5 block w-full rounded-none px-3 py-2 text-left text-[0.9375rem] transition-colors"
                 style={
                   index === cap
-                    ? { background: GOLD_GRADIENT, color: "#fff", fontWeight: 600 }
-                    : { color: theme.texto }
+                    ? { color: theme.texto, fontWeight: 600, fontFamily: READER_SERIF, boxShadow: `inset 2px 0 0 ${GOLD}` }
+                    : { color: theme.texto, fontFamily: READER_SERIF }
                 }
               >
-                <span className="mr-2 font-mono text-[10px]" style={index === cap ? undefined : { color: theme.sub }}>
+                <span className="mr-2 inline-block w-6 text-right font-brand text-xs" style={{ color: GOLD }}>
                   {index + 1}
                 </span>
                 {item.title}
