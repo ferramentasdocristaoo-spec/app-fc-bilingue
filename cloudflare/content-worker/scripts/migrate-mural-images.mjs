@@ -4,7 +4,7 @@
 //
 //   SUPABASE_URL=https://rwyyggtsjbwnwzsnlkgy.supabase.co \
 //   SUPABASE_SERVICE_ROLE_KEY=... CONTENT_BASE_URL=https://<worker> \
-//   node scripts/migrate-mural-images.mjs [--upload] [--bucket fc-app-content]
+//   node scripts/migrate-mural-images.mjs [--upload] [--bucket fc-bilingue-content]
 //
 // Saída: .export/mural/* e .export/mural-update.sql (rodar no SQL Editor depois de conferir).
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -13,7 +13,7 @@ import { spawnSync } from "node:child_process";
 
 const args = process.argv.slice(2);
 const upload = args.includes("--upload");
-const bucket = args.includes("--bucket") ? args[args.indexOf("--bucket") + 1] : "fc-app-content";
+const bucket = args.includes("--bucket") ? args[args.indexOf("--bucket") + 1] : "fc-bilingue-content";
 const url = (process.env.SUPABASE_URL ?? "").replace(/\/$/, "");
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const contentBase = (process.env.CONTENT_BASE_URL ?? "").replace(/\/$/, "");

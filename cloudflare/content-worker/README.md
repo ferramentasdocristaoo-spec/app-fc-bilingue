@@ -1,4 +1,4 @@
-# fc-content — Worker de conteúdo do app FC bilíngue
+# fc-bilingue-content — Worker de conteúdo do app FC bilíngue
 
 Serve o conteúdo pesado do app pela Cloudflare para cortar o egress do Supabase (plano gratuito).
 Supabase continua com login, approved_emails, entitlements, progresso, pedidos de oração, IA e webhook.

@@ -5,7 +5,7 @@
 // Uso (o dono roda, depois de aprovar):
 //   SUPABASE_URL=https://rwyyggtsjbwnwzsnlkgy.supabase.co \
 //   SUPABASE_SERVICE_ROLE_KEY="$(security find-generic-password -s <servico> -a <conta> -w)" \
-//   node scripts/export-library.mjs [--upload] [--bucket fc-app-content]
+//   node scripts/export-library.mjs [--upload] [--bucket fc-bilingue-content]
 //
 // A chave service role fica só na variável de ambiente desta execução — nunca em arquivo.
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -14,7 +14,7 @@ import { spawnSync } from "node:child_process";
 
 const args = process.argv.slice(2);
 const upload = args.includes("--upload");
-const bucket = args.includes("--bucket") ? args[args.indexOf("--bucket") + 1] : "fc-app-content";
+const bucket = args.includes("--bucket") ? args[args.indexOf("--bucket") + 1] : "fc-bilingue-content";
 const url = (process.env.SUPABASE_URL ?? "").replace(/\/$/, "");
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!url || !key) {

@@ -2,21 +2,21 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   // Conta Cloudflare: SOMENTE b5668ee34791cf78503327dd063b7c88 (ferramentasdocristaoo@gmail.com)
   "account_id": "b5668ee34791cf78503327dd063b7c88",
-  "name": "fc-content",
+  "name": "fc-bilingue-content",
   "main": "src/index.ts",
   "compatibility_date": "2026-10-01",
   "workers_dev": true,
   // Domínio próprio sugerido (ativar no passo de deploy, depois de aprovado):
   // "routes": [{ "pattern": "api.herramientasdelcristiano.com", "custom_domain": true }],
   "r2_buckets": [
-    { "binding": "CONTENT", "bucket_name": "fc-app-content", "preview_bucket_name": "fc-app-content-dev" }
+    { "binding": "CONTENT", "bucket_name": "fc-bilingue-content", "preview_bucket_name": "fc-bilingue-content-dev" }
   ],
   "vars": {
     "SUPABASE_URL": "https://rwyyggtsjbwnwzsnlkgy.supabase.co",
-    "ALLOWED_ORIGINS": "https://app-fc-bilingue.pages.dev,https://app.herramientasdelcristiano.com",
+    "ALLOWED_ORIGINS": "https://app-fc-bilingue.pages.dev,https://app.herramientasdelcristiano.com,https://reforma.app-fc-bilingue.pages.dev,https://reforma.fc-bilingue-previa.pages.dev",
     // Transição: aceita o login antigo (só e-mail) até o link mágico estar ligado no app.
     "ALLOW_LEGACY_EMAIL": "true",
-    "PUBLIC_BASE_URL": "https://fc-content.ferramentasdocristaoo.workers.dev",
+    "PUBLIC_BASE_URL": "https://fc-bilingue-content.ferramentasdocristaoo.workers.dev",
     "BIBLE_ORIGIN": "https://bolls.life"
   },
   // Segredos (wrangler secret put): SUPABASE_ANON_KEY e, se o projeto usar JWT HS256, SUPABASE_JWT_SECRET
