@@ -26,6 +26,12 @@ export default defineConfig(() => ({
         navigateFallbackDenylist: [/^\/~oauth/],
         // Fontes auto-hospedadas (só latin/latin-ext) entram no precache para uso offline
         globPatterns: ["**/*.{js,wasm,css,html}", "**/*latin*.woff2"],
+        // Gravuras da Jornada (domínio público): ficam no aparelho depois da primeira visita.
+        runtimeCaching: [{
+          urlPattern: ({ url }) => url.pathname.startsWith("/jornada/") && url.pathname.endsWith(".webp"),
+          handler: "CacheFirst",
+          options: { cacheName: "jornada-gravuras", expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 180 } },
+        }],
       },
       manifest: {
         name: "Ferramentas do Cristão",

@@ -1,0 +1,173 @@
+/* ============================================================
+   Jornada interativa — figuras de "Livro de Estudo"
+   Stepper dos movimentos, mapa SVG, paragens, família, tempo e quiz.
+   Só tokens do tema (papel, tinta, ouro); vinho marca o "atual".
+   ============================================================ */
+:root { --journey-wine: 352 52% 66%; --journey-sea: 205 30% 20%; --journey-land: 216 40% 13%; --journey-river: 200 30% 42%; }
+.light { --journey-wine: 352 55% 32%; --journey-sea: 196 22% 85%; --journey-land: 40 45% 90%; --journey-river: 196 22% 60%; }
+
+/* ---------- Stepper dos movimentos ---------- */
+.jstep { margin-top: 20px; }
+.jstep ol {
+  list-style: none; margin: 0; padding: 0 0 4px;
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(148px, 1fr);
+  overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+.jstep li { scroll-snap-align: start; }
+.jstep-item {
+  display: flex; flex-direction: column; gap: 2px; width: 100%; min-height: 44px;
+  padding: 0 14px 12px 0; border: 0; background: none; text-align: left; cursor: pointer;
+  color: hsl(var(--ink-3)); text-decoration: none; font: inherit;
+}
+.jstep-bar { display: block; height: 3px; margin-bottom: 12px; background: hsl(var(--rule)); }
+.jstep-bar i { display: block; height: 100%; background: hsl(var(--gold)); transition: width .3s ease; }
+.jstep-num { font: 500 0.875rem/1.2 var(--font-brand); letter-spacing: .06em; color: hsl(var(--gold-ink)); }
+.jstep-title { font: 600 1.0625rem/1.25 var(--font-display); color: hsl(var(--ink-2)); }
+.jstep-meta { font: 400 0.75rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
+.jstep-check { color: hsl(var(--gold-ink)); font-weight: 600; }
+.jstep-item:hover .jstep-title { color: hsl(var(--ink)); }
+.jstep-item.is-done .jstep-title { color: hsl(var(--ink)); }
+.jstep-item.is-active .jstep-bar { background: hsl(var(--journey-wine) / .35); }
+.jstep-item.is-active .jstep-bar i { background: hsl(var(--journey-wine)); }
+.jstep-item.is-active .jstep-title { color: hsl(var(--ink)); }
+.jstep-item.is-active .jstep-num { color: hsl(var(--journey-wine)); }
+.jstep-item:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 2px; }
+.jstep-compact { margin: 0; }
+.jstep-compact ol { grid-auto-columns: minmax(112px, 1fr); }
+.jstep-compact .jstep-title { font-size: 0.9375rem; }
+.jstep-compact .jstep-bar { margin-bottom: 8px; }
+
+/* ---------- Painel do movimento ---------- */
+.jmove { margin-top: 32px; scroll-margin-top: 24px; }
+.jmove-head { max-width: 760px; }
+.jmove-head h3 { margin: 8px 0 10px; font: 600 clamp(1.75rem, 4.5vw, 2.375rem)/1.12 var(--font-display); color: hsl(var(--ink)); }
+.jtags { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 20px 0 0; }
+.jtags > div { min-width: 0; }
+.jtags dt { font: 500 0.75rem/1.4 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
+.jtags dd { margin: 2px 0 0; padding-bottom: 4px; border-bottom: 1px solid hsl(var(--gold-soft)); font: 400 1.0625rem/1.4 var(--font-text); color: hsl(var(--ink)); }
+.jtags dd em { font-style: italic; font-size: 0.875rem; color: hsl(var(--ink-3)); }
+.jtags-small { gap: 10px 24px; margin-top: 16px; }
+.jtags-small dd { font-size: 0.9375rem; }
+.jmove-connection { margin: 18px 0 0; padding-left: 12px; border-left: 2px solid hsl(var(--gold-soft)); font: italic 400 1rem/1.6 var(--font-text); color: hsl(var(--ink-2)); max-width: 62ch; }
+.jmove-connection span { font: normal 500 0.75rem/1 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); margin-right: 6px; }
+.jmove-read { margin: 32px 0 0; }
+
+/* ---------- Mapa + paragem ---------- */
+.jstage { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 32px; align-items: start; }
+@media (min-width: 900px) { .jstage { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 0; } .jstage-stop { padding-left: 28px; margin-left: 28px; border-left: 1px solid hsl(var(--rule)); } }
+.jstage-map { margin: 0; border: 1px solid hsl(var(--rule)); border-radius: 4px; overflow: hidden; background: hsl(var(--journey-sea)); }
+.jstage-map figcaption { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px 12px; background: hsl(var(--paper-2)); border-top: 1px solid hsl(var(--rule)); font: 400 0.75rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+
+.jmap { display: block; width: 100%; height: auto; aspect-ratio: 1000 / 765; touch-action: manipulation; }
+.jmap-sea { fill: hsl(var(--journey-sea)); }
+.jmap-land { fill: hsl(var(--journey-land)); stroke: hsl(var(--journey-river) / .7); stroke-width: 0.8; vector-effect: non-scaling-stroke; }
+.jmap-lake { fill: hsl(var(--journey-sea)); stroke: hsl(var(--journey-river) / .7); stroke-width: 0.6; vector-effect: non-scaling-stroke; }
+.jmap-river { fill: none; stroke: hsl(var(--journey-river)); stroke-width: 1.2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.jmap-label { font-family: var(--font-display); font-style: italic; letter-spacing: .08em; fill: hsl(var(--ink-3)); pointer-events: none; }
+.jmap-label-region { text-transform: uppercase; }
+.jmap-area { fill: hsl(var(--gold) / .1); stroke: hsl(var(--gold) / .6); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.jmap-area.is-unknown { stroke-dasharray: 4 4; }
+.jmap-leg { stroke: hsl(var(--ink-3) / .45); stroke-width: 1.2; stroke-dasharray: 4 5; vector-effect: non-scaling-stroke; fill: none; }
+.jmap-leg.is-visited { stroke: hsl(var(--gold)); stroke-dasharray: none; stroke-width: 2; }
+.jmap-leg.is-current { vector-effect: none; stroke: hsl(var(--journey-wine)); stroke-dasharray: 1; stroke-dashoffset: 1; animation: jmap-draw .9s ease-out forwards; }
+@keyframes jmap-draw { to { stroke-dashoffset: 0; } }
+.jmap-stop { cursor: pointer; outline: none; }
+.jmap-hit { fill: transparent; }
+.jmap-dot { fill: hsl(var(--paper)); stroke: hsl(var(--ink-2)); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.jmap-dot-num { font-family: var(--font-ui); font-weight: 700; fill: hsl(var(--ink)); pointer-events: none; }
+.jmap-stop:not(.is-active):not(.is-visited) .jmap-name { font-weight: 500; fill: hsl(var(--ink-2)); }
+.jmap-name { font-family: var(--font-ui); font-weight: 600; fill: hsl(var(--ink)); paint-order: stroke; stroke: hsl(var(--journey-land)); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.jmap-stop.is-visited .jmap-dot { fill: hsl(var(--gold)); stroke: hsl(var(--gold-ink)); }
+.jmap-stop.is-visited .jmap-dot-num { fill: hsl(var(--paper)); }
+.jmap-stop.is-active .jmap-dot { fill: hsl(var(--journey-wine)); stroke: hsl(var(--paper)); stroke-width: 2; }
+.jmap-stop.is-active .jmap-dot-num { fill: hsl(var(--paper)); }
+.jmap-stop:hover .jmap-dot { stroke: hsl(var(--gold-ink)); stroke-width: 2.2; }
+.jmap-stop:focus-visible .jmap-dot { stroke: hsl(var(--gold)); stroke-width: 3.5; }
+
+.jstage-count { font: 500 0.8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
+.jstage-stop h4 { margin: 6px 0 4px; font: 600 clamp(1.625rem, 4vw, 2rem)/1.15 var(--font-display); color: hsl(var(--ink)); }
+.jstage-ref { font: 500 0.875rem/1.4 var(--font-ui); color: hsl(var(--gold-ink)); }
+.jstage-stop > p { margin: 12px 0 0; font: 400 1.0625rem/1.7 var(--font-text); color: hsl(var(--ink)); }
+.jstage-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.jstage-nav .ed-btn:disabled { opacity: .4; cursor: default; }
+
+/* Lista de paragens (mini-stepper do mapa) */
+.jstops { margin-top: 20px; }
+.jstops ol { list-style: none; margin: 0; padding: 0 0 4px; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(104px, 1fr); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: thin; }
+.jstops li { scroll-snap-align: start; }
+.jstops button { display: flex; flex-direction: column; gap: 2px; width: 100%; min-height: 44px; padding: 0 10px 8px 0; border: 0; background: none; text-align: left; cursor: pointer; font: inherit; }
+.jstops-bar { display: block; height: 2px; margin-bottom: 8px; background: hsl(var(--rule)); }
+.jstops-num { font: 500 0.75rem/1.2 var(--font-brand); color: hsl(var(--ink-3)); }
+.jstops-name { font: 400 0.8125rem/1.3 var(--font-ui); color: hsl(var(--ink-3)); }
+.jstops button.is-visited .jstops-bar { background: hsl(var(--gold)); }
+.jstops button.is-visited .jstops-name { color: hsl(var(--ink-2)); }
+.jstops button.is-active .jstops-bar { background: hsl(var(--journey-wine)); height: 3px; }
+.jstops button.is-active .jstops-num { color: hsl(var(--journey-wine)); }
+.jstops button.is-active .jstops-name { color: hsl(var(--ink)); font-weight: 600; }
+.jstops button:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 2px; }
+
+/* ---------- Família, tempo e quiz ---------- */
+.jaids { display: grid; grid-template-columns: 1fr; gap: 40px; }
+@media (min-width: 900px) { .jaids { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; } }
+.jaid h3 { margin: 6px 0 14px; font: 600 1.5rem/1.2 var(--font-display); color: hsl(var(--ink)); }
+.jaid-note { margin: 14px 0 0; font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+
+.jfam, .jfam ul { list-style: none; margin: 0; padding: 0; }
+.jfam ul { margin-left: 10px; padding-left: 16px; border-left: 1px solid hsl(var(--gold-soft)); }
+.jfam li { position: relative; padding: 3px 0; }
+.jfam ul > li::before { content: ""; position: absolute; left: -16px; top: 0.95em; width: 12px; height: 1px; background: hsl(var(--gold-soft)); }
+.jfam-name { font: 400 1.0625rem/1.4 var(--font-text); color: hsl(var(--ink)); }
+.jfam-name.is-line { font-weight: 600; color: hsl(var(--gold-ink)); }
+.jfam-spouse { font: 400 0.8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); }
+
+.jera { display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 0; align-items: start; }
+.jera-zone { padding-top: 10px; border-top: 2px dashed hsl(var(--rule)); }
+.jera-zone.is-dated { border-top-style: solid; }
+.jera-zone.is-active { border-top-color: hsl(var(--journey-wine)); }
+.jera-zone small { display: block; font: 500 0.6875rem/1.3 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: hsl(var(--ink-3)); min-height: 2.6em; padding-right: 6px; }
+.jera-zone ol { list-style: none; margin: 8px 0 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+.jera-zone li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font: 500 0.75rem/1.2 var(--font-brand); color: hsl(var(--ink-3)); }
+.jera-zone li i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid hsl(var(--ink-3)); background: hsl(var(--paper)); }
+.jera-zone li.is-active { color: hsl(var(--journey-wine)); }
+.jera-zone li.is-active i { background: hsl(var(--journey-wine)); border-color: hsl(var(--journey-wine)); }
+.jera-zone.is-dated ol { flex-direction: column; gap: 8px; }
+.jera-zone.is-dated li { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-family: var(--font-ui); }
+.jera-zone.is-dated li span { font-weight: 600; color: hsl(var(--ink-2)); font-variant-numeric: tabular-nums; }
+.jera-zone.is-dated li em { flex-basis: 100%; padding-left: 15px; font: italic 400 0.8125rem/1.3 var(--font-text); color: hsl(var(--ink-3)); }
+.jera-next { padding: 10px 0 0 8px; border-top: 2px dotted hsl(var(--rule)); font: 500 0.75rem/1.3 var(--font-ui); color: hsl(var(--ink-3)); white-space: nowrap; }
+
+.jquiz fieldset { margin: 0; padding: 0; border: 0; }
+.jquiz legend { margin-bottom: 12px; font: 400 1.0625rem/1.5 var(--font-text); color: hsl(var(--ink)); }
+.jquiz legend small { display: block; margin-top: 2px; font: 500 0.75rem/1.4 var(--font-ui); color: hsl(var(--gold-ink)); }
+.jquiz-option { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 8px; padding: 8px 12px; border: 1px solid hsl(var(--rule)); border-radius: 4px; font: 400 0.9375rem/1.35 var(--font-ui); color: hsl(var(--ink)); cursor: pointer; }
+.jquiz-option:hover { border-color: hsl(var(--gold)); }
+.jquiz-option input { accent-color: hsl(var(--gold-ink)); width: 16px; height: 16px; flex: none; }
+.jquiz-option:has(input:focus-visible) { outline: 2px solid hsl(var(--gold)); outline-offset: 2px; }
+.jquiz-option.is-right { border-color: hsl(var(--gold-ink)); background: hsl(var(--gold) / .14); }
+.jquiz-option.is-wrong { border-color: hsl(var(--journey-wine)); background: hsl(var(--journey-wine) / .08); }
+.jquiz-option.is-muted { opacity: .55; cursor: default; }
+.jquiz-feedback { margin: 14px 0 0; font: 400 0.9375rem/1.55 var(--font-text); color: hsl(var(--ink-2)); }
+.jquiz-feedback strong { color: hsl(var(--gold-ink)); }
+.jquiz-feedback.is-wrong strong { color: hsl(var(--journey-wine)); }
+.jquiz-retry { margin-top: 10px; background: none; border-top: 0; border-left: 0; border-right: 0; cursor: pointer; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jmap-leg.is-current { animation: none; stroke-dashoffset: 0; }
+  .jstep-bar i { transition: none; }
+}
+
+/* Página do capítulo: stepper compacto entre o cabeçalho e a leitura */
+.chapter-journey-steps { max-width: 1000px; margin: 0 auto; padding: 24px 20px 0; display: flex; flex-direction: column; gap: 12px; }
+.chapter-journey-steps .ed-link { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; }
+.chapter-journey-steps .ed-link svg { width: 14px; height: 14px; }
+
+/* Gravura da etapa (domínio público), com crédito */
+.jfigure { margin: 28px 0 0; }
+.jfigure img { display: block; width: 100%; height: auto; border: 1px solid hsl(var(--rule)); border-radius: 4px; background: hsl(var(--paper-2)); }
+/* No escuro a gravura fica como prancha clara, ligeiramente atenuada (sem inverter a obra). */
+:root:not(.light) .jfigure img { filter: brightness(.86) sepia(.12); }
+.jfigure-missing { aspect-ratio: 6 / 5; border: 1px dashed hsl(var(--rule)); border-radius: 4px; background: repeating-linear-gradient(45deg, hsl(var(--gold) / .06) 0 12px, transparent 12px 24px); }
+.jfigure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.75rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.jfigure figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
+.jfigure figcaption a { color: hsl(var(--gold-ink)); text-decoration: none; }

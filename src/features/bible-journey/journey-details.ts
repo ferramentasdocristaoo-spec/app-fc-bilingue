@@ -69,6 +69,17 @@ const bookPlaces: Record<string, string> = {
   hebrews: "Christian communities", james: "The Diaspora", "1-peter": "Asia Minor", "2-peter": "Asia Minor", "1-john": "Asia Minor", "2-john": "Asia Minor", "3-john": "Asia Minor", jude: "Christian communities", revelation: "Patmos · Asia Minor",
 };
 
+const susa = (name: string) => ({ palace: `${name} · palácio`, threat: name, reversal: name, deliverance: name });
+const estherPlaces: Record<JourneyLanguage, Record<string, string>> = {
+  "pt-PT": { ...susa("Susã"), palace: "Susã · palácio real" }, en: { ...susa("Susa"), palace: "Susa · royal palace" }, es: { ...susa("Susa"), palace: "Susa · palacio real" },
+  fr: { ...susa("Suse"), palace: "Suse · palais royal" }, it: { ...susa("Susa"), palace: "Susa · palazzo reale" }, de: { ...susa("Susa"), palace: "Susa · Königspalast" },
+};
+
+const placesByBook: Record<string, Record<JourneyLanguage, Record<string, string>>> = {
+  exodus: exodusPlaces, numbers: numbersPlaces, deuteronomy: deuteronomyPlaces, judges: judgesPlaces, ruth: ruthPlaces,
+  "1-samuel": firstSamuelPlaces, "2-samuel": secondSamuelPlaces, "1-kings": firstKingsPlaces, "2-kings": secondKingsPlaces, "1-chronicles": firstChroniclesPlaces, esther: estherPlaces,
+};
+
 export function getJourneySectionDetails(book: JourneyBook, section: JourneySection, language: JourneyLanguage): JourneySectionDetails {
   const editorial = book.slug === "genesis" ? genesisJourneyDetails[section.slug]?.[language] : undefined;
   if (editorial) return editorial;
@@ -77,7 +88,9 @@ export function getJourneySectionDetails(book: JourneyBook, section: JourneySect
   return {
     event: section.content[language].description,
     characters: overview.characters,
-    place: (book.slug === "1-chronicles" ? firstChroniclesPlaces : book.slug === "2-kings" ? secondKingsPlaces : book.slug === "1-kings" ? firstKingsPlaces : book.slug === "2-samuel" ? secondSamuelPlaces : book.slug === "1-samuel" ? firstSamuelPlaces : book.slug === "ruth" ? ruthPlaces : book.slug === "judges" ? judgesPlaces : book.slug === "deuteronomy" ? deuteronomyPlaces : book.slug === "numbers" ? numbersPlaces : exodusPlaces)[language]?.[section.slug] ?? bookPlaces[book.slug] ?? "Israel",
+    // Cada livro só lê a sua própria tabela. Antes, qualquer livro fora da lista caía nos lugares
+    // do Êxodo e um slug coincidente (ex.: "deliverance" em Ester) mostrava "Mar Vermelho".
+    place: placesByBook[book.slug]?.[language]?.[section.slug] ?? bookPlaces[book.slug] ?? "Israel",
     connection: overview.principles[sectionIndex % overview.principles.length],
   };
 }

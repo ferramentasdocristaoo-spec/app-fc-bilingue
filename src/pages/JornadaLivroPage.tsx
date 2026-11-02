@@ -1,23 +1,26 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { journeyCatalogRepository, normalizeJourneyLanguage } from "@/features/bible-journey/catalog";
-import { getJourneySectionDetails } from "@/features/bible-journey/journey-details";
 import { journeyProgressForBook, journeyProgressRepository } from "@/features/bible-journey/progress";
 import type { JourneyBook } from "@/features/bible-journey/types";
 import { journeyCategoryLabel } from "@/features/bible-journey/category-labels";
+import { JourneyStepper } from "@/components/journey/JourneyStepper";
+import { JourneyMovement } from "@/components/journey/JourneyMovement";
+import { defaultSectionSlug } from "@/components/journey/journey-utils";
 import "./JourneyDesign.css";
-
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI"];
-const roman = (index: number) => ROMAN[index] ?? String(index + 1);
-const range = (start: number, end: number) => start === end ? `${start}` : `${start}–${end}`;
 
 export default function JornadaLivroPage() {
   const { bookSlug, testament } = useParams(); const { t, i18n } = useTranslation();
   const language = normalizeJourneyLanguage(i18n.resolvedLanguage || i18n.language);
   const [book, setBook] = useState<JourneyBook | null>();
   const [allBooks, setAllBooks] = useState<JourneyBook[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setRevision] = useState(0); // re-render quando o quiz muda o progresso guardado
   useEffect(() => { journeyCatalogRepository.getBook(bookSlug || "").then(setBook); journeyCatalogRepository.listBooks().then(setAllBooks); }, [bookSlug]);
+  const { hash } = useLocation();
+  // Vindo do capítulo ("Ver no mapa"): o livro carrega de forma assíncrona, por isso o salto à âncora é manual.
+  useEffect(() => { if (book && hash === "#jornada-movimento") document.getElementById("jornada-movimento")?.scrollIntoView({ block: "start" }); }, [book, hash]);
   if (book === undefined) return <div className="journey-loading">{t("common.loading")}</div>;
   if (!book) return <div className="journey-loading">{t("notFound.title")}</div>;
   const overview = book.overview[language];
@@ -29,6 +32,12 @@ export default function JornadaLivroPage() {
   const bookIndex = allBooks.findIndex(item => item.slug === book.slug);
   const previousBook = bookIndex > 0 ? allBooks[bookIndex - 1] : undefined;
   const nextBook = bookIndex >= 0 ? allBooks[bookIndex + 1] : undefined;
+  const requestedSlug = searchParams.get("movimento");
+  const activeSection = book.sections.find(item => item.slug === requestedSlug) ?? book.sections.find(item => item.slug === defaultSectionSlug(book, progressState)) ?? book.sections[0];
+  const selectSection = (slug: string) => {
+    const next = new URLSearchParams(searchParams); next.set("movimento", slug);
+    setSearchParams(next, { replace: true });
+  };
   const testamentLabel = book.testament === "old-testament" ? t("journey.oldTestament") : t("journey.newTestament");
 
   return <div className="journey-book-page">
@@ -70,22 +79,8 @@ export default function JornadaLivroPage() {
 
       <section aria-labelledby="journey-movements-title">
         <h2 id="journey-movements-title" className="journey-h2">{t("journey.bookJourney")}</h2>
-        <ol className="journey-movements">
-          {book.sections.map((section, index) => {
-            const content = section.content[language];
-            const details = getJourneySectionDetails(book, section, language);
-            return <li key={section.slug}>
-              <span className="ed-num">{roman(index)}</span>
-              <div>
-                <h3>{content.title}</h3>
-                <p>{details?.event || content.description}</p>
-                {details && <p className="journey-who">{details.characters.join(", ")}{details.place ? ` — ${details.place}` : ""}</p>}
-                {details?.connection && <p className="journey-connection">{details.connection}</p>}
-              </div>
-              <span className="journey-range">{range(section.startChapter, section.endChapter)}</span>
-            </li>;
-          })}
-        </ol>
+        <JourneyStepper book={book} language={language} progress={progressState} activeSlug={activeSection?.slug} onSelect={selectSection} />
+        {activeSection && <JourneyMovement book={book} section={activeSection} language={language} testament={testament || book.testament} onProgressChange={() => setRevision(value => value + 1)} />}
       </section>
 
       <div className="ed-orn" aria-hidden>✦</div>
