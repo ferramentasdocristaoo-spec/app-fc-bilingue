@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { setLanguageManually } from '@/i18n';
+import type { AppLanguage } from '@/i18n/geo-language';
 
 const languages = [
   { code: 'pt-PT', flag: '🇵🇹', name: 'Português' },
@@ -36,7 +38,7 @@ export const LanguageSwitcher = ({ className = '', variant = 'horizontal' }: Lan
         <span className="sr-only">{t('dashboard.selectLanguage')}</span>
         <select
           value={current}
-          onChange={(event) => i18n.changeLanguage(event.target.value)}
+          onChange={(event) => void setLanguageManually(event.target.value as AppLanguage)}
           className="h-9 appearance-none rounded-md border-0 bg-transparent py-1 pl-2 pr-6 font-body text-sm font-medium text-ink-2 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
         >
           {languages.map((lang) => (
@@ -55,7 +57,7 @@ export const LanguageSwitcher = ({ className = '', variant = 'horizontal' }: Lan
           key={lang.code}
           variant={current === lang.code ? 'default' : 'ghost'}
           size="sm"
-          onClick={() => i18n.changeLanguage(lang.code)}
+          onClick={() => void setLanguageManually(lang.code as AppLanguage)}
           title={lang.name}
           className="h-8 justify-start gap-2 px-2 text-sm"
         >

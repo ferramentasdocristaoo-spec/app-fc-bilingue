@@ -7,7 +7,7 @@ interface AuthContextType {
   email: string | null;
   loading: boolean;
   /** pending = "checkEmail" quando o link mágico foi enviado e falta o usuário clicar. */
-  signIn: (email: string) => Promise<{ error: string | null; pending?: "checkEmail" }>;
+  signIn: (email: string, password?: string) => Promise<{ error: string | null; pending?: "checkEmail" }>;
   signOut: () => void;
 }
 
@@ -15,10 +15,17 @@ const AUTH_KEY = "fc-sermon-auth-email";
 
 /**
  * "email" (padrão): login antigo, só confere se o e-mail está liberado.
- * "magiclink": Supabase Auth com link mágico — gera o JWT que o Worker fc-content confere.
+ * "magiclink": Supabase Auth com link mágico — gera o JWT que o Worker de conteúdo confere.
+ * "password": Supabase Auth com e-mail + senha — também gera JWT real, sem depender de SMTP.
  * Só ligue "magiclink" depois de configurar SMTP próprio no Supabase (ver relatório).
  */
-const AUTH_MODE = import.meta.env.VITE_AUTH_MODE === "magiclink" ? "magiclink" : "email";
+type AuthMode = "email" | "magiclink" | "password";
+export const AUTH_MODE: AuthMode =
+  import.meta.env.VITE_AUTH_MODE === "magiclink"
+    ? "magiclink"
+    : import.meta.env.VITE_AUTH_MODE === "password"
+      ? "password"
+      : "email";
 
 const RPC_STATUS: Record<string, AccessStatus> = {
   ok: "ok",
@@ -94,10 +101,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const signIn = async (inputEmail: string) => {
+  const signIn = async (inputEmail: string, password?: string) => {
     const normalizedEmail = inputEmail.trim().toLowerCase();
     const status = await checkAccess(normalizedEmail);
     if (status !== "ok") return { error: status };
+
+    if (AUTH_MODE === "password") {
+      if (!password) return { error: "passwordEmpty" };
+      const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+      if (error) return { error: "invalidCredentials" };
+      // onAuthStateChange(SIGNED_IN) confere de novo a liberação e grava o e-mail.
+      localStorage.setItem(AUTH_KEY, normalizedEmail);
+      setEmail(normalizedEmail);
+      return { error: null };
+    }
 
     if (AUTH_MODE === "magiclink") {
       const { error } = await supabase.auth.signInWithOtp({
@@ -116,7 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = () => {
     localStorage.removeItem(AUTH_KEY);
     setEmail(null);
-    if (AUTH_MODE === "magiclink") void supabase.auth.signOut();
+    if (AUTH_MODE !== "email") void supabase.auth.signOut();
   };
 
   return (
