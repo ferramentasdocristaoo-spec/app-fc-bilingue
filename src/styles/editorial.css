@@ -1,0 +1,81 @@
+/*
+ * Gramática editorial "Livro de Estudo", compartilhada pelas páginas.
+ * Estrutura vem de tipografia e filetes, não de cartões.
+ * Tamanho mínimo de texto de interface: 12px. Leitura: 17–18px.
+ */
+
+.ed-eyebrow {
+  display: block;
+  font: 500 0.75rem/1.4 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--gold-ink));
+}
+
+.ed-num {
+  font: 500 0.875rem/1 var(--font-brand);
+  letter-spacing: 0.06em;
+  color: hsl(var(--gold-ink));
+  font-variant-numeric: lining-nums;
+}
+
+.ed-lede {
+  font: 400 1.0625rem/1.65 var(--font-text);
+  color: hsl(var(--ink-2));
+  max-width: 62ch;
+  margin: 0;
+}
+
+.ed-prose {
+  font: 400 1.0625rem/1.75 var(--font-text);
+  color: hsl(var(--ink));
+  max-width: 66ch;
+}
+
+@media (min-width: 768px) {
+  .ed-lede { font-size: 1.125rem; }
+  .ed-prose { font-size: 1.125rem; }
+}
+
+.ed-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1px solid hsl(var(--ink));
+  border-radius: 4px;
+  font: 500 0.9375rem/1.2 var(--font-ui);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.ed-btn-primary { background: hsl(var(--ink)); color: hsl(var(--paper)); }
+.ed-btn-primary:hover { background: hsl(var(--ink) / 0.88); }
+.ed-btn-ghost { background: transparent; color: hsl(var(--ink)); }
+.ed-btn-ghost:hover { background: hsl(var(--ink) / 0.06); }
+.ed-btn:focus-visible,
+.ed-link:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 3px; }
+
+.ed-link {
+  display: inline-block;
+  font: 500 0.875rem/1.4 var(--font-ui);
+  color: hsl(var(--gold-ink));
+  text-decoration: none;
+  border-bottom: 1px solid hsl(var(--gold-soft));
+  padding-bottom: 1px;
+}
+.ed-link:hover { border-bottom-color: hsl(var(--gold-ink)); }
+
+/* Filete ornamental: linha · ✦ · linha */
+.ed-orn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 56px 0;
+  color: hsl(var(--gold));
+  font-size: 0.875rem;
+}
+.ed-orn::before,
+.ed-orn::after { content: ""; flex: 1; height: 1px; background: hsl(var(--rule)); }
+@media (min-width: 768px) { .ed-orn { margin: 80px 0; } }

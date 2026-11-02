@@ -1,0 +1,21 @@
+/*
+ * Fontes auto-hospedadas (@fontsource), sem Google Fonts: funcionam offline no PWA.
+ * Só os subconjuntos latin + latin-ext, que cobrem pt, es, en, fr, it e de.
+ *   Display  -> Cormorant Garamond (títulos, versículos em destaque)
+ *   Texto    -> Source Serif 4 (leitura, descrições, prosa)
+ *   Interface-> Inter (menu, botões, rótulos)
+ *   Marca    -> Cinzel (só o nome da marca e numerais)
+ */
+@import "@fontsource/cormorant-garamond/latin-500.css";
+@import "@fontsource/cormorant-garamond/latin-ext-500.css";
+@import "@fontsource/cormorant-garamond/latin-600.css";
+@import "@fontsource/cormorant-garamond/latin-ext-600.css";
+@import "@fontsource/cormorant-garamond/latin-500-italic.css";
+@import "@fontsource/cormorant-garamond/latin-ext-500-italic.css";
+@import "@fontsource/cinzel/latin-500.css";
+@import "@fontsource/cinzel/latin-ext-500.css";
+@import "@fontsource/cinzel/latin-600.css";
+@import "@fontsource/cinzel/latin-ext-600.css";
+@import "@fontsource-variable/source-serif-4/opsz.css";
+@import "@fontsource-variable/source-serif-4/opsz-italic.css";
+@import "@fontsource-variable/inter/wght.css";

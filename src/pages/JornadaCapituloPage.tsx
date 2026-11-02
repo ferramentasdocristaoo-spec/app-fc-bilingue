@@ -9,6 +9,7 @@ import type { JourneyBook } from "@/features/bible-journey/types";
 import type { EditorialGenerationResult } from "@/features/bible-journey/editorial-generator";
 import { getPublishedJourneyEditorial } from "@/features/bible-journey/published-editorial";
 import "./JourneyDesign.css";
+import "./JourneyTimeline.css";
 
 export default function JornadaCapituloPage() {
   const { bookSlug, chapter: rawChapter, testament } = useParams(); const chapterNumber = Number(rawChapter);
