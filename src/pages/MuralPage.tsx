@@ -6,6 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { uploadPrayerImage } from "@/lib/content-api";
+
+// Mural lista só os pedidos mais recentes (antes baixava a tabela inteira a cada visita).
+const MURAL_PAGE_SIZE = 100;
 import { toast } from "sonner";
 import { ImagePlus, X } from "lucide-react";
 
@@ -40,7 +44,11 @@ const MuralPage = () => {
   ];
 
   const fetchPedidos = async () => {
-    const { data, error } = await supabase.from("prayer_requests").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("prayer_requests")
+      .select("id, nome, pedido, categoria, amens, image_url, created_at")
+      .order("created_at", { ascending: false })
+      .limit(MURAL_PAGE_SIZE);
     if (data) setPedidos(data as Pedido[]);
     if (error) console.error(error);
   };
@@ -67,12 +75,9 @@ const MuralPage = () => {
     let image_url: string | null = null;
 
     if (imageFile) {
-      const ext = imageFile.name.split(".").pop();
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from("prayer-images").upload(path, imageFile);
-      if (uploadError) { toast.error(t("common.error")); setLoading(false); return; }
-      const { data: urlData } = supabase.storage.from("prayer-images").getPublicUrl(path);
-      image_url = urlData.publicUrl;
+      const upload = await uploadPrayerImage(imageFile);
+      if (upload.error || !upload.url) { toast.error(t("common.error")); setLoading(false); return; }
+      image_url = upload.url;
     }
 
     const { error } = await supabase.from("prayer_requests").insert({
@@ -93,7 +98,11 @@ const MuralPage = () => {
   };
 
   const orar = async (id: string, currentAmens: number) => {
-    const { error } = await supabase.from("prayer_requests").update({ amens: currentAmens + 1 }).eq("id", id);
+    // Prefere a RPC atômica (migração 20261102020000); sem ela, usa o update antigo.
+    const rpc = await supabase.rpc("add_prayer_amen" as never, { _id: id } as never);
+    const error = rpc.error
+      ? (await supabase.from("prayer_requests").update({ amens: currentAmens + 1 }).eq("id", id)).error
+      : null;
     if (!error) setPedidos((prev) => prev.map((p) => (p.id === id ? { ...p, amens: p.amens + 1 } : p)));
   };
 
@@ -140,7 +149,7 @@ const MuralPage = () => {
               <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{p.categoria}</span>
             </div>
             <p className="text-sm text-foreground">{p.pedido}</p>
-            {p.image_url && <img src={p.image_url} alt="" className="w-full h-40 object-cover rounded-md" />}
+            {p.image_url && <img src={p.image_url} alt="" loading="lazy" decoding="async" className="w-full h-40 object-cover rounded-md" />}
             <div className="flex items-center justify-between w-full">
               <span className="text-xs text-muted-foreground">
                 {new Date(p.created_at).toLocaleDateString(i18n.language)}

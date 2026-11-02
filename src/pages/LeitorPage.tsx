@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { libraryLanguage, libraryProduct, setLastRead, setVolumeProgress } from "@/data/library";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchLibraryVolume } from "@/lib/content-api";
 
 interface VolumeContent {
   title: string;
@@ -117,15 +117,13 @@ export default function LeitorPage() {
   useEffect(() => {
     if (!email || !volumeSlug) return;
     setLoading(true);
-    supabase.functions.invoke("library-content", {
-      body: {
-        email,
-        product_slug: productSlug,
-        volume_slug: volumeSlug,
-        language: libraryLanguage(i18n.resolvedLanguage || i18n.language),
-      },
+    fetchLibraryVolume({
+      email,
+      productSlug: productSlug ?? "",
+      volumeSlug,
+      language: libraryLanguage(i18n.resolvedLanguage || i18n.language),
     }).then(({ data, error: requestError }) => {
-      if (requestError || data?.error) setError(data?.error || "content_error");
+      if (requestError || !data) setError(requestError || "content_error");
       else setBook(data as VolumeContent);
       setLoading(false);
     });
