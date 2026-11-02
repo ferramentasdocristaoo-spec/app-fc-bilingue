@@ -1,13 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, BookOpen, CheckCircle2, Map, Sparkles } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import { journeyCatalogRepository, normalizeJourneyLanguage } from "@/features/bible-journey/catalog";
 import { journeyProgressForBook, journeyProgressRepository } from "@/features/bible-journey/progress";
-import type { JourneyBook } from "@/features/bible-journey/types";
+import type { JourneyBook, TestamentSlug } from "@/features/bible-journey/types";
 import { journeyCategoryLabel } from "@/features/bible-journey/category-labels";
 import "./JourneyDesign.css";
+
+interface CategoryGroup { category: string; books: JourneyBook[] }
+
+/** Agrupa os livros de um testamento por categoria, mantendo a ordem canônica. */
+const groupByCategory = (books: JourneyBook[], testament: TestamentSlug): CategoryGroup[] => {
+  const groups: CategoryGroup[] = [];
+  books
+    .filter((book) => book.testament === testament)
+    .sort((a, b) => a.position - b.position)
+    .forEach((book) => {
+      const last = groups.at(-1);
+      if (last && last.category === book.category) last.books.push(book);
+      else groups.push({ category: book.category, books: [book] });
+    });
+  return groups;
+};
 
 export default function JornadaPage() {
   const { t, i18n } = useTranslation();
@@ -15,28 +30,60 @@ export default function JornadaPage() {
   const [books, setBooks] = useState<JourneyBook[]>([]);
   useEffect(() => { journeyCatalogRepository.listBooks().then(setBooks); }, []);
 
+  const progressState = journeyProgressRepository.getState();
+  const testaments = useMemo(() => [
+    { slug: "old-testament" as const, numeral: "I", title: t("journey.oldTestament"), description: t("journey.oldDescription"), groups: groupByCategory(books, "old-testament") },
+    { slug: "new-testament" as const, numeral: "II", title: t("journey.newTestament"), description: t("journey.newDescription"), groups: groupByCategory(books, "new-testament") },
+  ], [books, t]);
+
   return <PageShell title={t("journey.title")}>
     <div className="journey-home">
-      <section className="journey-hero">
-        <div><span><Sparkles />{t("journey.eyebrow")}</span><h2>{t("journey.heroTitle")}</h2><p>{t("journey.heroDescription")}</p></div>
-        <div className="journey-total"><strong>66</strong><span>{t("journey.books")}</span><i /><strong>1.189</strong><span>{t("journey.chapters")}</span></div>
-      </section>
-      <section className="testament-grid">
-        <article><div className="testament-icon"><Map /></div><span>01</span><h3>{t("journey.oldTestament")}</h3><p>{t("journey.oldDescription")}</p><small>39 {t("journey.books")}</small></article>
-        <article><div className="testament-icon"><BookOpen /></div><span>02</span><h3>{t("journey.newTestament")}</h3><p>{t("journey.newDescription")}</p><small>27 {t("journey.books")}</small></article>
-      </section>
-      <header className="journey-section-head"><div><h3>{t("journey.title")}</h3><p>{books.length}/66 {t("journey.books")}</p></div></header>
-      <section className="journey-book-grid">
-        {books.map((book) => {
-          const overview = book.overview[language];
-          const progress = journeyProgressForBook(journeyProgressRepository.getState(), book.slug, book.chapterCount);
-          return <Link to={`/jornada/${book.testament}/${book.slug}`} key={book.slug}>
-            <div className="journey-book-art"><BookOpen /><span>{String(book.position).padStart(2, "0")}</span></div>
-            <div className="journey-book-copy"><small>{journeyCategoryLabel(book.category, language)}</small><h3>{overview.title}</h3><p>{overview.description}</p><div className="journey-book-progress"><span>{progress.percentage}%</span><div><i style={{ width: `${progress.percentage}%` }} /></div></div></div>
-            {progress.percentage === 100 ? <CheckCircle2 /> : <ArrowRight />}
-          </Link>;
-        })}
-      </section>
+      <header className="journey-opening">
+        <span className="ed-eyebrow">{t("journey.eyebrow")}</span>
+        <h2>{t("journey.heroTitle")}</h2>
+        <p className="ed-lede">{t("journey.heroDescription")}</p>
+        <p className="journey-count"><strong>66</strong> {t("journey.books")} <span aria-hidden>·</span> <strong>1.189</strong> {t("journey.chapters")}</p>
+        <nav className="journey-testament-jump" aria-label={t("journey.title")}>
+          {testaments.map((testament) => <a key={testament.slug} href={`#${testament.slug}`}>{testament.title}</a>)}
+        </nav>
+      </header>
+
+      {testaments.map((testament) => {
+        const count = testament.groups.reduce((total, group) => total + group.books.length, 0);
+        return <section className="journey-toc" id={testament.slug} key={testament.slug} aria-labelledby={`${testament.slug}-title`}>
+          <header className="journey-toc-head">
+            <span className="ed-num">{testament.numeral}</span>
+            <div>
+              <h3 id={`${testament.slug}-title`}>{testament.title}</h3>
+              <p>{testament.description}</p>
+            </div>
+            <small>{count} {t("journey.books")}</small>
+          </header>
+
+          {testament.groups.map((group) => <div className="journey-toc-group" key={`${testament.slug}-${group.category}-${group.books[0].slug}`}>
+            <h4 className="ed-eyebrow">{journeyCategoryLabel(group.category, language)}</h4>
+            <ol>
+              {group.books.map((book) => {
+                const overview = book.overview[language];
+                const progress = journeyProgressForBook(progressState, book.slug, book.chapterCount);
+                const status = progress.completed === 0
+                  ? `${book.chapterCount} ${t("journey.chapters")}`
+                  : progress.completed === progress.total ? "✓" : `${progress.completed}/${progress.total}`;
+                return <li key={book.slug}>
+                  <Link to={`/jornada/${book.testament}/${book.slug}`} className={progress.completed > 0 ? "has-progress" : undefined}>
+                    <span className="ed-num">{String(book.position).padStart(2, "0")}</span>
+                    <span className="journey-toc-copy">
+                      <strong>{overview.title}</strong>
+                      <span>{overview.description}</span>
+                    </span>
+                    <span className="journey-toc-status">{status}</span>
+                  </Link>
+                </li>;
+              })}
+            </ol>
+          </div>)}
+        </section>;
+      })}
     </div>
   </PageShell>;
 }

@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, ArrowRight, BookOpen, Calendar, Check, Compass, Feather, Link2, MapPin, Users } from "lucide-react";
 import { journeyCatalogRepository, normalizeJourneyLanguage } from "@/features/bible-journey/catalog";
 import { getJourneySectionDetails } from "@/features/bible-journey/journey-details";
 import { journeyProgressForBook, journeyProgressRepository } from "@/features/bible-journey/progress";
 import type { JourneyBook } from "@/features/bible-journey/types";
 import { journeyCategoryLabel } from "@/features/bible-journey/category-labels";
 import "./JourneyDesign.css";
-import "./JourneyTimeline.css";
+
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI"];
+const roman = (index: number) => ROMAN[index] ?? String(index + 1);
+const range = (start: number, end: number) => start === end ? `${start}` : `${start}–${end}`;
 
 export default function JornadaLivroPage() {
   const { bookSlug, testament } = useParams(); const { t, i18n } = useTranslation();
@@ -19,21 +21,103 @@ export default function JornadaLivroPage() {
   if (book === undefined) return <div className="journey-loading">{t("common.loading")}</div>;
   if (!book) return <div className="journey-loading">{t("notFound.title")}</div>;
   const overview = book.overview[language];
-  const progress = journeyProgressForBook(journeyProgressRepository.getState(), book.slug, book.chapterCount);
+  const progressState = journeyProgressRepository.getState();
+  const progress = journeyProgressForBook(progressState, book.slug, book.chapterCount);
+  const isDone = (number: number) => Boolean(progressState.chapters[`${book.slug}:${number}`]?.completed);
+  // "Atual" = primeiro capítulo ainda não concluído, só quando já há progresso.
+  const currentChapter = progress.completed > 0 ? book.chapters.find(chapter => !isDone(chapter.number))?.number : undefined;
   const bookIndex = allBooks.findIndex(item => item.slug === book.slug);
   const previousBook = bookIndex > 0 ? allBooks[bookIndex - 1] : undefined;
   const nextBook = bookIndex >= 0 ? allBooks[bookIndex + 1] : undefined;
+  const testamentLabel = book.testament === "old-testament" ? t("journey.oldTestament") : t("journey.newTestament");
 
   return <div className="journey-book-page">
-    <header className="journey-book-hero"><Link to="/jornada"><ArrowLeft /></Link><div className="journey-book-emblem"><BookOpen /><span>{String(book.position).padStart(2, "0")}</span></div><div><small>{journeyCategoryLabel(book.category, language)} · {book.chapterCount} {t("journey.chapters")}</small><h1>{overview.title}</h1><p>{overview.description}</p></div><div className="journey-progress-ring"><strong>{progress.percentage}%</strong><span>{t("journey.completed")}</span></div></header>
     <main className="journey-book-content">
-      <section className="overview-layout">
-        <article className="overview-main"><span>{t("journey.aboutBook")}</span><p>{overview.context}</p><div className="overview-facts"><div><Feather /><span>{t("journey.author")}</span><strong>{overview.author}</strong></div><div><Calendar /><span>{t("journey.date")}</span><strong>{overview.date}</strong></div><div><Compass /><span>{t("journey.nameOrigin")}</span><strong>{overview.nameOrigin}</strong></div></div></article>
-        <aside><section><span>{t("journey.themes")}</span><div className="journey-tags">{overview.themes.map(v => <b key={v}>{v}</b>)}</div></section><section><span><Users />{t("journey.characters")}</span><p>{overview.characters.join(" · ")}</p></section><section><span><Check />{t("journey.principles")}</span><ul>{overview.principles.map(v => <li key={v}>{v}</li>)}</ul></section></aside>
+      <Link to="/jornada" className="ed-link journey-back">← {t("journey.title")}</Link>
+
+      <header className="journey-opener">
+        <div className="journey-bignum" aria-hidden>{String(book.position).padStart(2, "0")}</div>
+        <div className="journey-opener-title">
+          <span className="ed-eyebrow">{testamentLabel} · {journeyCategoryLabel(book.category, language)}</span>
+          <h1>{overview.title}</h1>
+          <p className="ed-lede">{overview.description}</p>
+        </div>
+        <div className="journey-opener-meta">
+          <strong>{progress.completed} / {progress.total}</strong>
+          <span>{t("journey.chapters")}</span>
+          <div className="journey-rule-bar" role="progressbar" aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.completed}><i style={{ width: `${progress.percentage}%` }} /></div>
+        </div>
+      </header>
+
+      <section className="journey-about" aria-label={t("journey.aboutBook")}>
+        <div>
+          <p className="ed-prose journey-dropcap">{overview.context}</p>
+          {overview.principles.length > 0 && <>
+            <h2 className="ed-eyebrow journey-principles-title">{t("journey.principles")}</h2>
+            <ul className="journey-principles">{overview.principles.map(v => <li key={v}>{v}</li>)}</ul>
+          </>}
+        </div>
+        <dl className="journey-margin-note">
+          <dt>{t("journey.author")}</dt><dd>{overview.author}</dd>
+          <dt>{t("journey.date")}</dt><dd>{overview.date}</dd>
+          <dt>{t("journey.nameOrigin")}</dt><dd>{overview.nameOrigin}</dd>
+          {overview.themes.length > 0 && <><dt>{t("journey.themes")}</dt><dd>{overview.themes.join(" · ")}</dd></>}
+          {overview.characters.length > 0 && <><dt>{t("journey.characters")}</dt><dd>{overview.characters.join(", ")}</dd></>}
+        </dl>
       </section>
-      <section className="timeline-section"><header><span>{t("journey.timeline")}</span><h2>{t("journey.bookJourney")}</h2></header><div className="journey-timeline">{book.sections.map((section, index) => <article key={section.slug}><span>{String(index + 1).padStart(2, "0")}</span><div><small>{section.startChapter}-{section.endChapter}</small><h3>{section.content[language].title}</h3><p>{section.content[language].description}</p></div></article>)}</div><div className="journey-story-grid">{book.sections.map((section, index) => { const details = getJourneySectionDetails(book, section, language); if (!details) return null; return <article key={section.slug}><header><span>{String(index + 1).padStart(2, "0")}</span><div><small>{t("journey.timeline")}</small><h3>{section.content[language].title}</h3></div><b>{section.startChapter}-{section.endChapter}</b></header><p>{details.event}</p><div className="journey-story-meta"><span><Users />{details.characters.join(" · ")}</span><span><MapPin />{details.place}</span></div><footer><Link2 /><span>{details.connection}</span></footer></article>; })}</div></section>
-      <section className="chapter-map"><header><h2>{t("journey.chapterByChapter")}</h2><p>{t("journey.chapterDescription")}</p></header><div>{book.chapters.map(chapter => { const done = journeyProgressRepository.getState().chapters[`${book.slug}:${chapter.number}`]?.completed; return <Link className={done ? "done" : ""} to={`/jornada/${testament}/${book.slug}/capitulos/${chapter.number}`} key={chapter.number}><span>{chapter.number}</span><strong>{chapter.content[language].title}</strong>{done ? <Check /> : <ArrowRight />}</Link>; })}</div></section>
-      <nav className="book-journey-navigation">{previousBook ? <Link to={`/jornada/${previousBook.testament}/${previousBook.slug}`}><ArrowLeft /><span><small>{String(previousBook.position).padStart(2, "0")}</small><strong>{previousBook.overview[language].title}</strong><p>{previousBook.overview[language].description}</p></span></Link> : <span />}{nextBook && <Link to={`/jornada/${nextBook.testament}/${nextBook.slug}`}><span><small>{String(nextBook.position).padStart(2, "0")}</small><strong>{nextBook.overview[language].title}</strong><p>{nextBook.overview[language].description}</p></span><ArrowRight /></Link>}</nav>
+
+      <div className="ed-orn" aria-hidden>✦</div>
+
+      <section aria-labelledby="journey-movements-title">
+        <h2 id="journey-movements-title" className="journey-h2">{t("journey.bookJourney")}</h2>
+        <ol className="journey-movements">
+          {book.sections.map((section, index) => {
+            const content = section.content[language];
+            const details = getJourneySectionDetails(book, section, language);
+            return <li key={section.slug}>
+              <span className="ed-num">{roman(index)}</span>
+              <div>
+                <h3>{content.title}</h3>
+                <p>{details?.event || content.description}</p>
+                {details && <p className="journey-who">{details.characters.join(", ")}{details.place ? ` — ${details.place}` : ""}</p>}
+                {details?.connection && <p className="journey-connection">{details.connection}</p>}
+              </div>
+              <span className="journey-range">{range(section.startChapter, section.endChapter)}</span>
+            </li>;
+          })}
+        </ol>
+      </section>
+
+      <div className="ed-orn" aria-hidden>✦</div>
+
+      <section aria-labelledby="journey-chapters-title">
+        <h2 id="journey-chapters-title" className="journey-h2">{t("journey.chapterByChapter")}</h2>
+        <p className="journey-h2-sub">{t("journey.chapterDescription")}</p>
+        <ol className="journey-chapters">
+          {book.chapters.map(chapter => {
+            const done = isDone(chapter.number);
+            const now = chapter.number === currentChapter;
+            return <li key={chapter.number}>
+              <Link className={done ? "done" : now ? "now" : undefined} aria-current={now ? "step" : undefined} to={`/jornada/${testament}/${book.slug}/capitulos/${chapter.number}`}>
+                <b>{chapter.number}</b>
+                <span>{chapter.content[language].title}</span>
+                {done && <i aria-label={t("journey.completedChapter")}>✓</i>}
+              </Link>
+            </li>;
+          })}
+        </ol>
+      </section>
+
+      <nav className="journey-book-nav" aria-label={t("journey.title")}>
+        {previousBook ? <Link to={`/jornada/${previousBook.testament}/${previousBook.slug}`}>
+          <small>← {String(previousBook.position).padStart(2, "0")}</small>
+          <strong>{previousBook.overview[language].title}</strong>
+        </Link> : <span />}
+        {nextBook && <Link to={`/jornada/${nextBook.testament}/${nextBook.slug}`} className="is-next">
+          <small>{String(nextBook.position).padStart(2, "0")} →</small>
+          <strong>{nextBook.overview[language].title}</strong>
+        </Link>}
+      </nav>
     </main>
   </div>;
 }
