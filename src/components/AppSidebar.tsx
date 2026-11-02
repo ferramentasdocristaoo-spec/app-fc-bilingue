@@ -16,6 +16,10 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 
+// Item do menu: sem "pílula"; o ativo ganha um filete dourado à esquerda.
+const NAV_ITEM = "h-9 rounded-none pl-3 text-[0.9375rem] text-sidebar-foreground/80 hover:bg-transparent hover:text-sidebar-accent-foreground data-[active=true]:bg-transparent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-[inset_2px_0_0_hsl(var(--sidebar-primary))] [&>svg]:opacity-70";
+const GROUP_LABEL = "text-sidebar-foreground/50 text-[0.6875rem] font-medium uppercase tracking-[0.14em]";
+
 export function AppSidebar() {
   const { t, i18n } = useTranslation();
   const location = useLocation();
@@ -42,19 +46,19 @@ export function AppSidebar() {
 
   const renderItems = (items: typeof preparationItems) => items.map((item) => (
     <SidebarMenuItem key={item.path}>
-      <SidebarMenuButton asChild isActive={location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)}>
+      <SidebarMenuButton asChild className={NAV_ITEM} isActive={location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)}>
         <NavLink to={item.path}><item.icon className="h-4 w-4" /><span>{item.title}</span></NavLink>
       </SidebarMenuButton>
     </SidebarMenuItem>
   ));
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
-      <SidebarHeader className="p-4 flex items-center gap-3">
-        <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-10 h-10 object-contain shrink-0" />
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
+      <SidebarHeader className="px-4 pt-6 pb-4 flex flex-col items-center gap-3 text-center">
+        <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-14 h-14 object-contain shrink-0 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:h-8" />
         <div className="overflow-hidden group-data-[collapsible=icon]:hidden">
-          <h2 className="font-display text-sm font-bold text-primary leading-tight">{t("appName")}</h2>
-          <p className="text-[10px] text-sidebar-foreground/60">{t("subtitle")}</p>
+          <h2 className="font-brand text-[0.8125rem] font-semibold tracking-[0.06em] text-sidebar-primary leading-snug">{t("appName")}</h2>
+          <p className="mt-1 font-serif italic text-xs text-sidebar-foreground/60">{t("subtitle")}</p>
         </div>
       </SidebarHeader>
 
@@ -63,7 +67,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/"}>
+                <SidebarMenuButton asChild className={NAV_ITEM} isActive={location.pathname === "/"}>
                   <NavLink to="/" end>
                     <Home className="h-4 w-4" />
                     <span>{t("sidebar.home")}</span>
@@ -74,15 +78,15 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/45 text-[9px] uppercase tracking-[0.16em]">{t("workspace.groups.preparation")}</SidebarGroupLabel>
+          <SidebarGroupLabel className={GROUP_LABEL}>{t("workspace.groups.preparation")}</SidebarGroupLabel>
           <SidebarGroupContent><SidebarMenu>{renderItems(preparationItems)}</SidebarMenu></SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/45 text-[9px] uppercase tracking-[0.16em]">{t("workspace.groups.study")}</SidebarGroupLabel>
+          <SidebarGroupLabel className={GROUP_LABEL}>{t("workspace.groups.study")}</SidebarGroupLabel>
           <SidebarGroupContent><SidebarMenu>{renderItems(studyItems)}</SidebarMenu></SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/45 text-[9px] uppercase tracking-[0.16em]">{t("workspace.groups.life")}</SidebarGroupLabel>
+          <SidebarGroupLabel className={GROUP_LABEL}>{t("workspace.groups.life")}</SidebarGroupLabel>
           <SidebarGroupContent><SidebarMenu>{renderItems(connectionItems)}</SidebarMenu></SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
@@ -90,14 +94,14 @@ export function AppSidebar() {
       <SidebarFooter className="p-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={signOut} className="text-sidebar-foreground/70 hover:text-destructive">
+            <SidebarMenuButton onClick={signOut} className="text-sidebar-foreground/70 hover:bg-transparent hover:text-sidebar-accent-foreground">
               <LogOut className="h-4 w-4" />
               <span>{t("sidebar.logout")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
         {email && (
-          <p className="text-[10px] text-sidebar-foreground/60 truncate px-2 group-data-[collapsible=icon]:hidden">
+          <p className="text-xs text-sidebar-foreground/60 truncate px-2 group-data-[collapsible=icon]:hidden">
             {email}
           </p>
         )}

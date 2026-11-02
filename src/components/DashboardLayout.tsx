@@ -17,10 +17,10 @@ const MenuButton = () => {
       variant="ghost"
       size="icon"
       onClick={toggleSidebar}
-      className="menu-toggle h-9 w-9 hover:bg-primary/10"
+      className="menu-toggle h-10 w-10 hover:bg-transparent"
       aria-label="Menu"
     >
-      <Menu className="!h-6 !w-6" strokeWidth={2.4} />
+      <Menu className="!h-6 !w-6" strokeWidth={1.75} />
     </Button>
   );
 };
@@ -36,19 +36,20 @@ const DashboardLayout = () => {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-12 flex items-center justify-between border-b border-border px-4 shrink-0 md:px-6">
-            <div className="flex items-center">
+          <header className="h-14 flex items-center justify-between gap-2 border-b border-rule-soft bg-background px-3 shrink-0 md:px-6">
+            <div className="flex min-w-0 items-center">
               <MenuButton />
-              <span className="ml-3 font-display text-sm font-bold text-primary md:hidden">{t("appName")}</span>
+              <span className="ml-2 truncate font-brand text-[0.8125rem] font-semibold tracking-[0.04em] text-primary md:hidden">{t("appName")}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-1 md:gap-3">
               <InstallButton />
               <LanguageSwitcher variant="horizontal" />
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="text-primary hover:bg-primary/10"
+                className="text-ink-2 hover:bg-transparent hover:text-foreground"
+                aria-label={theme === "dark" ? t("dashboard.lightMode") : t("dashboard.darkMode")}
                 title={theme === "dark" ? t("dashboard.lightMode") : t("dashboard.darkMode")}
               >
                 {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}

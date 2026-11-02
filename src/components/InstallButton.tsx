@@ -65,13 +65,13 @@ const InstallButton = () => {
     <>
       <Button
         onClick={handleClick}
-        variant="outline"
+        variant="ghost"
         size="sm"
-        className="gap-2 border-primary/30 text-primary hover:bg-primary/10"
+        aria-label={t("install.button")}
+        className="gap-2 px-2 text-ink-2 hover:bg-transparent hover:text-foreground"
       >
         <Download className="w-4 h-4" />
         <span className="hidden sm:inline">{t("install.button")}</span>
-        <span className="sm:hidden">{t("install.button")}</span>
       </Button>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

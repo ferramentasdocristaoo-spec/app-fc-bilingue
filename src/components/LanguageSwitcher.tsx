@@ -15,27 +15,51 @@ interface LanguageSwitcherProps {
   variant?: 'horizontal' | 'vertical';
 }
 
-export const LanguageSwitcher = ({ className = '', variant = 'horizontal' }: LanguageSwitcherProps) => {
-  const { i18n } = useTranslation();
+const matchLanguage = (current: string) => {
+  const exact = languages.find((lang) => lang.code === current);
+  if (exact) return exact.code;
+  const base = current.split('-')[0];
+  return languages.find((lang) => lang.code.split('-')[0] === base)?.code ?? 'pt-PT';
+};
 
-  const currentLanguage = i18n.language.split('-')[0];
+/**
+ * "horizontal": um único seletor discreto em texto ("Português ▾"), em vez de 6 bandeiras.
+ * "vertical": lista de botões (mantida para quem já usa).
+ */
+export const LanguageSwitcher = ({ className = '', variant = 'horizontal' }: LanguageSwitcherProps) => {
+  const { t, i18n } = useTranslation();
+  const current = matchLanguage(i18n.resolvedLanguage || i18n.language || 'pt-PT');
+
+  if (variant === 'horizontal') {
+    return (
+      <label className={`relative inline-flex items-center ${className}`}>
+        <span className="sr-only">{t('dashboard.selectLanguage')}</span>
+        <select
+          value={current}
+          onChange={(event) => i18n.changeLanguage(event.target.value)}
+          className="h-9 appearance-none rounded-md border-0 bg-transparent py-1 pl-2 pr-6 font-body text-sm font-medium text-ink-2 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+        >
+          {languages.map((lang) => (
+            <option key={lang.code} value={lang.code} className="bg-popover text-popover-foreground">{lang.name}</option>
+          ))}
+        </select>
+        <span aria-hidden className="pointer-events-none absolute right-1.5 text-xs text-ink-3">▾</span>
+      </label>
+    );
+  }
 
   return (
-    <div className={`flex ${variant === 'horizontal' ? 'gap-2' : 'flex-col gap-1'} ${className}`}>
+    <div className={`flex flex-col gap-1 ${className}`}>
       {languages.map((lang) => (
         <Button
           key={lang.code}
-          variant={currentLanguage === lang.code ? 'default' : 'ghost'}
+          variant={current === lang.code ? 'default' : 'ghost'}
           size="sm"
           onClick={() => i18n.changeLanguage(lang.code)}
           title={lang.name}
-          className={`h-8 w-8 p-0 text-lg ${
-            currentLanguage === lang.code
-              ? 'ring-2 ring-offset-2 ring-primary'
-              : 'hover:bg-accent'
-          }`}
+          className="h-8 justify-start gap-2 px-2 text-sm"
         >
-          {lang.flag}
+          <span aria-hidden>{lang.flag}</span>{lang.name}
         </Button>
       ))}
     </div>

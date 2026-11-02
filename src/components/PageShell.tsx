@@ -14,14 +14,14 @@ const PageShell = ({ title, children }: PageShellProps) => {
   const { fontSizeClass } = useFontSize();
 
   return (
-    <div className="flex flex-col px-4 pt-4 pb-8 md:px-8 md:pt-6">
-      <div className="flex items-center gap-3 mb-4">
+    <div className="flex flex-col px-5 pt-5 pb-10 md:px-10 md:pt-8">
+      <div className="flex items-center gap-3 mb-6 md:mb-8">
         {isMobile && (
-          <Link to="/" className="w-9 h-9 rounded-full bg-card gold-border flex items-center justify-center">
-            <ArrowLeft className="w-4 h-4 text-primary" />
+          <Link to="/" aria-label="←" className="-ml-2 w-10 h-10 flex items-center justify-center text-ink-2 hover:text-foreground">
+            <ArrowLeft className="w-5 h-5" />
           </Link>
         )}
-        <h1 className="font-display text-lg md:text-xl font-bold text-primary flex-1">{title}</h1>
+        <h1 className="font-display text-2xl md:text-[2rem] font-semibold leading-tight text-foreground flex-1">{title}</h1>
         <FontSizeSelector />
       </div>
       <div className={`flex-1 ${fontSizeClass}`}>{children}</div>
