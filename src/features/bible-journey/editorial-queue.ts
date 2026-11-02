@@ -1,6 +1,7 @@
 import type { EditorialGenerationResult } from "./editorial-generator";
 import type { JourneyBook, JourneyLanguage } from "./types";
 import { cleanBibleText } from "@/lib/bible-text";
+import { fetchBibleChapter } from "@/lib/content-api";
 
 export type EditorialQueueStatus = "pending" | "generating" | "generated" | "reviewed" | "published" | "failed";
 
@@ -65,13 +66,12 @@ export function removeEditorialQueueItem(state: EditorialQueueState, id: string)
 }
 
 export async function fetchEditorialScripture(item: EditorialQueueItem): Promise<string> {
-  const baseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  const url = `${baseUrl}/functions/v1/bible-proxy?version=${encodeURIComponent(item.sourceVersion)}&bookId=${item.bibleBookId}&chapter=${item.chapter}`;
-  const response = await fetch(url, { headers: { apikey: apiKey, Authorization: `Bearer ${apiKey}` } });
-  if (!response.ok) throw new Error("Não foi possível carregar o texto bíblico.");
-  const data = await response.json() as Array<{ verse?: number; text?: string }>;
-  if (!Array.isArray(data)) throw new Error("A fonte bíblica devolveu uma resposta inválida.");
+  let data: Array<{ verse?: number; text?: string }>;
+  try {
+    data = await fetchBibleChapter({ version: item.sourceVersion, bookId: item.bibleBookId, chapter: item.chapter }) as Array<{ verse?: number; text?: string }>;
+  } catch {
+    throw new Error("Não foi possível carregar o texto bíblico.");
+  }
   const scripture = data.filter(verse => typeof verse.text === "string").map(verse => `${verse.verse ?? ""} ${cleanBibleText(verse.text || "")}`.trim()).join("\n");
   if (!scripture) throw new Error("O capítulo bíblico está vazio.");
   return scripture;

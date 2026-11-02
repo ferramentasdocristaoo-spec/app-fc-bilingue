@@ -1,4 +1,5 @@
 import { cleanBibleText } from "@/lib/bible-text";
+import { fetchBibleChapter } from "@/lib/content-api";
 
 // Versículos clássicos que rodam por dia do ano (numeração de livros da bolls.life).
 const VERSES: { book: number; chapter: number; verse: number }[] = [
@@ -59,15 +60,8 @@ export async function fetchDailyVerse(language: string): Promise<DailyVerse | nu
   } catch { /* cache inválido é ignorado */ }
 
   try {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-    const res = await fetch(
-      `${supabaseUrl}/functions/v1/bible-proxy?version=${version}&bookId=${ref.book}&chapter=${ref.chapter}`,
-      { headers: { Authorization: `Bearer ${supabaseKey}` } },
-    );
-    if (!res.ok) return null;
-    const verses = await res.json();
-    const found = Array.isArray(verses) ? verses.find((v) => v.verse === ref.verse) : null;
+    const verses = (await fetchBibleChapter({ version, bookId: ref.book, chapter: ref.chapter })) as Array<{ verse?: number; text?: string }>;
+    const found = verses.find((v) => v?.verse === ref.verse);
     if (!found?.text) return null;
     const result: DailyVerse = { text: cleanBibleText(found.text), ...ref };
     localStorage.setItem(cacheKey, JSON.stringify(result));

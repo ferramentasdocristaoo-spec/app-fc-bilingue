@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, ChevronLeft, ChevronRight, BookOpen, Volume2, Pause, Play, Square } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PageShell from "@/components/PageShell";
+import { fetchBibleChapter } from "@/lib/content-api";
 import { cleanBibleText } from "@/lib/bible-text";
 import { useSearchParams } from "react-router-dom";
 
@@ -199,20 +200,7 @@ const BibliaPage = () => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      const res = await fetch(
-        `${supabaseUrl}/functions/v1/bible-proxy?version=${encodeURIComponent(version)}&bookId=${bookId}&chapter=${chapter}`,
-        {
-          headers: {
-            apikey: supabaseKey,
-            Authorization: `Bearer ${supabaseKey}`,
-          },
-        },
-      );
-      if (!res.ok) throw new Error("Erro ao buscar capítulo");
-      const data: unknown = await res.json();
-      if (!Array.isArray(data)) throw new Error("Resposta inválida da Bíblia");
+      const data = await fetchBibleChapter({ version, bookId, chapter });
 
       const validVerses = data
         .filter(isVerse)
