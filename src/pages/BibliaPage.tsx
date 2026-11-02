@@ -357,7 +357,7 @@ const BibliaPage = () => {
       </div>
 
       {/* Chapter title */}
-      <h2 className="text-xl font-bold text-foreground mb-4">
+      <h2 className="font-display text-3xl font-semibold text-foreground mb-5 pb-3 border-b border-rule">
         {bookNames[bookId - 1] || currentBook.name} {chapter}
       </h2>
 
@@ -367,14 +367,14 @@ const BibliaPage = () => {
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
         </div>
       ) : verses.length > 0 ? (
-        <div className="space-y-2 mb-6">
+        <div className="space-y-2 mb-8 max-w-[68ch] font-serif text-[1.0625rem] md:text-lg" lang={lang}>
           {verses.map((v) => (
             <p
               key={v.pk}
               ref={(el) => { verseRefs.current[v.verse] = el; }}
-              className={`leading-relaxed text-foreground rounded px-1 transition-colors ${versoAtual === v.verse ? "bg-primary/25" : selectedVerse === v.verse ? "bg-primary/15" : ""}`}
+              className={`leading-[1.75] text-foreground rounded-sm px-1 transition-colors ${versoAtual === v.verse ? "bg-primary/25" : selectedVerse === v.verse ? "bg-primary/15" : ""}`}
             >
-              <span className="font-bold text-primary mr-1 text-xs align-super">{v.verse}</span>
+              <span className="font-body font-semibold text-gold-ink mr-1 text-xs align-super">{v.verse}</span>
               <span className="whitespace-pre-line">{v.text}</span>
             </p>
           ))}
