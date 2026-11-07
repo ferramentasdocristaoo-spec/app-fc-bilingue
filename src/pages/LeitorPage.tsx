@@ -342,7 +342,6 @@ export default function LeitorPage() {
             className="mx-auto px-6 pb-16 pt-10 sm:px-8 sm:pt-16"
             style={{ maxWidth: `calc(${fonte * 33}px + 4rem)`, fontFamily: READER_SERIF, fontSize: fonte, lineHeight: 1.7 }}
           >
-            <p className="mb-3 font-brand" style={{ fontSize: 14, letterSpacing: "0.08em", color: theme.acento }} aria-hidden>{cap + 1}</p>
             <h2 id="leitura-linha--1" className="font-display mb-10 font-semibold" style={{ fontSize: fonte * 1.9, lineHeight: 1.1, textWrap: "balance", ...realce(-1) } as React.CSSProperties}>
               {chapter?.title}
             </h2>

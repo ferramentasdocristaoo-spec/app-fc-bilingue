@@ -1,5 +1,4 @@
 /* Página do capítulo: contexto, editorial e navegação entre etapas. */
-.chapter-journey-page>header>div>i{display:block;width:min(360px,75vw);height:2px;margin-top:9px;background:hsl(214 25% 25%);border-radius:99px;overflow:hidden}.chapter-journey-page>header>div>i>b{display:block;height:100%;background:hsl(var(--primary));border-radius:inherit}.chapter-context{margin:21px 0;padding:18px;border:1px solid hsl(var(--primary)/.22);border-radius:4px;background:linear-gradient(135deg,hsl(var(--primary)/.08),transparent)}.chapter-context>small{font-size:0.8125rem;letter-spacing:.13em;text-transform:uppercase;color:hsl(var(--primary))}.chapter-context>p{font:400 1rem/1.55 var(--font-text);margin:8px 0 13px}.chapter-context>div{display:flex;flex-wrap:wrap;gap:7px}.chapter-context>div>span{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:7px;background:hsl(var(--card));font-size:0.8125rem;color:hsl(var(--muted-foreground))}.chapter-context svg{width:12px;color:hsl(var(--primary))}.chapter-context>footer{display:flex;align-items:flex-start;gap:7px;margin-top:13px;padding-top:11px;border-top:1px solid hsl(var(--border));font-size:0.8125rem;line-height:1.5;color:hsl(var(--muted-foreground))}.chapter-step-navigation{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:27px;padding-top:20px;border-top:1px solid hsl(var(--border))}.chapter-step-navigation>a{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid hsl(var(--border));border-radius:4px;color:hsl(var(--foreground));text-decoration:none;font-size:0.8125rem;line-height:1.35}.chapter-step-navigation>a:last-child{text-align:right;justify-content:flex-end}.chapter-step-navigation>a>span{display:flex;flex-direction:column}.chapter-step-navigation small{color:hsl(var(--primary));font-size:0.8125rem}.chapter-step-navigation svg{width:13px;min-width:13px;color:hsl(var(--primary))}
 
 @media (max-width: 560px) {
   .chapter-step-navigation { grid-template-columns: 1fr; }
@@ -19,25 +18,11 @@
 }
 
 /* ---------- Capítulo no "Livro de Estudo": papel e filetes, sem faixa escura nem cartões ---------- */
-.chapter-journey-page>header { height: auto; min-height: 72px; padding: 16px clamp(18px,4vw,50px); background: transparent; color: hsl(var(--ink)); border-bottom: 1px solid hsl(var(--rule)); }
-.chapter-journey-page>header>a { color: hsl(var(--gold-ink)); }
-.chapter-journey-page>header>div { min-width: 0; }
-.chapter-journey-page>header small { display: block; color: hsl(var(--gold-ink)); }
-.chapter-journey-page>header h1 { font-size: 1.375rem; color: hsl(var(--ink)); }
-.chapter-journey-page>header>div>i { width: 100%; max-width: 360px; background: hsl(var(--rule)); }
-.chapter-journey-page>header>div>i>b { background: hsl(var(--gold)); }
-.chapter-journey-page>header>span { flex: none; color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
-.chapter-journey-page>main { gap: 40px; }
-.chapter-reading,.chapter-journey-page aside { border: 0; background: transparent; padding: 0; box-shadow: none; }
-.chapter-journey-page aside { padding-left: 32px; border-left: 1px solid hsl(var(--rule)); }
 .chapter-context { max-width: 100%; border: 0; border-top: 1px solid hsl(var(--rule)); background: transparent; border-radius: 0; padding: 16px 0 0; }
 .chapter-context>div { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .chapter-context>div>span { min-width: 0; max-width: 100%; background: transparent; border: 0; padding: 0; overflow-wrap: anywhere; white-space: normal; }
 .chapter-editorial { border: 0; border-top: 1px solid hsl(var(--rule)); background: transparent; border-radius: 0; padding: 16px 0 0; }
-.chapter-reading blockquote { background: transparent; }
 .chapter-step-navigation a { border-radius: 0; border: 0; border-top: 1px solid hsl(var(--rule)); background: transparent; box-shadow: none; }
 .chapter-step-navigation .next-book-step { background: transparent; border-color: hsl(var(--gold-soft)); }
 @media (max-width: 800px) {
-  .chapter-journey-page>main { grid-template-columns: minmax(0, 1fr); }
-  .chapter-journey-page aside { padding-left: 0; padding-top: 24px; border-left: 0; border-top: 1px solid hsl(var(--rule)); }
 }

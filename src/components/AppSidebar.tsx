@@ -59,8 +59,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
-      <SidebarHeader className="px-4 pt-6 pb-4 flex flex-col items-center gap-3 text-center">
-        <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-14 h-14 object-contain shrink-0 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:h-8" />
+      <SidebarHeader className="px-4 pt-4 pb-2 flex flex-col items-center gap-2 text-center">
+        <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-12 h-12 object-contain shrink-0 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:h-8" />
         <div className="overflow-hidden group-data-[collapsible=icon]:hidden">
           <h2 className="font-brand text-[0.8125rem] font-semibold tracking-[0.06em] text-sidebar-primary leading-snug">{t("appName")}</h2>
           <p className="mt-1 font-serif italic text-xs text-sidebar-foreground/70">{t("subtitle")}</p>
@@ -68,7 +68,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
+        <SidebarGroup className="py-1">
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -82,15 +82,15 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
+        <SidebarGroup className="py-1">
           <SidebarGroupLabel className={GROUP_LABEL}>{t("workspace.groups.preparation")}</SidebarGroupLabel>
           <SidebarGroupContent><SidebarMenu>{renderItems(preparationItems)}</SidebarMenu></SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
+        <SidebarGroup className="py-1">
           <SidebarGroupLabel className={GROUP_LABEL}>{t("workspace.groups.study")}</SidebarGroupLabel>
           <SidebarGroupContent><SidebarMenu>{renderItems(studyItems)}</SidebarMenu></SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
+        <SidebarGroup className="py-1">
           <SidebarGroupLabel className={GROUP_LABEL}>{t("workspace.groups.life")}</SidebarGroupLabel>
           <SidebarGroupContent><SidebarMenu>{renderItems(connectionItems)}</SidebarMenu></SidebarGroupContent>
         </SidebarGroup>

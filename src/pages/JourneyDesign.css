@@ -73,7 +73,8 @@
 .journey-book-page { min-height: 100%; background: hsl(var(--background)); color: hsl(var(--ink)); }
 .journey-book-content { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; }
 @media (min-width: 768px) { .journey-book-content { padding: 40px clamp(28px, 4vw, 56px) 112px; } }
-.journey-back { margin-bottom: 28px; }
+.journey-back { display: none; margin-bottom: 28px; }
+@media (min-width: 768px) { .journey-back { display: inline-block; } }
 
 .journey-opener {
   display: grid;
@@ -189,41 +190,44 @@
 
 .journey-loading { min-height: 50vh; display: grid; place-items: center; color: hsl(var(--muted-foreground)); }
 
-/* ---------- Página do capítulo (P3: só escala mínima e fontes) ---------- */
-.chapter-journey-page{min-height:100%;background:hsl(var(--background))}
-.chapter-journey-page>header{height:85px;padding:0 clamp(18px,4vw,50px);display:flex;align-items:center;gap:18px;background:hsl(214 58% 9%);color:white}
-.chapter-journey-page>header>a{color:hsl(var(--primary))}
-.chapter-journey-page>header>a svg{width:20px}
-.chapter-journey-page>header>div{flex:1}
-.chapter-journey-page>header small{color:hsl(var(--primary));font-size:0.8125rem}
-.chapter-journey-page>header h1{font:600 1.25rem var(--font-display);margin:3px 0}
-.chapter-journey-page>header>span{font-size:0.8125rem;color:hsl(214 17% 72%)}
-.chapter-journey-page>main{max-width:1000px;margin:auto;padding:35px 20px;display:grid;grid-template-columns:1.2fr .8fr;gap:15px}
-.chapter-reading,.chapter-journey-page aside{border:1px solid hsl(var(--border));background:hsl(var(--card));border-radius:4px;padding:clamp(22px,4vw,40px)}
-.chapter-reading>span{font-size:0.8125rem;letter-spacing:.14em;color:hsl(var(--primary))}
-.chapter-reading h2{font:600 2rem/1.15 var(--font-display)}
-.chapter-reading>p{font-family:var(--font-text);font-size:1.0625rem;line-height:1.75;color:hsl(var(--ink-2))}
-.chapter-reading>a{display:inline-flex;align-items:center;gap:9px;margin-top:12px;padding:10px 13px;border-radius:4px;background:hsl(var(--ink));color:hsl(var(--paper));text-decoration:none;font-size:0.875rem;font-weight:500}
-.chapter-reading>a svg{width:14px}
-.chapter-reading blockquote{margin:28px 0 0;padding:18px;border-left:2px solid hsl(var(--primary));background:hsl(var(--primary)/.06);font:italic 400 1.0625rem/1.6 var(--font-text)}
-.chapter-reading blockquote small{display:block;font:500 0.75rem var(--font-ui);letter-spacing:.13em;color:hsl(var(--primary));margin-bottom:7px}
-.chapter-journey-page aside{display:flex;flex-direction:column}
-.chapter-journey-page aside label{display:flex;align-items:center;gap:8px;font-size:0.8125rem;font-weight:700}
-.chapter-journey-page aside label svg{width:16px;color:hsl(var(--primary))}
-.chapter-journey-page textarea{flex:1;min-height:230px;margin:15px 0;border:1px solid hsl(var(--border));border-radius:4px;background:hsl(var(--background)/.5);padding:13px;color:hsl(var(--foreground));font:inherit;font-size:0.8125rem;resize:vertical}
-.chapter-journey-page aside button{display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid hsl(var(--primary));border-radius:4px;padding:11px;background:transparent;color:hsl(var(--primary));font-size:0.8125rem;font-weight:700}
-.chapter-journey-page aside button.completed{background:hsl(var(--primary));color:hsl(var(--primary-foreground))}
-.chapter-journey-page aside button svg{width:15px}
-
-@media(max-width:800px){.chapter-journey-page>main{grid-template-columns:1fr}.chapter-journey-page textarea{min-height:180px}}
+/* ---------- Página do capítulo: coluna de leitura e nota de margem ---------- */
+.chapter-journey-page { width: min(1120px, 100%); margin: 0 auto; padding: 24px 20px 72px; }
+@media (min-width: 768px) { .chapter-journey-page { padding: 40px 40px 112px; } }
+.chapter-head { padding-bottom: 20px; }
+.chapter-back { display: none; }
+@media (min-width: 768px) { .chapter-back { display: inline-block; margin-bottom: 8px; } }
+.chapter-crumb { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin: 0 0 6px; font: 400 .875rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.chapter-head h1 { margin: 0; font: 600 clamp(2.125rem, 5vw, 3rem)/1.08 var(--font-display); color: hsl(var(--ink)); }
+.chapter-head .journey-rule-bar { margin-top: 16px; }
+.chapter-journey-steps { margin-bottom: 32px; }
+.chapter-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; }
+@media (min-width: 1024px) { .chapter-layout { grid-template-columns: minmax(0, 40rem) minmax(240px, 300px); justify-content: space-between; gap: 64px; align-items: start; } }
+.chapter-summary { margin: 0 0 28px; font: 400 1.1875rem/1.65 var(--font-text); color: hsl(var(--ink)); }
+.chapter-context { margin-bottom: 28px; padding-top: 20px; border-top: 1px solid hsl(var(--rule)); }
+.chapter-context h2 { margin: 6px 0 16px; font: 600 1.625rem/1.2 var(--font-display); color: hsl(var(--ink)); }
+.chapter-event { margin: 8px 0 16px; font: 400 1.0625rem/1.7 var(--font-text); color: hsl(var(--ink)); }
+.chapter-context dl { margin: 0 0 16px; }
+.chapter-context dl > div { display: grid; grid-template-columns: minmax(0, 7rem) minmax(0, 1fr); gap: 12px; padding: 8px 0; border-top: 1px solid hsl(var(--rule-soft)); }
+.chapter-context dt { font: 500 .875rem/1.6 var(--font-ui); color: hsl(var(--ink-3)); }
+.chapter-context dd { margin: 0; font: 400 1rem/1.55 var(--font-text); color: hsl(var(--ink)); }
+.chapter-connection { margin: 0 0 8px; font: italic 400 1rem/1.6 var(--font-text); color: hsl(var(--ink-2)); }
+.chapter-reading blockquote { margin: 40px 0 0; padding: 4px 0 4px 20px; border-left: 2px solid hsl(var(--gold)); font: italic 400 1.25rem/1.5 var(--font-text); color: hsl(var(--ink)); }
+.chapter-reading blockquote small { display: block; margin-bottom: 6px; font: 500 .75rem/1.4 var(--font-ui); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
+.chapter-notes { display: flex; flex-direction: column; padding: 20px; background: hsl(var(--paper-2)); border-radius: 2px; }
+@media (min-width: 1024px) { .chapter-notes { position: sticky; top: 24px; } }
+.chapter-notes label { font: 500 .9375rem/1.4 var(--font-ui); color: hsl(var(--ink)); }
+.chapter-notes textarea { min-height: 200px; margin-top: 8px; padding: 8px 0; background: transparent; border: 0; border-bottom: 1px solid hsl(var(--ink) / .4); font: 400 1rem/1.6 var(--font-text); color: hsl(var(--ink)); resize: vertical; }
+.chapter-notes textarea::placeholder { color: hsl(var(--ink-3)); }
+.chapter-notes textarea:focus { outline: none; border-bottom-color: hsl(var(--gold-ink)); }
+.chapter-notes .ed-btn { margin-top: 12px; }
 
 /* ---------- Fontes e licenças ---------- */
 .journey-sources h1 { margin: 24px 0 12px; font: 600 clamp(2rem, 5vw, 2.75rem)/1.1 var(--font-display); color: hsl(var(--ink)); }
 .journey-sources section { max-width: 72ch; margin-top: 32px; padding-top: 16px; border-top: 1px solid hsl(var(--rule)); font: 400 1.0625rem/1.6 var(--font-text); color: hsl(var(--ink)); }
 .journey-sources h2 { margin: 0 0 8px; font: 500 0.75rem/1.4 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
-.journey-sources a { color: hsl(var(--gold-ink)); text-underline-offset: 2px; }
+.journey-sources a { color: hsl(var(--gold-ink)); text-decoration: underline; text-decoration-color: hsl(var(--gold)); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .journey-sources dd { margin: 0 0 12px; color: hsl(var(--ink-2)); }
 .journey-sources ul { list-style: none; margin: 12px 0 0; padding: 0; }
-.journey-sources li { padding: 6px 0; border-bottom: 1px solid hsl(var(--rule-soft)); font-size: 1rem; }
+.journey-sources li { padding: 10px 0; border-bottom: 1px solid hsl(var(--rule-soft)); font-size: 1rem; }
 .journey-sources em { font-style: italic; color: hsl(var(--ink-3)); }
 .journey-sources-link { max-width: 960px; margin: 48px auto 0; }

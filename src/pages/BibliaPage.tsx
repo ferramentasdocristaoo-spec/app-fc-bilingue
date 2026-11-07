@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, ChevronLeft, ChevronRight, BookOpen, Volume2, Pause, Play, Square } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pause, Play, Square, Volume2 } from "lucide-react";
+import { ToolError } from "@/components/ToolKit";
 import { toast } from "@/hooks/use-toast";
 import PageShell from "@/components/PageShell";
 import { fetchBibleChapter } from "@/lib/content-api";
@@ -180,6 +180,7 @@ const BibliaPage = () => {
   });
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const [lendo, setLendo] = useState(false);
   const [pausado, setPausado] = useState(false);
@@ -199,6 +200,7 @@ const BibliaPage = () => {
   const fetchChapter = useCallback(async () => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
+    setFailed(false);
     try {
       const data = await fetchBibleChapter({ version, bookId, chapter });
 
@@ -210,13 +212,13 @@ const BibliaPage = () => {
       if (requestId === requestIdRef.current) setVerses(validVerses);
     } catch {
       if (requestId === requestIdRef.current) {
-        toast({ title: t("biblia.error"), description: t("biblia.errorMessage"), variant: "destructive" });
+        setFailed(true);
         setVerses([]);
       }
     } finally {
       if (requestId === requestIdRef.current) setLoading(false);
     }
-  }, [version, bookId, chapter, t]);
+  }, [version, bookId, chapter]);
 
   useEffect(() => {
     fetchChapter();
@@ -231,7 +233,11 @@ const BibliaPage = () => {
 
   const iniciarLeitura = useCallback(() => {
     const synth = window.speechSynthesis;
-    if (!synth || verses.length === 0) return;
+    if (verses.length === 0) return;
+    if (!synth) {
+      toast({ title: t("common.error"), description: t("livraria.reader.noSpeech"), variant: "destructive" });
+      return;
+    }
     synth.cancel();
     const speechLang = SPEECH_LANG[lang] ?? "pt-PT";
     const voices = synth.getVoices().filter((v) => v.lang.replace("_", "-").toLowerCase().startsWith(speechLang.slice(0, 2)));
@@ -252,7 +258,7 @@ const BibliaPage = () => {
     });
     setLendo(true);
     setPausado(false);
-  }, [verses, lang, selectedVerse]);
+  }, [verses, lang, selectedVerse, t]);
 
   const alternarLeitura = useCallback(() => {
     const synth = window.speechSynthesis;
@@ -265,7 +271,14 @@ const BibliaPage = () => {
   useEffect(() => { pararLeitura(); }, [version, bookId, chapter, pararLeitura]);
   useEffect(() => () => { window.speechSynthesis?.cancel(); }, []);
 
+  const irTopo = () => { document.querySelector("main")?.scrollTo(0, 0); window.scrollTo(0, 0); };
+  const nomeLivro = (id: number) => bookNames[id - 1] || BOOKS.find((b) => b.id === id)?.name || "";
+  const prevLabel = chapter > 1 ? `${nomeLivro(bookId)} ${chapter - 1}` : bookId > 1 ? `${nomeLivro(bookId - 1)} ${BOOKS[bookId - 2].chapters}` : "";
+  const nextLabel = chapter < currentBook.chapters ? `${nomeLivro(bookId)} ${chapter + 1}` : bookId < 66 ? `${nomeLivro(bookId + 1)} 1` : "";
+
   const goToPrevChapter = () => {
+    irTopo();
+    setSelectedVerse(null);
     if (chapter > 1) {
       setChapter((c) => c - 1);
     } else {
@@ -278,6 +291,8 @@ const BibliaPage = () => {
   };
 
   const goToNextChapter = () => {
+    irTopo();
+    setSelectedVerse(null);
     if (chapter < currentBook.chapters) {
       setChapter((c) => c + 1);
     } else {
@@ -291,111 +306,87 @@ const BibliaPage = () => {
 
   return (
     <PageShell title={t("sidebar.biblia.title")}>
-      {/* Selectors */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <Select value={String(bookId)} onValueChange={(v) => { setBookId(Number(v)); setChapter(1); setSelectedVerse(null); }}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={t("biblia.bookLabel")} />
-          </SelectTrigger>
-          <SelectContent className="max-h-60">
-            {BOOKS.map((b) => (
-              <SelectItem key={b.id} value={String(b.id)}>{bookNames[b.id - 1] || b.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={String(chapter)} onValueChange={(v) => { setChapter(Number(v)); setSelectedVerse(null); }}>
-          <SelectTrigger className="w-[100px]">
-            <SelectValue placeholder={t("biblia.chapterLabel")} />
-          </SelectTrigger>
-          <SelectContent className="max-h-60">
-            {Array.from({ length: currentBook.chapters }, (_, i) => (
-              <SelectItem key={i + 1} value={String(i + 1)}>{t("biblia.chapterFormat", { chapter: i + 1 })}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {verses.length > 0 && (
-          <>
-            <Button variant="outline" size="icon" onClick={alternarLeitura} aria-label={t("livraria.reader.listen")} className={lendo ? "text-primary border-primary" : ""}>
-              {!lendo ? <Volume2 className="h-4 w-4" /> : pausado ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-            </Button>
-            {lendo && (
-              <Button variant="outline" size="icon" onClick={pararLeitura} aria-label={t("livraria.reader.stopListening")}>
-                <Square className="h-3.5 w-3.5" />
-              </Button>
-            )}
-          </>
-        )}
-        {verses.length > 0 && (
-          <Select value={selectedVerse ? String(selectedVerse) : ""} onValueChange={(v) => {
+      <div className="bible-controls">
+        <div className="bible-book">
+          <label className="ed-label" id="biblia-livro">{t("biblia.bookLabel")}</label>
+          <Select value={String(bookId)} onValueChange={(v) => { setBookId(Number(v)); setChapter(1); setSelectedVerse(null); }}>
+            <SelectTrigger aria-labelledby="biblia-livro"><SelectValue placeholder={t("biblia.bookLabel")} /></SelectTrigger>
+            <SelectContent className="max-h-72">
+              {BOOKS.map((b) => <SelectItem key={b.id} value={String(b.id)}>{bookNames[b.id - 1] || b.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="ed-label" id="biblia-capitulo">{t("biblia.chapterName")}</label>
+          <Select value={String(chapter)} onValueChange={(v) => { setChapter(Number(v)); setSelectedVerse(null); }}>
+            <SelectTrigger aria-labelledby="biblia-capitulo"><SelectValue placeholder={t("biblia.chapterName")} /></SelectTrigger>
+            <SelectContent className="max-h-72">
+              {Array.from({ length: currentBook.chapters }, (_, i) => <SelectItem key={i + 1} value={String(i + 1)}>{i + 1}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="ed-label" id="biblia-verso">{t("biblia.verseName")}</label>
+          <Select value={selectedVerse ? String(selectedVerse) : ""} disabled={verses.length === 0} onValueChange={(v) => {
             const num = Number(v);
             setSelectedVerse(num);
             verseRefs.current[num]?.scrollIntoView({ behavior: "smooth", block: "center" });
           }}>
-            <SelectTrigger className="w-[100px]">
-              <SelectValue placeholder={t("biblia.verseLabel")} />
-            </SelectTrigger>
-            <SelectContent className="max-h-60">
-              {verses.map((v) => (
-                <SelectItem key={v.verse} value={String(v.verse)}>{t("biblia.verseFormat", { verse: v.verse })}</SelectItem>
-              ))}
+            <SelectTrigger aria-labelledby="biblia-verso"><SelectValue placeholder="—" /></SelectTrigger>
+            <SelectContent className="max-h-72">
+              {verses.map((v) => <SelectItem key={v.verse} value={String(v.verse)}>{v.verse}</SelectItem>)}
             </SelectContent>
           </Select>
-        )}
-
-        <Select value={version} onValueChange={(value) => { setVersion(value); setSelectedVerse(null); }}>
-          <SelectTrigger className="w-[260px]">
-            <SelectValue placeholder={t("biblia.versionLabel")} />
-          </SelectTrigger>
-          <SelectContent className="max-h-60">
-            {versions.map((v) => (
-              <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        </div>
+        <div className="bible-version">
+          <label className="ed-label" id="biblia-versao">{t("biblia.versionLabel")}</label>
+          <Select value={version} onValueChange={(value) => { setVersion(value); setSelectedVerse(null); }}>
+            <SelectTrigger aria-labelledby="biblia-versao"><SelectValue placeholder={t("biblia.versionLabel")} /></SelectTrigger>
+            <SelectContent className="max-h-72">
+              {versions.map((v) => <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Chapter title */}
-      <h2 className="font-display text-3xl font-semibold text-foreground mb-5 pb-3 border-b border-rule">
-        {bookNames[bookId - 1] || currentBook.name} {chapter}
-      </h2>
+      <div className="bible-title">
+        <h2>{bookNames[bookId - 1] || currentBook.name} {chapter}</h2>
+        {verses.length > 0 && (
+          <div className="bible-listen" role="group" aria-label={t("biblia.listenChapter")}>
+            <button type="button" onClick={alternarLeitura}>
+              {!lendo ? <Volume2 aria-hidden /> : pausado ? <Play aria-hidden /> : <Pause aria-hidden />}
+              {!lendo ? t("biblia.listenChapter") : pausado ? t("livraria.reader.resume") : t("livraria.reader.pause")}
+            </button>
+            {lendo && <button type="button" onClick={pararLeitura}><Square aria-hidden />{t("livraria.reader.stop")}</button>}
+          </div>
+        )}
+      </div>
 
-      {/* Verses */}
       {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div>
+        <div className="ed-wait-lines" role="status" aria-label={t("common.loading")}>{Array.from({ length: 10 }).map((_, i) => <i key={i} />)}</div>
       ) : verses.length > 0 ? (
-        <div className="space-y-2 mb-8 max-w-[68ch] font-serif text-[1.0625rem] md:text-lg" lang={lang}>
+        <div className="bible-text" lang={lang}>
           {verses.map((v) => (
             <p
               key={v.pk}
               ref={(el) => { verseRefs.current[v.verse] = el; }}
-              className={`leading-[1.75] text-foreground rounded-sm px-1 transition-colors ${versoAtual === v.verse ? "bg-primary/25" : selectedVerse === v.verse ? "bg-primary/15" : ""}`}
+              className={versoAtual === v.verse ? "is-reading" : selectedVerse === v.verse ? "is-selected" : ""}
             >
-              <span className="font-body font-semibold text-gold-ink mr-1 text-xs align-super">{v.verse}</span>
+              <sup>{v.verse}</sup>
               <span className="whitespace-pre-line">{v.text}</span>
             </p>
           ))}
         </div>
+      ) : failed ? (
+        <ToolError onRetry={fetchChapter}>{t("biblia.errorMessage")}</ToolError>
       ) : (
-        <div className="text-center py-16 text-muted-foreground">
-          <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-40" />
-          <p>{t("biblia.emptyState")}</p>
-        </div>
+        <p className="ed-empty">{t("biblia.emptyState")}</p>
       )}
 
-      {/* Navigation */}
-      <div className="flex justify-between items-center pt-4 border-t border-border">
-        <Button variant="outline" size="sm" onClick={goToPrevChapter} disabled={bookId === 1 && chapter === 1}>
-          <ChevronLeft className="w-4 h-4 mr-1" /> {t("biblia.previousButton")}
-        </Button>
-        <span className="text-xs text-muted-foreground">{bookNames[bookId - 1] || currentBook.name} {chapter}</span>
-        <Button variant="outline" size="sm" onClick={goToNextChapter} disabled={bookId === 66 && chapter === currentBook.chapters}>
-          {t("biblia.nextButton")} <ChevronRight className="w-4 h-4 ml-1" />
-        </Button>
-      </div>
+      <nav className="bible-nav" aria-label={t("biblia.choose")}>
+        {prevLabel ? <button type="button" onClick={goToPrevChapter}><ArrowLeft aria-hidden /><span><small>{t("biblia.previousButton")}</small>{prevLabel}</span></button> : <span />}
+        {nextLabel ? <button type="button" className="is-next" onClick={goToNextChapter}><span><small>{t("biblia.nextButton")}</small>{nextLabel}</span><ArrowRight aria-hidden /></button> : <span />}
+      </nav>
     </PageShell>
   );
 };

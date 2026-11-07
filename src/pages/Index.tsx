@@ -61,12 +61,14 @@ const Index = () => {
         {current?.textoBase
           ? <p className="workspace-ref">{current.textoBase}</p>
           : <p className="workspace-current-text">{t("workspace.startDescription")}</p>}
-        {current && <p className="workspace-meta">{current.status || t("workspace.draft")} · {t("workspace.sermonsPrepared", { count: sermons.length })}</p>}
+        {current && <p className="workspace-meta">{current.status === "finalizado" ? t("esbocos.statusFinal") : t("esbocos.statusDraft")} · {t("workspace.sermonsPrepared", { count: sermons.length })}</p>}
         <div className="workspace-actions">
           {current
             ? <Link to="/esbocos" className="ed-btn ed-btn-primary">{t("workspace.continue")} <span aria-hidden>→</span></Link>
-            : <Link to="/oficina" className="ed-btn ed-btn-primary">{t("workspace.startJourney")} <span aria-hidden>→</span></Link>}
-          <Link to="/oficina" className="ed-btn ed-btn-ghost">{t("workspace.newMessage")}</Link>
+            : <Link to="/oficina" className="ed-btn ed-btn-primary">{t("workspace.prepareMessage")} <span aria-hidden>→</span></Link>}
+          {current
+            ? <Link to="/oficina" className="ed-btn ed-btn-ghost">{t("workspace.newMessage")}</Link>
+            : <Link to="/jornada" className="ed-btn ed-btn-ghost">{t("workspace.exploreJourney")}</Link>}
         </div>
       </section>
 
@@ -74,7 +76,7 @@ const Index = () => {
         <span className="ed-eyebrow">{t("dashboard.verseOfDay")}</span>
         <blockquote>{verse ? `“${verse.text}”` : verseFailed ? t("workspace.verseUnavailable") : t("workspace.loadingWord")}</blockquote>
         {verse && <cite>{verseRef}</cite>}
-        <Link to="/biblia" className="ed-link">{t("dashboard.readInBible")}</Link>
+        <Link to={verse ? `/biblia?bookId=${verse.book}&chapter=${verse.chapter}` : "/biblia"} className="ed-link">{t("dashboard.readInBible")}</Link>
         {lastRead && <Link to="/livraria" className="workspace-continue">
           <span className="workspace-spine" aria-hidden />
           <span>

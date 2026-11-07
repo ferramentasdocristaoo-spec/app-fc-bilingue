@@ -1,9 +1,8 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import { BookCover } from "@/components/library/BookCover";
-import { Progress } from "@/components/ui/progress";
+import "./JourneyDesign.css";
 import { getVolumeProgress, libraryProduct } from "@/data/library";
 
 export default function ColecaoPage() {
@@ -13,29 +12,22 @@ export default function ColecaoPage() {
   if (!product) return <Navigate to="/livraria" replace />;
 
   return (
-    <PageShell title={product.title}>
-      <Link to="/livraria" className="mb-2 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />{t("livraria.back")}</Link>
-      {product.slug === "apocalipse-revelado" && (
-        <p className="mb-6 text-sm text-muted-foreground">{t("livraria.orderNote")}</p>
-      )}
-      <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+    <PageShell title={product.title} lede={product.slug === "apocalipse-revelado" ? t("livraria.orderNote") : undefined} width="wide">
+      <Link to="/livraria" className="ed-link journey-back">← {t("livraria.back")}</Link>
+      <ul className="library-volumes">
         {product.volumes.map((volume) => {
           const progress = getVolumeProgress(product.slug, volume.slug);
           return (
-            <Link key={volume.slug} to={`/livraria/${product.slug}/${volume.slug}`} className="group">
-              <BookCover title={volume.title} volume={volume.number} className="aspect-[2/3] w-full transition group-hover:-translate-y-1 group-hover:shadow-2xl" />
-              <div className="mt-3 flex items-start justify-between gap-2">
-                <div>
-                  {volume.ref && <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{volume.ref}</p>}
-                  <h2 className="text-sm font-semibold leading-tight group-hover:text-primary">{volume.title}</h2>
-                </div>
-                {progress >= 100 && <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}
-              </div>
-              {progress > 0 && progress < 100 && <Progress value={progress} className="mt-2 h-1" />}
-            </Link>
+            <li key={volume.slug}>
+              <Link to={`/livraria/${product.slug}/${volume.slug}`} aria-label={volume.title}>
+                <BookCover title={volume.title} volume={volume.number} />
+              </Link>
+              {volume.ref && <p className="library-ref">{volume.ref}</p>}
+              {progress > 0 && <p className="library-progress">{progress >= 100 ? t("livraria.finished") : t("livraria.percentRead", { progress: Math.round(progress) })}</p>}
+            </li>
           );
         })}
-      </div>
+      </ul>
     </PageShell>
   );
 }

@@ -1,11 +1,8 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Lock, Library, Loader2 } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import { BookCover } from "@/components/library/BookCover";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getProductProgress, libraryProducts } from "@/data/library";
@@ -31,34 +28,29 @@ export default function LivrariaPage() {
   }, [email]);
 
   return (
-    <PageShell title={t("livraria.title")}>
-      <div className="mb-6 max-w-2xl">
-        <div className="mb-2 flex items-center gap-2 text-primary"><Library className="h-5 w-5" /><span className="font-semibold">{t("livraria.header")}</span></div>
-        <p className="ed-lede">{t("livraria.headerDescription")}</p>
-      </div>
-
-      <div className="flex flex-col gap-6">
+    <PageShell title={t("livraria.title")} lede={t("livraria.headerDescription")} width="wide">
+      <div className="library-shelf">
         {products.map((product) => {
           const progress = getProductProgress(product.slug);
           const hasAccess = access[product.slug];
           const singleVolume = product.volumes.length === 1;
           const target = singleVolume ? `/livraria/${product.slug}/${product.volumes[0].slug}` : `/livraria/${product.slug}`;
           return (
-            <article key={product.slug} className="max-w-3xl border-t border-rule-soft">
-              <div className="grid gap-6 py-6 sm:grid-cols-[150px_1fr]">
-                <BookCover title={product.title} className="mx-auto h-52 w-36 sm:mx-0" />
-                <div className="flex flex-col justify-center">
-                  <span className="ed-eyebrow mb-2">{t("livraria.badge", { count: product.volumes.length })}</span>
-                  <h2 className="ed-result-title">{product.title}</h2>
-                  <p className="ed-panel-body mt-2">{product.description}</p>
-                  {progress > 0 && <div className="mt-4"><div className="mb-1 flex justify-between text-xs text-muted-foreground"><span>{t("livraria.progress")}</span><span>{progress}%</span></div><Progress value={progress} className="h-2" /></div>}
-                  <div className="mt-5">
-                    {hasAccess === undefined || hasAccess === null ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : hasAccess ? (
-                      <Button asChild><Link to={target}>{progress ? t("livraria.continueReading") : singleVolume ? t("livraria.readNow") : t("livraria.openCollection")}</Link></Button>
-                    ) : (
-                      <Button variant="outline" className="gap-2" disabled><Lock className="h-4 w-4" />{t("livraria.locked")}</Button>
-                    )}
-                  </div>
+            <article key={product.slug} className="library-item">
+              <BookCover title={product.title} />
+              <div>
+                <span className="ed-eyebrow">{t("livraria.badge", { count: product.volumes.length })}</span>
+                <h2 className="ed-result-title">{product.title}</h2>
+                <p className="ed-panel-body">{product.description}</p>
+                {progress > 0 && <p className="library-progress">{t("livraria.percentRead", { progress })}</p>}
+                <div className="library-action">
+                  {hasAccess === undefined || hasAccess === null ? (
+                    <span className="ed-wait-lines inline-block w-40" role="status" aria-label={t("common.loading")}><i style={{ margin: 0, height: 44, width: "100%" }} /></span>
+                  ) : hasAccess ? (
+                    <Link className="ed-btn ed-btn-primary" to={target}>{progress ? t("livraria.continueReading") : singleVolume ? t("livraria.readNow") : t("livraria.openCollection")}</Link>
+                  ) : (
+                    <p className="library-progress">{t("livraria.lockedHint")}</p>
+                  )}
                 </div>
               </div>
             </article>

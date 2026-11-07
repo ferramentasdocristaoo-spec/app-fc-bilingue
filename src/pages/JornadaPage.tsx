@@ -36,12 +36,9 @@ export default function JornadaPage() {
     { slug: "new-testament" as const, numeral: "II", title: t("journey.newTestament"), description: t("journey.newDescription"), groups: groupByCategory(books, "new-testament") },
   ], [books, t]);
 
-  return <PageShell title={t("journey.title")}>
+  return <PageShell title={t("journey.heroTitle")} lede={t("journey.heroDescription")}>
     <div className="journey-home">
       <header className="journey-opening">
-        <span className="ed-eyebrow">{t("journey.eyebrow")}</span>
-        <h2>{t("journey.heroTitle")}</h2>
-        <p className="ed-lede">{t("journey.heroDescription")}</p>
         <p className="journey-count"><strong>66</strong> {t("journey.books")} <span aria-hidden>·</span> <strong>1.189</strong> {t("journey.chapters")}</p>
         <nav className="journey-testament-jump" aria-label={t("journey.title")}>
           {testaments.map((testament) => <a key={testament.slug} href={`#${testament.slug}`}>{testament.title}</a>)}

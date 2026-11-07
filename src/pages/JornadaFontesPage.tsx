@@ -31,11 +31,9 @@ export default function JornadaFontesPage() {
       <section>
         <h2>{t("journey.sourcesPage.engravings")}</h2>
         <p>{t("journey.sourcesPage.engravingsNote")}</p>
+        <p>{t("journey.sourcesPublicDomain")}</p>
         <ul>
-          {figures.map(figure => <li key={figure.src}>
-            <a href={figure.sourceUrl} {...external}>{figure.title[language]}</a>
-            <span> · {figure.artist}, {figure.year} · <em>{t("journey.publicDomain")}</em></span>
-          </li>)}
+          {figures.map(figure => <li key={figure.src}><a href={figure.sourceUrl} {...external}>{figure.title[language]}</a></li>)}
         </ul>
       </section>
 
