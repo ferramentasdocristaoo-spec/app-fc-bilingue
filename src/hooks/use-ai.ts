@@ -6,7 +6,7 @@ import { toast } from "@/hooks/use-toast";
 type AiAction = "gerar-esboco" | "raio-x" | "devocional" | "garimpo" | "nomes";
 
 export function useAi() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   const callAi = async (action: AiAction, payload: Record<string, string>) => {
@@ -17,18 +17,18 @@ export function useAi() {
       });
 
       if (error) {
-        toast({ title: "Erro", description: error.message || "Falha ao chamar a IA.", variant: "destructive" });
+        toast({ title: t("common.error"), description: t("common.aiError"), variant: "destructive" });
         return null;
       }
 
       if (data?.error) {
-        toast({ title: "Erro", description: data.error, variant: "destructive" });
+        toast({ title: t("common.error"), description: t("common.aiError"), variant: "destructive" });
         return null;
       }
 
       return data.result;
     } catch (e) {
-      toast({ title: "Erro", description: "Não foi possível conectar com a IA.", variant: "destructive" });
+      toast({ title: t("common.error"), description: t("common.aiError"), variant: "destructive" });
       return null;
     } finally {
       setLoading(false);

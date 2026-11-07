@@ -34,7 +34,7 @@ export default function LivrariaPage() {
     <PageShell title={t("livraria.title")}>
       <div className="mb-6 max-w-2xl">
         <div className="mb-2 flex items-center gap-2 text-primary"><Library className="h-5 w-5" /><span className="font-semibold">{t("livraria.header")}</span></div>
-        <p className="text-sm text-muted-foreground">{t("livraria.headerDescription")}</p>
+        <p className="ed-lede">{t("livraria.headerDescription")}</p>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -44,13 +44,13 @@ export default function LivrariaPage() {
           const singleVolume = product.volumes.length === 1;
           const target = singleVolume ? `/livraria/${product.slug}/${product.volumes[0].slug}` : `/livraria/${product.slug}`;
           return (
-            <article key={product.slug} className="max-w-3xl overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-              <div className="grid gap-6 p-5 sm:grid-cols-[150px_1fr]">
+            <article key={product.slug} className="max-w-3xl border-t border-rule-soft">
+              <div className="grid gap-6 py-6 sm:grid-cols-[150px_1fr]">
                 <BookCover title={product.title} className="mx-auto h-52 w-36 sm:mx-0" />
                 <div className="flex flex-col justify-center">
-                  <span className="mb-2 w-fit rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">{t("livraria.badge", { count: product.volumes.length })}</span>
-                  <h2 className="font-display text-2xl font-bold">{product.title}</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
+                  <span className="ed-eyebrow mb-2">{t("livraria.badge", { count: product.volumes.length })}</span>
+                  <h2 className="ed-result-title">{product.title}</h2>
+                  <p className="ed-panel-body mt-2">{product.description}</p>
                   {progress > 0 && <div className="mt-4"><div className="mb-1 flex justify-between text-xs text-muted-foreground"><span>{t("livraria.progress")}</span><span>{progress}%</span></div><Progress value={progress} className="h-2" /></div>}
                   <div className="mt-5">
                     {hasAccess === undefined || hasAccess === null ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : hasAccess ? (

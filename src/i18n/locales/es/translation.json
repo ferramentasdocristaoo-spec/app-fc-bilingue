@@ -107,7 +107,8 @@
     "recentOutlines": "Tus últimos bosquejos",
     "noOutlines": "Aún no tienes bosquejos guardados.",
     "createSermon": "Crear sermón",
-    "discover": "Materiales para ti"
+    "discover": "Materiales para ti",
+    "menu": "Menú"
   },
   "oficina": {
     "description": "Crea esquemas de sermones completos con introducción, desarrollo y conclusión. Personaliza el tema, versículo base y duración.",
@@ -146,7 +147,8 @@
     "deleteButton": "Eliminar",
     "copiedNotif": "Copiar",
     "deletedNotif": "Eliminado",
-    "deletedMessage": "Sermón eliminado con éxito."
+    "deletedMessage": "Sermón eliminado con éxito.",
+    "copiedMessage": "El esquema se copió al portapapeles."
   },
   "raioX": {
     "description": "Analiza versículos bíblicos en profundidad con comparación de versiones, etimología y contexto histórico.",
@@ -219,7 +221,8 @@
     "categoryFinances": "Finanzas",
     "categoryWork": "Trabajo",
     "categorySpirituality": "Espiritualidad",
-    "categoryGeneral": "General"
+    "categoryGeneral": "General",
+    "anonymous": "Anónimo"
   },
   "voz": {
     "description": "Recibe una palabra de Dios para el día. Una promesa bíblica seleccionada especialmente para ti.",
@@ -229,7 +232,8 @@
     "description": "Consulta esquemas compartidos por otros predicadores de la comunidad.",
     "cloneButton": "Clonar Esquema",
     "byAuthor": "por {{author}} • {{date}}",
-    "clonedAlert": "¡Esquema clonado en tu biblioteca!"
+    "clonedAlert": "¡Esquema clonado en tu biblioteca!",
+    "empty": "Todavía no hay esquemas compartidos. Cuando la comunidad comparta alguno, aparecerá aquí."
   },
   "biblia": {
     "description": "Lee la Biblia Sagrada en diferentes versiones. Compara versiones y profundiza en el estudio de las Escrituras.",
@@ -339,7 +343,9 @@
     "save": "Guardar",
     "delete": "Eliminar",
     "edit": "Editar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "aiError": "No se pudo obtener la respuesta. Inténtalo de nuevo.",
+    "retry": "Reintentar"
   },
   "livraria": {
     "title": "Librería",
@@ -416,7 +422,7 @@
       "sources": "FUENTES Y MATERIALES",
       "assistant": "Asistente",
       "working": "TRABAJANDO CONTIGO",
-      "help": "Puedo ayudarte a profundizar este mensaje. Elige una acción o edita el contenido libremente.",
+      "help": "Usa el índice para recorrer el mensaje y abre el editor completo para ajustar el texto.",
       "develop": "Sugerir desarrollo",
       "supportTexts": "Encontrar textos de apoyo",
       "illustration": "Crear una ilustración",
@@ -441,7 +447,8 @@
       "Textual"
     ],
     "sermonsPrepared_one": "{{count}} mensaje preparado",
-    "sermonsPrepared_other": "{{count}} mensajes preparados"
+    "sermonsPrepared_other": "{{count}} mensajes preparados",
+    "verseUnavailable": "No se pudo cargar el versículo en este momento."
   },
   "journey": {
     "title": "Recorrido por la Biblia",

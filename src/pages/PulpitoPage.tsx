@@ -24,16 +24,19 @@ const PulpitoPage = () => {
 
   return (
     <PageShell title={t("sidebar.pulpito.title")}>
-      <div className="max-w-sm mx-auto flex flex-col gap-3">
-        <p className="text-sm text-muted-foreground leading-relaxed">{t("pulpito.description")}</p>
+      <div className="max-w-2xl mx-auto flex flex-col gap-3">
+        <p className="ed-lede">{t("pulpito.description")}</p>
+        {sermoesPub.length === 0 && (
+          <p className="ed-empty">{t("pulpito.empty")}</p>
+        )}
         {sermoesPub.map((s, i) => (
           <div key={i} className="menu-card flex-col items-start gap-2">
             <div className="flex items-center justify-between w-full">
               <h3 className="font-semibold text-sm text-foreground">{s.titulo}</h3>
-              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{s.tema}</span>
+              <span className="ed-chip">{s.tema}</span>
             </div>
             <p className="text-xs text-muted-foreground">{s.autor} • {s.textoBase}</p>
-            <p className="text-sm text-foreground">{s.resumo}</p>
+            <p className="ed-panel-body">{s.resumo}</p>
             <Button variant="outline" size="sm" className="self-end text-xs" onClick={() => clonar(s)}>
               {t("pulpito.cloneButton")}
             </Button>

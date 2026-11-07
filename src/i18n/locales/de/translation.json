@@ -107,7 +107,8 @@
     "recentOutlines": "Ihre letzten Gliederungen",
     "noOutlines": "Noch keine gespeicherten Gliederungen.",
     "createSermon": "Predigt erstellen",
-    "discover": "Materialien für Sie"
+    "discover": "Materialien für Sie",
+    "menu": "Menü"
   },
   "oficina": {
     "description": "Erstellen Sie vollständige Predigtgliederungen mit Einleitung, Hauptteil und Schluss. Passen Sie Thema, Bibelstelle und Dauer an.",
@@ -146,7 +147,8 @@
     "deleteButton": "Löschen",
     "copiedNotif": "Kopieren",
     "deletedNotif": "Gelöscht",
-    "deletedMessage": "Predigt erfolgreich entfernt."
+    "deletedMessage": "Predigt erfolgreich entfernt.",
+    "copiedMessage": "Die Gliederung wurde in die Zwischenablage kopiert."
   },
   "raioX": {
     "description": "Analysieren Sie Bibelverse gründlich mit Übersetzungsvergleich, Etymologie und historischem Kontext.",
@@ -219,7 +221,8 @@
     "categoryFinances": "Finanzen",
     "categoryWork": "Arbeit",
     "categorySpirituality": "Geistliches Leben",
-    "categoryGeneral": "Allgemein"
+    "categoryGeneral": "Allgemein",
+    "anonymous": "Anonym"
   },
   "voz": {
     "description": "Erhalten Sie ein Wort Gottes für den Tag. Eine Bibelverheißung, besonders für Sie ausgewählt.",
@@ -229,7 +232,8 @@
     "description": "Sehen Sie Gliederungen, die andere Prediger mit der Gemeinschaft geteilt haben.",
     "cloneButton": "Gliederung übernehmen",
     "byAuthor": "von {{author}} • {{date}}",
-    "clonedAlert": "Gliederung in Ihre Bibliothek übernommen!"
+    "clonedAlert": "Gliederung in Ihre Bibliothek übernommen!",
+    "empty": "Noch keine geteilten Gliederungen. Sobald die Gemeinschaft welche teilt, erscheinen sie hier."
   },
   "biblia": {
     "description": "Lesen Sie die Heilige Bibel in verschiedenen Übersetzungen. Vergleichen Sie Übersetzungen und vertiefen Sie Ihr Schriftstudium.",
@@ -327,7 +331,7 @@
     "xlarge": "XL"
   },
   "notFound": {
-    "title": "Hoppla! Seite nicht gefunden",
+    "title": "Seite nicht gefunden",
     "description": "Die gesuchte Seite existiert nicht.",
     "button": "Zurück zur Startseite"
   },
@@ -339,7 +343,9 @@
     "save": "Speichern",
     "delete": "Löschen",
     "edit": "Bearbeiten",
-    "close": "Schließen"
+    "close": "Schließen",
+    "aiError": "Die Antwort konnte nicht abgerufen werden. Bitte versuche es erneut.",
+    "retry": "Erneut versuchen"
   },
   "livraria": {
     "title": "Bibliothek",
@@ -368,7 +374,8 @@
     },
     "badge_one": "1 Buch • 1 Produkt",
     "badge_other": "{{count}} Bände • 1 Produkt",
-    "readNow": "Jetzt lesen"
+    "readNow": "Jetzt lesen",
+    "productDescription": "Eine vollständige Sammlung, um die wichtigsten Ereignisse und Personen des Buches der Offenbarung zu verstehen."
   },
   "workspace": {
     "welcome": "Bereite weiter vor, was Gott dir aufs Herz gelegt hat.",
@@ -415,7 +422,7 @@
       "sources": "QUELLEN UND MATERIALIEN",
       "assistant": "Assistent",
       "working": "ARBEITET MIT DIR",
-      "help": "Ich kann helfen, diese Predigt zu vertiefen. Wähle eine Aktion oder bearbeite den Inhalt frei.",
+      "help": "Nutze die Gliederung, um durch die Botschaft zu gehen, und öffne den vollständigen Editor, um den Text anzupassen.",
       "develop": "Ausarbeitung vorschlagen",
       "supportTexts": "Ergänzende Bibelstellen finden",
       "illustration": "Illustration erstellen",
@@ -440,7 +447,8 @@
       "Textbezogen"
     ],
     "sermonsPrepared_one": "{{count}} Predigt vorbereitet",
-    "sermonsPrepared_other": "{{count}} Predigten vorbereitet"
+    "sermonsPrepared_other": "{{count}} Predigten vorbereitet",
+    "verseUnavailable": "Der Vers konnte gerade nicht geladen werden."
   },
   "journey": {
     "title": "Reise durch die Bibel",

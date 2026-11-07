@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useAi } from "@/hooks/use-ai";
 import { Sparkles, Save, Loader2, BookOpen, Lightbulb, MessageCircle, Copy, Download, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { escapeHtml } from "@/lib/utils";
 import "./WorkspaceDesign.css";
 
 const tempoMarks = [5, 10, 15, 20, 30, 45, 60, 90, 120];
@@ -27,13 +28,13 @@ interface EsbocoResult {
   conclusao: string;
 }
 
-const SectionCard = ({ titulo, icone, children }: { titulo: string; icone: React.ReactNode; children: React.ReactNode }) => (
-  <div className="rounded-xl border border-border bg-card/50 p-4 space-y-2">
+const SectionCard = ({ id, titulo, icone, children }: { id?: string; titulo: string; icone: React.ReactNode; children: React.ReactNode }) => (
+  <div id={id} className="ed-panel">
     <div className="flex items-center gap-2">
       {icone}
-      <h3 className="font-display font-bold text-sm text-primary">{titulo}</h3>
+      <h3 className="ed-panel-title">{titulo}</h3>
     </div>
-    <div className="text-sm text-foreground leading-relaxed">{children}</div>
+    <div className="ed-panel-body">{children}</div>
   </div>
 );
 
@@ -100,17 +101,19 @@ const OficinaPage = () => {
     const win = window.open("", "_blank");
     if (!win) return;
     win.document.write(`
-      <html><head><title>${resultado.titulo}</title>
+      <html><head><title>${escapeHtml(resultado.titulo || "")}</title>
       <style>
         body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; padding: 20px; line-height: 1.7; color: #333; }
         h1 { text-align: center; color: #5C3D2E; }
         pre { white-space: pre-wrap; font-family: Georgia, serif; font-size: 14px; }
       </style></head>
-      <body><h1>${resultado.titulo}</h1><pre>${texto}</pre></body></html>
+      <body><h1>${escapeHtml(resultado.titulo || "")}</h1><pre>${escapeHtml(texto || "")}</pre></body></html>
     `);
     win.document.close();
     setTimeout(() => { win.print(); }, 500);
   };
+
+  const irPara = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   const handleEditar = () => {
     if (resultado) { setConteudoEditavel(converterParaTexto(resultado)); setModoEdicao(true); }
@@ -136,7 +139,7 @@ const OficinaPage = () => {
           <div className="journey-heading"><span>{t("workspace.journey.kicker")}</span><h2>{t("workspace.journey.title")}</h2><p>{t("oficina.description")}</p></div>
         </>}
 
-        {!resultado && !modoEdicao && <div className="journey-form rounded-xl border border-border bg-card/50 p-5 space-y-5">
+        {!resultado && !modoEdicao && <div className="journey-form ed-panel ed-panel-form">
           <div className="space-y-1.5">
             <Label className="text-sm font-semibold text-foreground">{t("oficina.themeLabel")}</Label>
             <Input placeholder={t("oficina.themePlaceholder")} value={titulo} onChange={(e) => setTitulo(e.target.value)} />
@@ -189,29 +192,29 @@ const OficinaPage = () => {
           <div className="studio-shell animate-fade-in">
             <aside className="studio-outline">
               <span className="studio-panel-label">{t("workspace.studio.message")}</span>
-              <button className="active"><b>01</b>{t("oficina.introduction")}</button>
-              {resultado.pontos.map((p, i) => <button key={p.titulo}><b>0{i + 2}</b>{p.titulo}</button>)}
-              <button><b>0{resultado.pontos.length + 2}</b>{t("oficina.conclusion")}</button>
+              <button onClick={() => irPara("sec-intro")}><b>01</b>{t("oficina.introduction")}</button>
+              {resultado.pontos.map((p, i) => <button key={p.titulo} onClick={() => irPara(`sec-ponto-${i}`)}><b>0{i + 2}</b>{p.titulo}</button>)}
+              <button onClick={() => irPara("sec-conclusao")}><b>0{resultado.pontos.length + 2}</b>{t("oficina.conclusion")}</button>
               <div className="studio-sources"><span>{t("workspace.studio.sources")}</span><p><BookOpen />{resultado.texto_base}</p><p><Lightbulb />{tema || tipo}</p></div>
             </aside>
             <div className="studio-document">
             <div className="text-center space-y-1">
-              <h2 className="font-display text-2xl font-bold text-primary">{resultado.titulo}</h2>
+              <h2 className="ed-result-title">{resultado.titulo}</h2>
               {resultado.texto_base && <p className="text-sm text-muted-foreground">{resultado.texto_base}</p>}
             </div>
 
-            <SectionCard titulo={t("oficina.introduction")} icone={<BookOpen className="w-4 h-4 text-primary" />}>
+            <SectionCard id="sec-intro" titulo={t("oficina.introduction")} icone={<BookOpen className="w-4 h-4 text-primary" />}>
               <p className="font-medium mb-1">{resultado.introducao.gancho}</p>
               <p>{resultado.introducao.contextualizacao}</p>
             </SectionCard>
 
             {resultado.pontos.map((p, i) => (
-              <div key={i} className="rounded-xl border border-border bg-card/50 p-4 space-y-2">
-                <h3 className="font-display font-bold text-sm text-primary">{i + 1}. {p.titulo}</h3>
-                <p className="text-sm text-foreground">{p.conteudo}</p>
+              <div key={i} id={`sec-ponto-${i}`} className="ed-panel">
+                <h3 className="ed-panel-title">{i + 1}. {p.titulo}</h3>
+                <p className="ed-panel-body">{p.conteudo}</p>
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   {p.versiculos.map((v, j) => (
-                    <span key={j} className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-medium">{v}</span>
+                    <span key={j} className="ed-chip">{v}</span>
                   ))}
                 </div>
               </div>
@@ -221,7 +224,7 @@ const OficinaPage = () => {
               <p>{resultado.aplicacao_pratica}</p>
             </SectionCard>
 
-            <SectionCard titulo={t("oficina.conclusion")} icone={<MessageCircle className="w-4 h-4 text-primary" />}>
+            <SectionCard id="sec-conclusao" titulo={t("oficina.conclusion")} icone={<MessageCircle className="w-4 h-4 text-primary" />}>
               <p>{resultado.conclusao}</p>
             </SectionCard>
 
@@ -250,9 +253,6 @@ const OficinaPage = () => {
               <span>{t("workspace.studio.working")}</span>
               <h3>{resultado.pontos[0]?.titulo || resultado.titulo}</h3>
               <p>{t("workspace.studio.help")}</p>
-              <button><Sparkles /> {t("workspace.studio.develop")}</button>
-              <button><BookOpen /> {t("workspace.studio.supportTexts")}</button>
-              <button><Lightbulb /> {t("workspace.studio.illustration")}</button>
               <button onClick={handleEditar}>✏️ {t("workspace.studio.fullEditor")}</button>
             </aside>
           </div>

@@ -6,6 +6,7 @@ import { Search, Copy, Download, FileText, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { escapeHtml } from "@/lib/utils";
 
 interface Sermao {
   titulo: string;
@@ -55,13 +56,13 @@ const EsbocosPage = () => {
     const win = window.open("", "_blank");
     if (!win) return;
     win.document.write(`
-      <html><head><title>${selecionado.titulo}</title>
+      <html><head><title>${escapeHtml(selecionado.titulo || "")}</title>
       <style>
         body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; padding: 20px; line-height: 1.7; color: #333; }
         h1 { text-align: center; color: #5C3D2E; }
         pre { white-space: pre-wrap; font-family: Georgia, serif; font-size: 14px; }
       </style></head>
-      <body><h1>${selecionado.titulo}</h1><pre>${selecionado.conteudo}</pre></body></html>
+      <body><h1>${escapeHtml(selecionado.titulo || "")}</h1><pre>${escapeHtml(selecionado.conteudo || "")}</pre></body></html>
     `);
     win.document.close();
     setTimeout(() => win.print(), 500);
@@ -77,8 +78,8 @@ const EsbocosPage = () => {
 
   return (
     <PageShell title={t("sidebar.esbocos.title")}>
-      <div className="max-w-sm mx-auto flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground leading-relaxed">{t("esbocos.description")}</p>
+      <div className="max-w-2xl mx-auto flex flex-col gap-4">
+        <p className="ed-lede">{t("esbocos.description")}</p>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder={t("esbocos.searchPlaceholder")} className="pl-10" value={busca} onChange={(e) => setBusca(e.target.value)} />

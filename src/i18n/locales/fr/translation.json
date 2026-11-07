@@ -107,7 +107,8 @@
     "recentOutlines": "Vos derniers plans",
     "noOutlines": "Aucun plan enregistré pour l’instant.",
     "createSermon": "Créer un sermon",
-    "discover": "Matériels pour vous"
+    "discover": "Matériels pour vous",
+    "menu": "Menu"
   },
   "oficina": {
     "description": "Créez des plans de sermon complets avec introduction, développement et conclusion. Personnalisez le thème, le verset de base et la durée.",
@@ -146,7 +147,8 @@
     "deleteButton": "Supprimer",
     "copiedNotif": "Copier",
     "deletedNotif": "Supprimé",
-    "deletedMessage": "Sermon supprimé avec succès."
+    "deletedMessage": "Sermon supprimé avec succès.",
+    "copiedMessage": "Le plan a été copié dans le presse-papiers."
   },
   "raioX": {
     "description": "Analysez les versets bibliques en profondeur avec comparaison de versions, étymologie et contexte historique.",
@@ -219,7 +221,8 @@
     "categoryFinances": "Finances",
     "categoryWork": "Travail",
     "categorySpirituality": "Spiritualité",
-    "categoryGeneral": "Général"
+    "categoryGeneral": "Général",
+    "anonymous": "Anonyme"
   },
   "voz": {
     "description": "Recevez une parole de Dieu pour le jour. Une promesse biblique choisie spécialement pour vous.",
@@ -229,7 +232,8 @@
     "description": "Consultez les plans partagés par d'autres prédicateurs de la communauté.",
     "cloneButton": "Cloner le Plan",
     "byAuthor": "par {{author}} • {{date}}",
-    "clonedAlert": "Plan cloné dans votre bibliothèque!"
+    "clonedAlert": "Plan cloné dans votre bibliothèque!",
+    "empty": "Aucun plan partagé pour l'instant. Dès que la communauté en partagera, ils apparaîtront ici."
   },
   "biblia": {
     "description": "Lisez la Bible Sacrée en différentes versions. Comparez les versions et approfondissez votre étude des Écritures.",
@@ -327,7 +331,7 @@
     "xlarge": "TG"
   },
   "notFound": {
-    "title": "Oups! Page non trouvée",
+    "title": "Page non trouvée",
     "description": "La page que vous recherchez n'existe pas.",
     "button": "Retour à l'accueil"
   },
@@ -339,7 +343,9 @@
     "save": "Enregistrer",
     "delete": "Supprimer",
     "edit": "Modifier",
-    "close": "Fermer"
+    "close": "Fermer",
+    "aiError": "Impossible d'obtenir la réponse. Veuillez réessayer.",
+    "retry": "Réessayer"
   },
   "livraria": {
     "title": "Librairie",
@@ -416,7 +422,7 @@
       "sources": "SOURCES ET RESSOURCES",
       "assistant": "Assistant",
       "working": "À VOS CÔTÉS",
-      "help": "Je peux vous aider à approfondir ce message. Choisissez une action ou modifiez librement le contenu.",
+      "help": "Utilisez le sommaire pour parcourir le message et ouvrez l'éditeur complet pour ajuster le texte.",
       "develop": "Suggérer un développement",
       "supportTexts": "Trouver des textes d'appui",
       "illustration": "Créer une illustration",
@@ -441,7 +447,8 @@
       "Textuel"
     ],
     "sermonsPrepared_one": "{{count}} message préparé",
-    "sermonsPrepared_other": "{{count}} messages préparés"
+    "sermonsPrepared_other": "{{count}} messages préparés",
+    "verseUnavailable": "Le verset n'a pas pu être chargé pour le moment."
   },
   "journey": {
     "title": "Parcours de la Bible",

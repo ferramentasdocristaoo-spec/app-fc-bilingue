@@ -185,7 +185,8 @@
   }
 
   .menu-card {
-    @apply gold-border rounded-md p-4 flex items-center gap-4 transition-all duration-300 bg-card;
+    @apply flex items-center gap-4 border-t py-4;
+    border-color: hsl(var(--rule));
   }
 
   .menu-card:active {

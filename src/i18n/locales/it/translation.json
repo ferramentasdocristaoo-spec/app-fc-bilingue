@@ -107,7 +107,8 @@
     "recentOutlines": "I tuoi ultimi schemi",
     "noOutlines": "Non hai ancora schemi salvati.",
     "createSermon": "Crea sermone",
-    "discover": "Materiali per te"
+    "discover": "Materiali per te",
+    "menu": "Menu"
   },
   "oficina": {
     "description": "Crea schemi di sermoni completi con introduzione, sviluppo e conclusione. Personalizza il tema, il versetto base e la durata.",
@@ -146,7 +147,8 @@
     "deleteButton": "Elimina",
     "copiedNotif": "Copia",
     "deletedNotif": "Eliminato",
-    "deletedMessage": "Sermone rimosso con successo."
+    "deletedMessage": "Sermone rimosso con successo.",
+    "copiedMessage": "Lo schema è stato copiato negli appunti."
   },
   "raioX": {
     "description": "Analizza i versetti biblici in profondità con confronto di versioni, etimologia e contesto storico.",
@@ -219,7 +221,8 @@
     "categoryFinances": "Finanze",
     "categoryWork": "Lavoro",
     "categorySpirituality": "Spiritualità",
-    "categoryGeneral": "Generale"
+    "categoryGeneral": "Generale",
+    "anonymous": "Anonimo"
   },
   "voz": {
     "description": "Ricevi una parola da Dio per il giorno. Una promessa biblica scelta specialmente per te.",
@@ -229,7 +232,8 @@
     "description": "Consulta schemi condivisi da altri predicatori della comunità.",
     "cloneButton": "Clona Schema",
     "byAuthor": "di {{author}} • {{date}}",
-    "clonedAlert": "Schema clonato nella tua biblioteca!"
+    "clonedAlert": "Schema clonato nella tua biblioteca!",
+    "empty": "Non ci sono ancora schemi condivisi. Quando la comunità ne condividerà, appariranno qui."
   },
   "biblia": {
     "description": "Leggi la Bibbia Sacra in diverse versioni. Confronta le versioni e approfondisci lo studio delle Scritture.",
@@ -327,7 +331,7 @@
     "xlarge": "MG"
   },
   "notFound": {
-    "title": "Ops! Pagina non trovata",
+    "title": "Pagina non trovata",
     "description": "La pagina che stai cercando non esiste.",
     "button": "Torna alla Home"
   },
@@ -339,7 +343,9 @@
     "save": "Salva",
     "delete": "Elimina",
     "edit": "Modifica",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "aiError": "Non è stato possibile ottenere la risposta. Riprova.",
+    "retry": "Riprova"
   },
   "livraria": {
     "title": "Libreria",
@@ -416,7 +422,7 @@
       "sources": "FONTI E MATERIALI",
       "assistant": "Assistente",
       "working": "AL TUO FIANCO",
-      "help": "Posso aiutarti ad approfondire questo messaggio. Scegli un'azione o modifica liberamente il contenuto.",
+      "help": "Usa l'indice per scorrere il messaggio e apri l'editor completo per modificare il testo.",
       "develop": "Suggerisci sviluppo",
       "supportTexts": "Trova testi di supporto",
       "illustration": "Crea un'illustrazione",
@@ -441,7 +447,8 @@
       "Testuale"
     ],
     "sermonsPrepared_one": "{{count}} messaggio preparato",
-    "sermonsPrepared_other": "{{count}} messaggi preparati"
+    "sermonsPrepared_other": "{{count}} messaggi preparati",
+    "verseUnavailable": "Al momento non è possibile caricare il versetto."
   },
   "journey": {
     "title": "Viaggio nella Bibbia",

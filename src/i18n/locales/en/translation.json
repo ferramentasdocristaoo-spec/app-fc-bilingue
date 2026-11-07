@@ -107,7 +107,8 @@
     "recentOutlines": "Your recent outlines",
     "noOutlines": "No saved outlines yet.",
     "createSermon": "Create sermon",
-    "discover": "Materials for you"
+    "discover": "Materials for you",
+    "menu": "Menu"
   },
   "oficina": {
     "description": "Create complete sermon outlines with introduction, development, and conclusion. Customize the theme, base verse, and duration.",
@@ -146,7 +147,8 @@
     "deleteButton": "Delete",
     "copiedNotif": "Copy",
     "deletedNotif": "Deleted",
-    "deletedMessage": "Sermon removed successfully."
+    "deletedMessage": "Sermon removed successfully.",
+    "copiedMessage": "The outline was copied to the clipboard."
   },
   "raioX": {
     "description": "Analyze Bible verses in depth with version comparison, etymology, and historical context.",
@@ -219,7 +221,8 @@
     "categoryFinances": "Finances",
     "categoryWork": "Work",
     "categorySpirituality": "Spirituality",
-    "categoryGeneral": "General"
+    "categoryGeneral": "General",
+    "anonymous": "Anonymous"
   },
   "voz": {
     "description": "Receive a word from God for the day. A Bible promise selected especially for you.",
@@ -229,7 +232,8 @@
     "description": "Check outlines shared by other preachers in the community.",
     "cloneButton": "Clone Outline",
     "byAuthor": "by {{author}} • {{date}}",
-    "clonedAlert": "Outline cloned to your library!"
+    "clonedAlert": "Outline cloned to your library!",
+    "empty": "No shared outlines yet. When the community shares one, it will appear here."
   },
   "biblia": {
     "description": "Read the Holy Bible in different versions. Compare versions and deepen your study of Scripture.",
@@ -327,7 +331,7 @@
     "xlarge": "XL"
   },
   "notFound": {
-    "title": "Oops! Page Not Found",
+    "title": "Page Not Found",
     "description": "The page you are looking for does not exist.",
     "button": "Back to Home"
   },
@@ -339,7 +343,9 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "close": "Close"
+    "close": "Close",
+    "aiError": "We couldn't get a response. Please try again.",
+    "retry": "Try again"
   },
   "livraria": {
     "title": "Library",
@@ -416,7 +422,7 @@
       "sources": "SOURCES AND MATERIALS",
       "assistant": "Assistant",
       "working": "WORKING WITH YOU",
-      "help": "I can help deepen this message. Choose an action or edit the content freely.",
+      "help": "Use the outline to move through the message and open the full editor to adjust the text.",
       "develop": "Suggest development",
       "supportTexts": "Find supporting passages",
       "illustration": "Create an illustration",
@@ -441,7 +447,8 @@
       "Textual"
     ],
     "sermonsPrepared_one": "{{count}} message prepared",
-    "sermonsPrepared_other": "{{count}} messages prepared"
+    "sermonsPrepared_other": "{{count}} messages prepared",
+    "verseUnavailable": "The verse couldn't be loaded right now."
   },
   "journey": {
     "title": "Journey through the Bible",

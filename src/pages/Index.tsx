@@ -13,13 +13,23 @@ const Index = () => {
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage || i18n.language;
   const [verse, setVerse] = useState<DailyVerse | null>(null);
+  const [verseFailed, setVerseFailed] = useState(false);
   const lastRead = getLastRead(language);
   const sermons = useMemo<Sermon[]>(() => {
     try { return JSON.parse(localStorage.getItem("fc-sermoes") || "[]"); } catch { return []; }
   }, []);
   const current = sermons.at(-1);
 
-  useEffect(() => { fetchDailyVerse(language).then(setVerse); }, [language]);
+  useEffect(() => {
+    let active = true;
+    setVerseFailed(false);
+    fetchDailyVerse(language).then((value) => {
+      if (!active) return;
+      setVerse(value);
+      setVerseFailed(!value);
+    });
+    return () => { active = false; };
+  }, [language]);
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t("dashboard.goodMorning") : hour < 18 ? t("dashboard.goodAfternoon") : t("dashboard.goodEvening");
@@ -62,7 +72,7 @@ const Index = () => {
 
       <aside className="workspace-verse" aria-label={t("dashboard.verseOfDay")}>
         <span className="ed-eyebrow">{t("dashboard.verseOfDay")}</span>
-        <blockquote>{verse ? `“${verse.text}”` : t("workspace.loadingWord")}</blockquote>
+        <blockquote>{verse ? `“${verse.text}”` : verseFailed ? t("workspace.verseUnavailable") : t("workspace.loadingWord")}</blockquote>
         {verse && <cite>{verseRef}</cite>}
         <Link to="/biblia" className="ed-link">{t("dashboard.readInBible")}</Link>
         {lastRead && <Link to="/livraria" className="workspace-continue">

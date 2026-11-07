@@ -11,11 +11,11 @@ const titles: Record<JourneyLanguage, string[]> = {
 };
 
 const descriptions: Record<JourneyLanguage, (title: string) => string> = {
-  "pt-PT": title => `Visão geral de ${title.toLowerCase()} e do seu lugar na história de Génesis.`,
-  en: title => `An overview of ${title.toLowerCase()} and its place in the story of Genesis.`,
-  es: title => `Una visión general de ${title.toLowerCase()} y su lugar en la historia de Génesis.`,
-  fr: title => `Un aperçu de ${title.toLowerCase()} et de sa place dans l'histoire de la Genèse.`,
-  it: title => `Una panoramica di ${title.toLowerCase()} e del suo posto nella storia della Genesi.`,
+  "pt-PT": title => `«${title}»: visão geral do capítulo e do seu lugar na história de Génesis.`,
+  en: title => `“${title}”: an overview of the chapter and its place in the story of Genesis.`,
+  es: title => `«${title}»: visión general del capítulo y de su lugar en la historia de Génesis.`,
+  fr: title => `« ${title} » : aperçu du chapitre et de sa place dans l'histoire de la Genèse.`,
+  it: title => `«${title}»: panoramica del capitolo e del suo posto nella storia della Genesi.`,
   de: title => `Ein Überblick über „${title}“ und seine Bedeutung in der Genesis-Erzählung.`,
 };
 

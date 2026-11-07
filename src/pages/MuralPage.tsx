@@ -23,6 +23,8 @@ interface Pedido {
   created_at: string;
 }
 
+const isAnonymous = (nome: string) => !nome || ["anônimo", "anónimo"].includes(nome.trim().toLowerCase());
+
 const MuralPage = () => {
   const { t, i18n } = useTranslation();
   const [nome, setNome] = useState("");
@@ -108,8 +110,8 @@ const MuralPage = () => {
 
   return (
     <PageShell title={t("sidebar.mural.title")}>
-      <div className="max-w-sm mx-auto flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground leading-relaxed">{t("mural.description")}</p>
+      <div className="max-w-2xl mx-auto flex flex-col gap-4">
+        <p className="ed-lede">{t("mural.description")}</p>
 
         <div className="menu-card flex-col items-start gap-3">
           <h3 className="font-semibold text-sm text-primary">{t("mural.formTitle")}</h3>
@@ -145,10 +147,10 @@ const MuralPage = () => {
         {pedidos.map((p) => (
           <div key={p.id} className="menu-card flex-col items-start gap-2">
             <div className="flex items-center justify-between w-full">
-              <span className="font-semibold text-sm text-foreground">{p.nome}</span>
-              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{p.categoria}</span>
+              <span className="font-semibold text-sm text-foreground">{isAnonymous(p.nome) ? t("mural.anonymous") : p.nome}</span>
+              <span className="ed-chip">{categorias.find((c) => c.value === p.categoria)?.label ?? p.categoria}</span>
             </div>
-            <p className="text-sm text-foreground">{p.pedido}</p>
+            <p className="ed-panel-body">{p.pedido}</p>
             {p.image_url && <img src={p.image_url} alt="" loading="lazy" decoding="async" className="w-full h-40 object-cover rounded-md" />}
             <div className="flex items-center justify-between w-full">
               <span className="text-xs text-muted-foreground">

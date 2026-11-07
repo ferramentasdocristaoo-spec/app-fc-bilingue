@@ -17,3 +17,27 @@
   .chapter-editorial-connections { grid-template-columns: 1fr; }
   .chapter-editorial-connections p:last-child { text-align: left; justify-content: flex-start; }
 }
+
+/* ---------- Capítulo no "Livro de Estudo": papel e filetes, sem faixa escura nem cartões ---------- */
+.chapter-journey-page>header { height: auto; min-height: 72px; padding: 16px clamp(18px,4vw,50px); background: transparent; color: hsl(var(--ink)); border-bottom: 1px solid hsl(var(--rule)); }
+.chapter-journey-page>header>a { color: hsl(var(--gold-ink)); }
+.chapter-journey-page>header>div { min-width: 0; }
+.chapter-journey-page>header small { display: block; color: hsl(var(--gold-ink)); }
+.chapter-journey-page>header h1 { font-size: 1.375rem; color: hsl(var(--ink)); }
+.chapter-journey-page>header>div>i { width: 100%; max-width: 360px; background: hsl(var(--rule)); }
+.chapter-journey-page>header>div>i>b { background: hsl(var(--gold)); }
+.chapter-journey-page>header>span { flex: none; color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
+.chapter-journey-page>main { gap: 40px; }
+.chapter-reading,.chapter-journey-page aside { border: 0; background: transparent; padding: 0; box-shadow: none; }
+.chapter-journey-page aside { padding-left: 32px; border-left: 1px solid hsl(var(--rule)); }
+.chapter-context { max-width: 100%; border: 0; border-top: 1px solid hsl(var(--rule)); background: transparent; border-radius: 0; padding: 16px 0 0; }
+.chapter-context>div { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.chapter-context>div>span { min-width: 0; max-width: 100%; background: transparent; border: 0; padding: 0; overflow-wrap: anywhere; white-space: normal; }
+.chapter-editorial { border: 0; border-top: 1px solid hsl(var(--rule)); background: transparent; border-radius: 0; padding: 16px 0 0; }
+.chapter-reading blockquote { background: transparent; }
+.chapter-step-navigation a { border-radius: 0; border: 0; border-top: 1px solid hsl(var(--rule)); background: transparent; box-shadow: none; }
+.chapter-step-navigation .next-book-step { background: transparent; border-color: hsl(var(--gold-soft)); }
+@media (max-width: 800px) {
+  .chapter-journey-page>main { grid-template-columns: minmax(0, 1fr); }
+  .chapter-journey-page aside { padding-left: 0; padding-top: 24px; border-left: 0; border-top: 1px solid hsl(var(--rule)); }
+}

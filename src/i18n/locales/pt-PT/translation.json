@@ -94,7 +94,7 @@
     "lightMode": "Modo Claro",
     "darkMode": "Modo Escuro",
     "install": "Instalar Aplicação",
-    "selectLanguage": "Seleccionar Idioma",
+    "selectLanguage": "Selecionar idioma",
     "continueReading": "Continue de onde parou",
     "growth": "O seu crescimento",
     "booksCompleted": "{{done}} de {{total}} livros concluídos",
@@ -107,7 +107,8 @@
     "recentOutlines": "Os seus últimos esboços",
     "noOutlines": "Ainda não tem esboços guardados.",
     "createSermon": "Criar sermão",
-    "discover": "Materiais para si"
+    "discover": "Materiais para si",
+    "menu": "Menu"
   },
   "oficina": {
     "description": "Cria esboços de sermões completos com introdução, desenvolvimento e conclusão. Personaliza o tema, versículo base e duração.",
@@ -146,7 +147,8 @@
     "deleteButton": "Eliminar",
     "copiedNotif": "Copiar",
     "deletedNotif": "Eliminado",
-    "deletedMessage": "Sermão removido com sucesso."
+    "deletedMessage": "Sermão removido com sucesso.",
+    "copiedMessage": "O esboço foi copiado para a área de transferência."
   },
   "raioX": {
     "description": "Analisa versículos bíblicos em profundidade com comparação de versões, etimologia e contexto histórico.",
@@ -219,7 +221,8 @@
     "categoryFinances": "Finanças",
     "categoryWork": "Trabalho",
     "categorySpirituality": "Espiritualidade",
-    "categoryGeneral": "Geral"
+    "categoryGeneral": "Geral",
+    "anonymous": "Anónimo"
   },
   "voz": {
     "description": "Recebe uma palavra de Deus para o dia. Uma promessa bíblica selecionada especialmente para ti.",
@@ -229,7 +232,8 @@
     "description": "Consulta esboços partilhados por outros pregadores da comunidade.",
     "cloneButton": "Clonar Esboço",
     "byAuthor": "por {{author}} • {{date}}",
-    "clonedAlert": "Esboço clonado para a tua biblioteca!"
+    "clonedAlert": "Esboço clonado para a tua biblioteca!",
+    "empty": "Ainda não há esboços partilhados. Quando a comunidade partilhar, eles aparecem aqui."
   },
   "biblia": {
     "description": "Lê a Bíblia Sagrada em diferentes versões. Compara versões e aprofunda o teu estudo das Escrituras.",
@@ -327,7 +331,7 @@
     "xlarge": "SG"
   },
   "notFound": {
-    "title": "Oops! Página não encontrada",
+    "title": "Página não encontrada",
     "description": "A página que procuras não existe.",
     "button": "Voltar para Início"
   },
@@ -339,7 +343,9 @@
     "save": "Guardar",
     "delete": "Eliminar",
     "edit": "Editar",
-    "close": "Fechar"
+    "close": "Fechar",
+    "aiError": "Não foi possível obter a resposta. Tenta de novo.",
+    "retry": "Tentar de novo"
   },
   "livraria": {
     "title": "Livraria",
@@ -416,7 +422,7 @@
       "sources": "FONTES E MATERIAIS",
       "assistant": "Assistente",
       "working": "A TRABALHAR CONTIGO",
-      "help": "Posso ajudar a aprofundar esta mensagem. Escolhe uma ação ou edita o conteúdo livremente.",
+      "help": "Usa o índice para percorrer a mensagem e abre o editor completo para ajustar o texto.",
       "develop": "Sugerir desenvolvimento",
       "supportTexts": "Encontrar textos de apoio",
       "illustration": "Criar uma ilustração",
@@ -441,7 +447,8 @@
       "Textual"
     ],
     "sermonsPrepared_one": "{{count}} mensagem preparada",
-    "sermonsPrepared_other": "{{count}} mensagens preparadas"
+    "sermonsPrepared_other": "{{count}} mensagens preparadas",
+    "verseUnavailable": "Não foi possível carregar o versículo agora."
   },
   "journey": {
     "title": "Jornada pela Bíblia",

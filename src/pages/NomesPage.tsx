@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Loader2, BookOpen, Globe } from "lucide-react";
 import { useAi } from "@/hooks/use-ai";
+import { escapeHtml } from "@/lib/utils";
 
 interface NomeResultado {
   significado_geral: string;
@@ -18,20 +19,20 @@ interface NomeResultado {
 }
 
 const LinguaCard = ({ titulo, dados, cor }: { titulo: string; dados: { original: string; transliteracao: string; significado: string }; cor: string }) => (
-  <div className="rounded-xl border border-border bg-card/50 p-4 space-y-2">
-    <h3 className={`font-display font-bold text-sm ${cor}`}>{titulo}</h3>
+  <div className="ed-panel">
+    <h3 className="ed-panel-title">{titulo}</h3>
     <p className="text-foreground text-lg font-medium">{dados.original} <span className="text-muted-foreground">({dados.transliteracao})</span></p>
     <p className="text-sm text-muted-foreground">{dados.significado}</p>
   </div>
 );
 
 const SectionCard = ({ titulo, icone, children }: { titulo: string; icone: React.ReactNode; children: React.ReactNode }) => (
-  <div className="rounded-xl border border-border bg-card/50 p-4 space-y-2">
+  <div className="ed-panel">
     <div className="flex items-center gap-2">
       {icone}
-      <h3 className="font-display font-bold text-sm text-primary">{titulo}</h3>
+      <h3 className="ed-panel-title">{titulo}</h3>
     </div>
-    <div className="text-sm text-foreground leading-relaxed">{children}</div>
+    <div className="ed-panel-body">{children}</div>
   </div>
 );
 
@@ -57,9 +58,9 @@ const NomesPage = () => {
   return (
     <PageShell title={t("sidebar.nomes.title")}>
       <div className="max-w-2xl mx-auto flex flex-col gap-5">
-        <p className="text-sm text-muted-foreground leading-relaxed">{t("nomes.description")}</p>
+        <p className="ed-lede">{t("nomes.description")}</p>
 
-        <div className="rounded-xl border border-border bg-card/50 p-4 space-y-3">
+        <div className="ed-panel">
           <p className="text-sm text-muted-foreground font-medium">{t("nomes.label")}</p>
           <div className="flex gap-2">
             <Input placeholder={t("nomes.placeholder")} value={nome} onChange={(e) => setNome(e.target.value)} onKeyDown={(e) => e.key === "Enter" && pesquisar()} className="flex-1" />
@@ -72,18 +73,18 @@ const NomesPage = () => {
         {loading && (
           <div className="flex items-center justify-center py-12 gap-3 text-muted-foreground">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            <span className="text-sm" dangerouslySetInnerHTML={{ __html: t("nomes.loading", { name: `<strong class="text-primary">${nomePesquisado}</strong>` }) }} />
+            <span className="text-sm" dangerouslySetInnerHTML={{ __html: t("nomes.loading", { name: `<strong class="text-primary">${escapeHtml(nomePesquisado)}</strong>` }) }} />
           </div>
         )}
 
         {resultado && !loading && (
           <div className="flex flex-col gap-4 animate-fade-in">
             <div className="text-center space-y-1">
-              <h2 className="font-display text-2xl font-bold text-primary">{nomePesquisado}</h2>
+              <h2 className="ed-result-title">{nomePesquisado}</h2>
               <p className="text-sm text-muted-foreground italic">"{resultado.significado_geral}"</p>
             </div>
 
-            <h3 className="font-display font-bold text-primary text-base mt-2">{t("nomes.result")}</h3>
+            <h3 className="ed-section-title mt-2">{t("nomes.result")}</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {resultado.hebraico && <LinguaCard titulo={t("nomes.hebrew")} dados={resultado.hebraico} cor="text-primary" />}
@@ -100,11 +101,11 @@ const NomesPage = () => {
             </SectionCard>
 
             {resultado.variacoes && resultado.variacoes.length > 0 && (
-              <div className="rounded-xl border border-border bg-card/50 p-4 space-y-3">
-                <h3 className="font-display font-bold text-sm text-primary">{t("nomes.variations")}</h3>
+              <div className="ed-panel">
+                <h3 className="ed-panel-title">{t("nomes.variations")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {resultado.variacoes.map((v, i) => (
-                    <span key={i} className="text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full font-medium">{v}</span>
+                    <span key={i} className="ed-chip">{v}</span>
                   ))}
                 </div>
               </div>

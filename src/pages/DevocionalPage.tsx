@@ -15,12 +15,12 @@ interface DevocionalResult {
 }
 
 const SectionCard = ({ titulo, icone, children }: { titulo: string; icone: React.ReactNode; children: React.ReactNode }) => (
-  <div className="rounded-xl border border-border bg-card/50 p-4 space-y-2">
+  <div className="ed-panel">
     <div className="flex items-center gap-2">
       {icone}
-      <h3 className="font-display font-bold text-sm text-primary">{titulo}</h3>
+      <h3 className="ed-panel-title">{titulo}</h3>
     </div>
-    <div className="text-sm text-foreground leading-relaxed">{children}</div>
+    <div className="ed-panel-body">{children}</div>
   </div>
 );
 
@@ -41,9 +41,9 @@ const DevocionalPage = () => {
   return (
     <PageShell title={t("sidebar.devocional.title")}>
       <div className="max-w-2xl mx-auto flex flex-col gap-5">
-        <p className="text-sm text-muted-foreground leading-relaxed">{t("devocional.description")}</p>
+        <p className="ed-lede">{t("devocional.description")}</p>
 
-        <div className="rounded-xl border border-border bg-card/50 p-4 space-y-3">
+        <div className="ed-panel">
           <p className="text-sm text-muted-foreground font-medium">{t("devocional.label")}</p>
           <div className="flex gap-2">
             <Input
@@ -68,13 +68,13 @@ const DevocionalPage = () => {
         {resultado && !loading && (
           <div className="flex flex-col gap-4 animate-fade-in">
             <div className="text-center space-y-1">
-              <h2 className="font-display text-2xl font-bold text-primary">{resultado.titulo}</h2>
+              <h2 className="ed-result-title">{resultado.titulo}</h2>
             </div>
 
-            <div className="rounded-xl border border-border bg-card/50 p-4 space-y-2">
+            <div className="ed-panel">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-primary" />
-                <h3 className="font-display font-bold text-sm text-primary">📖 {t("devocional.reading")}</h3>
+                <h3 className="ed-panel-title">📖 {t("devocional.reading")}</h3>
               </div>
               <p className="text-lg font-display font-bold text-foreground">{resultado.leitura}</p>
             </div>
