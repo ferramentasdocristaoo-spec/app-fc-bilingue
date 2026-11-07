@@ -1,24 +1,13 @@
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  AArrowDown,
-  AArrowUp,
-  BookOpen,
-  ChevronLeft,
-  ChevronRight,
-  List,
-  Loader2,
-  Palette,
-  Pause,
-  Play,
-  Square,
-  Volume2,
-  X,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, List, Pause, Play, Square, Volume2, X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useTheme } from "@/hooks/use-theme";
 import { libraryLanguage, libraryProduct, setLastRead, setVolumeProgress } from "@/data/library";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchLibraryVolume } from "@/lib/content-api";
+import { toast } from "@/hooks/use-toast";
 
 interface VolumeContent {
   title: string;
@@ -34,29 +23,16 @@ interface Chapter {
 
 type ThemeName = "bege" | "sepia" | "noturno";
 
-const THEMES: Record<ThemeName, { bg: string; papel: string; texto: string; sub: string; borda: string }> = {
-  bege: {
-    bg: "hsl(40 35% 90%)",
-    papel: "hsl(42 50% 97%)",
-    texto: "hsl(28 30% 14%)",
-    sub: "hsl(30 15% 40%)",
-    borda: "hsl(38 26% 84%)",
-  },
-  sepia: {
-    bg: "hsl(36 45% 82%)",
-    papel: "hsl(38 55% 90%)",
-    texto: "hsl(28 40% 18%)",
-    sub: "hsl(30 25% 38%)",
-    borda: "hsl(34 30% 72%)",
-  },
-  noturno: {
-    bg: "hsl(28 15% 8%)",
-    papel: "hsl(28 12% 12%)",
-    texto: "hsl(40 25% 82%)",
-    sub: "hsl(38 15% 60%)",
-    borda: "hsl(28 12% 22%)",
-  },
+// Mesmos papéis do "Livro de Estudo": papel/tinta/dourado; a noite é o marinho da marca, com tinta quente.
+const THEMES: Record<ThemeName, { bg: string; papel: string; texto: string; sub: string; borda: string; acento: string }> = {
+  bege: { bg: "hsl(40 47% 94%)", papel: "hsl(40 50% 97%)", texto: "hsl(216 45% 16%)", sub: "hsl(218 17% 33%)", borda: "hsl(41 39% 80%)", acento: "hsl(40 58% 28%)" },
+  sepia: { bg: "hsl(37 48% 85%)", papel: "hsl(38 55% 90%)", texto: "hsl(28 40% 15%)", sub: "hsl(28 28% 28%)", borda: "hsl(34 30% 68%)", acento: "hsl(30 62% 24%)" },
+  noturno: { bg: "hsl(216 53% 8%)", papel: "hsl(216 48% 11%)", texto: "hsl(41 32% 84%)", sub: "hsl(41 12% 70%)", borda: "hsl(216 36% 22%)", acento: "hsl(41 55% 67%)" },
 };
+
+const PREFS_KEY = "fc-leitura-prefs";
+const MIN_FONT = 15;
+const MAX_FONT = 29;
 
 const SPEECH_LANG: Record<string, string> = {
   "pt-PT": "pt-BR",
@@ -67,7 +43,6 @@ const SPEECH_LANG: Record<string, string> = {
   de: "de-DE",
 };
 
-const GOLD = "hsl(42 65% 47%)";
 const READER_SERIF = "'Source Serif 4 Variable', 'Source Serif 4', Georgia, serif";
 
 // Cada capítulo é um bloco separado por linha em branco; a primeira linha é o título.
@@ -97,16 +72,29 @@ export default function LeitorPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { email } = useAuth();
+  const { theme: appTheme } = useTheme();
   const product = libraryProduct(i18n.resolvedLanguage || i18n.language, productSlug ?? "");
   const volume = product?.volumes.find((item) => item.slug === volumeSlug);
 
   const [book, setBook] = useState<VolumeContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [tentativa, setTentativa] = useState(0);
   const [cap, setCap] = useState(0);
-  const [fonte, setFonte] = useState(19);
-  const [tema, setTema] = useState<ThemeName>("bege");
+  // Tamanho e fundo valem para todos os livros; sem escolha salva, o fundo acompanha o tema do app.
+  const [fonte, setFonte] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(PREFS_KEY) ?? "{}").fonte ?? 19; } catch { return 19; }
+  });
+  const [tema, setTema] = useState<ThemeName>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PREFS_KEY) ?? "{}").tema;
+      if (saved && saved in THEMES) return saved;
+    } catch { /* preferências inválidas são ignoradas */ }
+    return appTheme === "dark" ? "noturno" : "bege";
+  });
   const [sumario, setSumario] = useState(false);
+  const tocCloseRef = useRef<HTMLButtonElement>(null);
+  const tocOpenRef = useRef<HTMLButtonElement>(null);
   const [lendo, setLendo] = useState(false);
   const [pausado, setPausado] = useState(false);
   const [linhaAtual, setLinhaAtual] = useState(-2);
@@ -117,6 +105,7 @@ export default function LeitorPage() {
   useEffect(() => {
     if (!email || !volumeSlug) return;
     setLoading(true);
+    setError("");
     fetchLibraryVolume({
       email,
       productSlug: productSlug ?? "",
@@ -130,11 +119,9 @@ export default function LeitorPage() {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) ?? "{}");
       if (saved.cap) setCap(saved.cap);
-      if (saved.fonte) setFonte(saved.fonte);
-      if (saved.tema) setTema(saved.tema);
     } catch { /* estado salvo inválido é ignorado */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email, i18n.language, i18n.resolvedLanguage, productSlug, volumeSlug]);
+  }, [email, i18n.language, i18n.resolvedLanguage, productSlug, volumeSlug, tentativa]);
 
   const chapters = useMemo(() => (book ? parseChapters(book.content) : []), [book]);
   const total = chapters.length;
@@ -142,7 +129,8 @@ export default function LeitorPage() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(storageKey, JSON.stringify({ cap, fonte, tema }));
+      localStorage.setItem(storageKey, JSON.stringify({ cap }));
+      localStorage.setItem(PREFS_KEY, JSON.stringify({ fonte, tema }));
     } catch { /* armazenamento indisponível */ }
     if (productSlug && volumeSlug && total > 0) {
       setVolumeProgress(productSlug, volumeSlug, ((cap + 1) / total) * 100);
@@ -163,7 +151,11 @@ export default function LeitorPage() {
 
   const iniciarLeitura = useCallback(() => {
     const synth = window.speechSynthesis;
-    if (!synth || !chapter) return;
+    if (!chapter) return;
+    if (!synth) {
+      toast({ title: t("common.error"), description: t("livraria.reader.noSpeech"), variant: "destructive" });
+      return;
+    }
     synth.cancel();
     const speechLang = SPEECH_LANG[libraryLanguage(i18n.resolvedLanguage || i18n.language)] ?? "pt-BR";
     const voices = synth.getVoices().filter((v) => v.lang.replace("_", "-").toLowerCase().startsWith(speechLang.slice(0, 2)));
@@ -183,7 +175,7 @@ export default function LeitorPage() {
     });
     setLendo(true);
     setPausado(false);
-  }, [chapter, i18n.language, i18n.resolvedLanguage]);
+  }, [chapter, i18n.language, i18n.resolvedLanguage, t]);
 
   const alternarLeitura = useCallback(() => {
     const synth = window.speechSynthesis;
@@ -210,9 +202,15 @@ export default function LeitorPage() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        // Esc fecha o que está por cima primeiro; só depois sai da leitura.
+        if (document.querySelector("[data-radix-popper-content-wrapper]")) return;
+        if (sumario) { setSumario(false); tocOpenRef.current?.focus(); return; }
+        fechar();
+      }
+      if (sumario) return;
       if (event.key === "ArrowLeft") anterior();
       if (event.key === "ArrowRight") proximo();
-      if (event.key === "Escape") fechar();
       // proteção do conteúdo: copiar, selecionar tudo, recortar, salvar e imprimir
       if ((event.ctrlKey || event.metaKey) && ["c", "a", "x", "s", "p"].includes(event.key.toLowerCase())) {
         event.preventDefault();
@@ -227,65 +225,74 @@ export default function LeitorPage() {
       document.removeEventListener("copy", bloquear);
       document.removeEventListener("cut", bloquear);
     };
-  }, [anterior, proximo, fechar]);
+  }, [anterior, proximo, fechar, sumario]);
+
+  useEffect(() => {
+    if (sumario) tocCloseRef.current?.focus();
+  }, [sumario]);
 
   if (!product || !volume) return <Navigate to="/livraria" replace />;
 
   const theme = THEMES[tema];
   const progresso = total > 0 ? ((cap + 1) / total) * 100 : 0;
 
-  const iconButton = "w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70";
+  const iconButton = "flex h-11 w-11 shrink-0 items-center justify-center transition-opacity hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px]";
+  const proximoCap = chapters[cap + 1];
+  const anteriorCap = chapters[cap - 1];
   const realce = (index: number) =>
-    index === linhaAtual ? { background: "hsl(42 65% 47% / 0.18)", borderRadius: 6 } : undefined;
+    index === linhaAtual ? { background: `color-mix(in srgb, ${theme.acento} 16%, transparent)`, boxShadow: `-8px 0 0 color-mix(in srgb, ${theme.acento} 16%, transparent), 8px 0 0 color-mix(in srgb, ${theme.acento} 16%, transparent)` } : undefined;
+  const nomesTema: Record<ThemeName, string> = { bege: t("livraria.reader.themePaper"), sepia: t("livraria.reader.themeSepia"), noturno: t("livraria.reader.themeNight") };
 
   return (
     <div
       className="fixed inset-0 z-[100] flex flex-col select-none"
-      style={{ background: theme.bg, height: "100dvh", WebkitTouchCallout: "none" } as React.CSSProperties}
+      style={{ background: theme.bg, color: theme.texto, height: "100dvh", WebkitTouchCallout: "none", outlineColor: theme.acento } as React.CSSProperties}
       role="dialog"
-      aria-label={`Lendo: ${volume.title}`}
+      aria-label={volume.title}
       onContextMenu={(event) => event.preventDefault()}
     >
-      <header
-        className="flex items-center justify-between px-3 py-2 shrink-0"
-        style={{ borderBottom: `1px solid ${theme.borda}` }}
-      >
-        <button onClick={() => setSumario((open) => !open)} aria-label={t("livraria.reader.toc")} className={iconButton} style={{ color: theme.sub }}>
+      <header className="flex shrink-0 items-center gap-1 px-1 sm:px-3" style={{ borderBottom: `1px solid ${theme.borda}`, paddingTop: "env(safe-area-inset-top)" }}>
+        <button onClick={fechar} aria-label={t("livraria.reader.close")} title={t("livraria.reader.close")} className={iconButton} style={{ color: theme.sub }}>
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <div className="min-w-0 flex-1 px-1">
+          <p className="truncate font-display text-[1.0625rem] font-semibold leading-tight">{volume.title}</p>
+          {total > 0 && <p className="truncate font-body text-[0.8125rem] leading-tight" style={{ color: theme.sub }}>{t("livraria.reader.chapterOf", { current: cap + 1, total })}</p>}
+        </div>
+        <button ref={tocOpenRef} onClick={() => setSumario((open) => !open)} aria-label={t("livraria.reader.toc")} aria-expanded={sumario} title={t("livraria.reader.toc")} className={iconButton} style={{ color: theme.sub }}>
           <List className="h-5 w-5" />
         </button>
-        <div
-          className="flex-1 truncate px-2 text-center font-body text-xs font-medium uppercase tracking-[0.14em]"
-          style={{ color: theme.sub }}
-        >
-          {chapter?.title ?? volume.title}
-        </div>
-        <div className="flex items-center gap-1">
-          <button onClick={alternarLeitura} aria-label={t("livraria.reader.listen")} className={iconButton} style={{ color: lendo ? GOLD : theme.sub }}>
-            {!lendo ? <Volume2 className="h-5 w-5" /> : pausado ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
-          </button>
-          {lendo && (
-            <button onClick={pararLeitura} aria-label={t("livraria.reader.stopListening")} className={iconButton} style={{ color: theme.sub }}>
-              <Square className="h-4 w-4" />
-            </button>
-          )}
-          <button onClick={() => setFonte((size) => Math.max(15, size - 2))} aria-label={t("livraria.reader.decreaseFont")} className={iconButton} style={{ color: theme.sub }}>
-            <AArrowDown className="h-5 w-5" />
-          </button>
-          <button onClick={() => setFonte((size) => Math.min(29, size + 2))} aria-label={t("livraria.reader.increaseFont")} className={iconButton} style={{ color: theme.sub }}>
-            <AArrowUp className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => setTema((current) => (current === "bege" ? "sepia" : current === "sepia" ? "noturno" : "bege"))}
-            aria-label={t("livraria.reader.changeTheme")}
-            className={iconButton}
-            style={{ color: theme.sub }}
-          >
-            <Palette className="h-5 w-5" />
-          </button>
-          <button onClick={fechar} aria-label={t("livraria.reader.close")} className={iconButton} style={{ color: theme.sub }}>
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        <button onClick={alternarLeitura} aria-label={!lendo ? t("livraria.reader.listen") : pausado ? t("livraria.reader.resume") : t("livraria.reader.pause")} title={t("livraria.reader.listen")} className={iconButton} style={{ color: lendo ? theme.acento : theme.sub }}>
+          {!lendo ? <Volume2 className="h-5 w-5" /> : pausado ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
+        </button>
+        <Popover>
+          <PopoverTrigger aria-label={t("livraria.reader.appearance")} title={t("livraria.reader.appearance")} className={`${iconButton} font-display text-xl font-semibold`} style={{ color: theme.sub }}>
+            Aa
+          </PopoverTrigger>
+          <PopoverContent align="end" className="z-[110] w-72 rounded-sm p-4" style={{ background: theme.papel, color: theme.texto, borderColor: theme.borda }}>
+            <p className="mb-2 font-body text-[0.8125rem] font-medium" style={{ color: theme.sub }}>{t("livraria.reader.size")}</p>
+            <div className="mb-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${theme.borda}` }}>
+              <button onClick={() => setFonte((size: number) => Math.max(MIN_FONT, size - 2))} disabled={fonte <= MIN_FONT} aria-label={t("livraria.reader.decreaseFont")} className="h-12 w-16 font-display text-lg font-semibold disabled:opacity-30">A−</button>
+              <span className="font-body text-sm tabular-nums" aria-live="polite" style={{ color: theme.sub }}>{fonte} px</span>
+              <button onClick={() => setFonte((size: number) => Math.min(MAX_FONT, size + 2))} disabled={fonte >= MAX_FONT} aria-label={t("livraria.reader.increaseFont")} className="h-12 w-16 font-display text-2xl font-semibold disabled:opacity-30">A+</button>
+            </div>
+            <p className="mb-2 font-body text-[0.8125rem] font-medium" id="leitor-fundo" style={{ color: theme.sub }}>{t("livraria.reader.background")}</p>
+            <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby="leitor-fundo">
+              {(Object.keys(THEMES) as ThemeName[]).map((nome) => (
+                <button
+                  key={nome}
+                  role="radio"
+                  aria-checked={tema === nome}
+                  onClick={() => setTema(nome)}
+                  className="flex h-14 flex-col items-center justify-center rounded-sm font-body text-[0.8125rem] font-medium"
+                  style={{ background: THEMES[nome].bg, color: THEMES[nome].texto, border: tema === nome ? `2px solid ${theme.acento}` : `1px solid ${THEMES[nome].borda}` }}
+                >
+                  {nomesTema[nome]}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
       </header>
 
       {email && (
@@ -298,10 +305,10 @@ export default function LeitorPage() {
                 left: `${(index % 3) * 34 + 4}%`,
                 top: `${Math.floor(index / 3) * 30 + 12}%`,
                 transform: "rotate(-28deg)",
-                fontSize: 12,
+                fontSize: 13,
                 letterSpacing: "0.08em",
                 color: theme.texto,
-                opacity: 0.055,
+                opacity: 0.035,
               }}
             >
               {email}
@@ -310,36 +317,33 @@ export default function LeitorPage() {
         </div>
       )}
 
-      <div className="h-[3px] shrink-0" style={{ background: theme.borda }}>
-        <div
-          className="h-full transition-all duration-300"
-          style={{ width: `${progresso}%`, background: GOLD }}
-        />
+      <div className="h-[2px] shrink-0" style={{ background: theme.borda }} role="progressbar" aria-label={t("livraria.progress")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progresso)}>
+        <div className="h-full transition-all duration-300" style={{ width: `${progresso}%`, background: theme.acento }} />
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex h-full items-center justify-center">
-            <Loader2 className="h-9 w-9 animate-spin" style={{ color: GOLD }} />
+          <div className="mx-auto w-full max-w-[640px] px-6 py-12 sm:px-8" role="status" aria-label={t("common.loading")}>
+            <div className="ed-wait-lines" style={{ color: theme.texto }} aria-hidden>
+              {Array.from({ length: 10 }).map((_, index) => <i key={index} style={{ background: `color-mix(in srgb, ${theme.texto} 10%, transparent)` }} />)}
+            </div>
           </div>
         ) : error || !book ? (
-          <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-            <BookOpen className="mb-3 h-8 w-8" style={{ color: theme.sub }} />
-            <p style={{ color: theme.sub }}>{t("livraria.reader.loadError")}</p>
+          <div className="mx-auto flex h-full max-w-md flex-col justify-center px-8">
+            <p className="font-display text-2xl font-semibold">{t("livraria.reader.loadError")}</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button onClick={() => setTentativa((value) => value + 1)} className="min-h-11 rounded px-5 font-body text-sm font-medium" style={{ background: theme.texto, color: theme.papel }}>{t("common.retry")}</button>
+              <button onClick={fechar} className="min-h-11 rounded px-5 font-body text-sm font-medium" style={{ border: `1px solid ${theme.sub}`, color: theme.texto }}>{t("livraria.back")}</button>
+            </div>
           </div>
         ) : (
           <article
-            lang={i18n.resolvedLanguage || i18n.language}
-            className="mx-auto px-6 py-10 sm:px-8"
-            style={{
-              maxWidth: 680,
-              fontFamily: READER_SERIF,
-              fontSize: fonte,
-              lineHeight: 1.75,
-              color: theme.texto,
-            }}
+            lang={libraryLanguage(i18n.resolvedLanguage || i18n.language)}
+            className="mx-auto px-6 pb-16 pt-10 sm:px-8 sm:pt-16"
+            style={{ maxWidth: `calc(${fonte * 33}px + 4rem)`, fontFamily: READER_SERIF, fontSize: fonte, lineHeight: 1.7 }}
           >
-            <h2 id="leitura-linha--1" className="font-display mb-8 font-semibold" style={{ fontSize: fonte * 1.75, lineHeight: 1.15, ...realce(-1) }}>
+            <p className="mb-3 font-brand" style={{ fontSize: 14, letterSpacing: "0.08em", color: theme.acento }} aria-hidden>{cap + 1}</p>
+            <h2 id="leitura-linha--1" className="font-display mb-10 font-semibold" style={{ fontSize: fonte * 1.9, lineHeight: 1.1, textWrap: "balance", ...realce(-1) } as React.CSSProperties}>
               {chapter?.title}
             </h2>
             {chapter?.lines.map((line, index) =>
@@ -347,8 +351,8 @@ export default function LeitorPage() {
                 <blockquote
                   key={index}
                   id={`leitura-linha-${index}`}
-                  className="my-6 border-l-2 pl-4 italic"
-                  style={{ borderColor: GOLD, color: theme.sub, ...realce(index) }}
+                  className="my-8 pl-5 italic"
+                  style={{ borderLeft: `2px solid ${theme.acento}`, ...realce(index) }}
                 >
                   {line}
                 </blockquote>
@@ -356,8 +360,8 @@ export default function LeitorPage() {
                 <h3
                   key={index}
                   id={`leitura-linha-${index}`}
-                  className="font-display mb-3 mt-8 font-semibold"
-                  style={{ fontSize: fonte * 1.3, lineHeight: 1.3, ...realce(index) }}
+                  className="font-display mb-3 mt-10 font-semibold"
+                  style={{ fontSize: fonte * 1.35, lineHeight: 1.25, ...realce(index) }}
                 >
                   {line}
                 </h3>
@@ -368,77 +372,70 @@ export default function LeitorPage() {
               ),
             )}
 
-            <div className="mb-6 mt-12 flex items-center justify-between gap-3">
-              {cap > 0 ? (
-                <button
-                  onClick={anterior}
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded px-4 py-3 font-body text-sm font-medium transition-opacity hover:opacity-80"
-                  style={{ border: `1px solid ${theme.borda}`, color: theme.sub }}
-                >
-                  <ChevronLeft className="h-4 w-4" /> {t("livraria.reader.prev")}
-                </button>
-              ) : (
-                <span />
-              )}
+            <nav className="mt-16 pt-6 font-body" style={{ borderTop: `1px solid ${theme.borda}` }} aria-label={t("livraria.reader.chapterOf", { current: cap + 1, total })}>
               {cap < total - 1 ? (
-                <button
-                  onClick={proximo}
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded px-5 py-3 font-body text-sm font-medium transition-opacity hover:opacity-90"
-                  style={{ background: theme.texto, color: theme.papel }}
-                >
-                  {t("livraria.reader.next")} <ChevronRight className="h-4 w-4" />
+                <button onClick={proximo} className="flex w-full items-center justify-between gap-4 rounded px-5 py-4 text-left transition-opacity hover:opacity-90" style={{ background: theme.texto, color: theme.papel }}>
+                  <span className="min-w-0">
+                    <span className="block text-[0.8125rem] leading-snug opacity-80">{t("livraria.reader.next")}</span>
+                    <span className="block truncate font-display text-xl font-semibold leading-snug">{proximoCap?.title}</span>
+                  </span>
+                  <ArrowRight className="h-5 w-5 shrink-0" />
                 </button>
               ) : (
-                <button
-                  onClick={concluir}
-                  className="min-h-[44px] rounded px-5 py-3 font-body text-sm font-medium transition-opacity hover:opacity-90"
-                  style={{ background: theme.texto, color: theme.papel }}
-                >
+                <button onClick={concluir} className="min-h-[52px] w-full rounded px-5 py-3 text-base font-medium transition-opacity hover:opacity-90" style={{ background: theme.texto, color: theme.papel }}>
                   {t("livraria.reader.finish")}
                 </button>
               )}
-            </div>
-            <p className="mb-4 text-center font-body text-xs" style={{ color: theme.sub }}>
-              {t("livraria.reader.chapterOf", { current: cap + 1, total })}
-            </p>
+              {anteriorCap && (
+                <button onClick={anterior} className="mt-2 flex min-h-11 w-full items-center gap-2 text-left text-sm font-medium" style={{ color: theme.sub }}>
+                  <ArrowLeft className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{anteriorCap.title}</span>
+                </button>
+              )}
+            </nav>
           </article>
         )}
       </div>
 
+      {lendo && (
+        <div className="flex shrink-0 items-center gap-2 px-4 py-2 font-body" style={{ background: theme.papel, borderTop: `1px solid ${theme.borda}`, paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }} role="status">
+          <span className="min-w-0 flex-1 truncate text-sm font-medium">{pausado ? t("livraria.reader.pausedLabel") : t("livraria.reader.listening")}</span>
+          <button onClick={alternarLeitura} className="inline-flex min-h-11 items-center gap-2 px-3 text-sm font-medium" style={{ color: theme.acento }}>
+            {pausado ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}{pausado ? t("livraria.reader.resume") : t("livraria.reader.pause")}
+          </button>
+          <button onClick={pararLeitura} className="inline-flex min-h-11 items-center gap-2 px-3 text-sm font-medium" style={{ color: theme.sub }}>
+            <Square className="h-3.5 w-3.5" />{t("livraria.reader.stop")}
+          </button>
+        </div>
+      )}
+
       {sumario && book && (
-        <div className="absolute inset-0 z-10 flex" style={{ top: 49 }}>
-          <div
-            className="h-full w-[300px] max-w-[85vw] overflow-y-auto p-4"
-            style={{ background: theme.papel, borderRight: `1px solid ${theme.borda}` }}
-          >
-            <p className="font-display mb-1 text-xl font-semibold" style={{ color: theme.texto }}>
-              {volume.title}
-            </p>
-            <p className="mb-4 font-body text-xs font-medium uppercase tracking-[0.14em]" style={{ color: theme.sub }}>
-              {t("livraria.reader.chaptersCount", { count: total })}
-            </p>
-            {chapters.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setCap(index);
-                  setSumario(false);
-                }}
-                className="mb-0.5 block w-full rounded-none px-3 py-2 text-left text-[0.9375rem] transition-colors"
-                style={
-                  index === cap
-                    ? { color: theme.texto, fontWeight: 600, fontFamily: READER_SERIF, boxShadow: `inset 2px 0 0 ${GOLD}` }
-                    : { color: theme.texto, fontFamily: READER_SERIF }
-                }
-              >
-                <span className="mr-2 inline-block w-6 text-right font-brand text-xs" style={{ color: GOLD }}>
-                  {index + 1}
-                </span>
-                {item.title}
-              </button>
-            ))}
-          </div>
-          <button aria-label={t("livraria.reader.toc")} className="flex-1" onClick={() => setSumario(false)} style={{ background: "rgba(0,0,0,0.25)" }} />
+        <div className="absolute inset-0 z-10 flex">
+          <nav className="flex h-full w-[340px] max-w-[88vw] flex-col" aria-label={t("livraria.reader.toc")} style={{ background: theme.papel, borderRight: `1px solid ${theme.borda}`, paddingTop: "env(safe-area-inset-top)" }}>
+            <div className="flex items-start justify-between gap-2 py-3 pl-5 pr-1" style={{ borderBottom: `1px solid ${theme.borda}` }}>
+              <div className="min-w-0 pt-1">
+                <p className="font-display text-xl font-semibold leading-tight">{volume.title}</p>
+                <p className="mt-1 font-body text-[0.8125rem]" style={{ color: theme.sub }}>{t("livraria.reader.chaptersCount", { count: total })}</p>
+              </div>
+              <button ref={tocCloseRef} onClick={() => setSumario(false)} aria-label={t("common.close")} className={iconButton} style={{ color: theme.sub }}><X className="h-5 w-5" /></button>
+            </div>
+            <ol className="flex-1 overflow-y-auto px-2 py-2">
+              {chapters.map((item, index) => (
+                <li key={index}>
+                  <button
+                    onClick={() => { setCap(index); setSumario(false); }}
+                    aria-current={index === cap ? "true" : undefined}
+                    className="grid min-h-11 w-full grid-cols-[28px_1fr] items-baseline px-3 py-2.5 text-left text-[1rem] leading-snug"
+                    style={{ fontFamily: READER_SERIF, fontWeight: index === cap ? 600 : 400, boxShadow: index === cap ? `inset 2px 0 0 ${theme.acento}` : undefined }}
+                  >
+                    <span className="font-brand text-[0.8125rem]" style={{ color: theme.acento }}>{index + 1}</span>
+                    <span>{item.title}</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </nav>
+          <button aria-label={t("common.close")} tabIndex={-1} className="flex-1" onClick={() => setSumario(false)} style={{ background: "rgba(0,0,0,0.3)" }} />
         </div>
       )}
     </div>
