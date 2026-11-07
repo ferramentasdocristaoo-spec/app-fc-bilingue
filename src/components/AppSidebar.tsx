@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 
 // Item do menu: sem "pílula"; o ativo ganha um filete dourado à esquerda.
-const NAV_ITEM = "h-11 md:h-9 rounded-none pl-3 text-[0.9375rem] text-sidebar-foreground/80 hover:bg-transparent hover:text-sidebar-accent-foreground data-[active=true]:bg-transparent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-[inset_2px_0_0_hsl(var(--sidebar-primary))] [&>svg]:opacity-70";
+const NAV_ITEM = "h-10 md:h-9 rounded-none pl-3 text-[0.9375rem] text-sidebar-foreground/80 hover:bg-transparent hover:text-sidebar-accent-foreground data-[active=true]:bg-transparent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-[inset_2px_0_0_hsl(var(--sidebar-primary))] [&>svg]:opacity-70";
 const GROUP_LABEL = "text-sidebar-foreground/70 text-xs font-medium uppercase tracking-[0.14em]";
 
 export function AppSidebar() {
@@ -60,7 +60,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarHeader className="px-4 pt-4 pb-2 flex flex-col items-center gap-2 text-center">
-        <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-12 h-12 object-contain shrink-0 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:h-8" />
+        <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="w-10 h-10 md:w-12 md:h-12 object-contain shrink-0 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:h-8" />
         <div className="overflow-hidden group-data-[collapsible=icon]:hidden">
           <h2 className="font-brand text-[0.8125rem] font-semibold tracking-[0.06em] text-sidebar-primary leading-snug">{t("appName")}</h2>
           <p className="mt-1 font-serif italic text-xs text-sidebar-foreground/70">{t("subtitle")}</p>
@@ -99,7 +99,7 @@ export function AppSidebar() {
       <SidebarFooter className="p-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={signOut} className="h-11 md:h-9 text-sidebar-foreground/70 hover:bg-transparent hover:text-sidebar-accent-foreground">
+            <SidebarMenuButton onClick={signOut} className="h-10 md:h-9 text-sidebar-foreground/70 hover:bg-transparent hover:text-sidebar-accent-foreground">
               <LogOut className="h-4 w-4" />
               <span>{t("sidebar.logout")}</span>
             </SidebarMenuButton>
