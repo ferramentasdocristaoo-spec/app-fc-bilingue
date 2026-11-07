@@ -18,7 +18,8 @@ export function useAi() {
         body: { action, payload: { ...payload, lang: i18n.language } },
       });
 
-      if (error || data?.error) {
+      // Resposta sem conteúdo também é falha: sem isto a tela ficava em branco, sem aviso.
+      if (error || data?.error || !data?.result) {
         setFailed(true);
         return null;
       }

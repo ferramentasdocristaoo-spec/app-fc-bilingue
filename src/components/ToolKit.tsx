@@ -72,7 +72,7 @@ export function ToolError({ onRetry, children }: { onRetry?: () => void; childre
   const { t } = useTranslation();
   return (
     <div className="ed-alert" role="alert">
-      <p>{children ?? t("common.aiError")}</p>
+      <p>{navigator.onLine ? (children ?? t("common.aiError")) : t("common.offline")}</p>
       {onRetry && <button type="button" className="ed-btn ed-btn-ghost" onClick={onRetry}>{t("common.retry")}</button>}
     </div>
   );

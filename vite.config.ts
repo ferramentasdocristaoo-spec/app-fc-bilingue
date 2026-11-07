@@ -38,10 +38,9 @@ export default defineConfig(() => ({
         short_name: "Ferramentas do Cristão",
         description: "Sua oficina completa para a Palavra e o Reino.",
         id: "/fc-sermon",
-        theme_color: "#161b26",
-        background_color: "#161b26",
+        theme_color: "#0e1c2e",
+        background_color: "#0e1c2e",
         display: "standalone",
-        orientation: "portrait",
         start_url: "/",
         icons: [
           { src: "/pwa-icon-192.png", sizes: "192x192", type: "image/png" },

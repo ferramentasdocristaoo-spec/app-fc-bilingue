@@ -54,14 +54,21 @@ const MuralPage = () => {
 
   const fetchPedidos = async () => {
     setFalhaLista(false);
-    const { data, error } = await supabase
-      .from("prayer_requests")
-      .select("id, nome, pedido, categoria, amens, image_url, created_at")
-      .order("created_at", { ascending: false })
-      .limit(MURAL_PAGE_SIZE);
-    if (data) setPedidos(data as Pedido[]);
-    if (error) { console.error(error); setFalhaLista(true); }
-    setCarregando(false);
+    setCarregando(true);
+    try {
+      const { data, error } = await supabase
+        .from("prayer_requests")
+        .select("id, nome, pedido, categoria, amens, image_url, created_at")
+        .order("created_at", { ascending: false })
+        .limit(MURAL_PAGE_SIZE);
+      if (error) throw error;
+      setPedidos((data ?? []) as Pedido[]);
+    } catch (error) {
+      console.error(error);
+      setFalhaLista(true);
+    } finally {
+      setCarregando(false);
+    }
   };
 
   useEffect(() => { fetchPedidos(); }, []);
@@ -171,7 +178,7 @@ const MuralPage = () => {
       <section className="mural-list" aria-labelledby="mural-lista">
         <h2 id="mural-lista" className="ed-eyebrow">{t("mural.prayingNow")}</h2>
         {carregando && <div className="ed-wait-lines" role="status" aria-label={t("common.loading")}>{Array.from({ length: 6 }).map((_, i) => <i key={i} />)}</div>}
-        {falhaLista && <ToolError onRetry={fetchPedidos}>{t("common.aiError")}</ToolError>}
+        {falhaLista && <ToolError onRetry={fetchPedidos}>{navigator.onLine ? t("mural.loadError") : t("common.offline")}</ToolError>}
         {!carregando && !falhaLista && pedidos.length === 0 && <p className="ed-empty">{t("mural.emptyState")}</p>}
         {pedidos.map((p) => (
           <article key={p.id} className="mural-item">

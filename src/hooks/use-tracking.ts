@@ -25,6 +25,7 @@ export const usePageTracking = () => {
     if (!email) return;
     const tool = TOOL_NAMES[pathname];
     if (!tool) return;
-    supabase.rpc("log_tool_usage", { _email: email, _tool: tool }).then(() => {});
+    // Métrica nunca atrapalha o uso: sem internet, só não registra.
+    supabase.rpc("log_tool_usage", { _email: email, _tool: tool }).then(() => {}, () => {});
   }, [pathname, email]);
 };

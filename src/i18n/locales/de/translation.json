@@ -266,7 +266,8 @@
     "removeImage": "Bild entfernen",
     "sent": "Anliegen gesendet. Wir beten mit Ihnen.",
     "prayed": "Ich bete mit Ihnen ({{count}})",
-    "prayingNow": "Anliegen der Gemeinschaft"
+    "prayingNow": "Anliegen der Gemeinschaft",
+    "loadError": "Die Anliegen konnten nicht geladen werden."
   },
   "voz": {
     "description": "Erhalten Sie ein Wort Gottes für den Tag. Eine Bibelverheißung, besonders für Sie ausgewählt.",
@@ -402,7 +403,8 @@
     "close": "Schließen",
     "aiError": "Die Antwort konnte nicht abgerufen werden. Bitte versuche es erneut.",
     "retry": "Erneut versuchen",
-    "backTo": "Zurück"
+    "backTo": "Zurück",
+    "offline": "Keine Internetverbindung. Diese Funktion benötigt Internet."
   },
   "livraria": {
     "title": "Bibliothek",
@@ -449,7 +451,8 @@
     "volume": "Band {{number}}",
     "lockedHint": "Nicht in Ihren Käufen enthalten.",
     "finished": "Gelesen",
-    "percentRead": "{{progress}} % gelesen"
+    "percentRead": "{{progress}} % gelesen",
+    "accessError": "Ihr Zugang konnte nicht bestätigt werden. Bitte prüfen Sie Ihre Internetverbindung."
   },
   "workspace": {
     "welcome": "Bereite weiter vor, was Gott dir aufs Herz gelegt hat.",

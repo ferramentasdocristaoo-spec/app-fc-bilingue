@@ -266,7 +266,8 @@
     "removeImage": "Remove image",
     "sent": "Request sent. We will pray with you.",
     "prayed": "Praying with you ({{count}})",
-    "prayingNow": "Community requests"
+    "prayingNow": "Community requests",
+    "loadError": "Could not load the requests."
   },
   "voz": {
     "description": "Receive a word from God for the day. A Bible promise selected especially for you.",
@@ -402,7 +403,8 @@
     "close": "Close",
     "aiError": "We couldn't get a response. Please try again.",
     "retry": "Try again",
-    "backTo": "Back"
+    "backTo": "Back",
+    "offline": "No internet connection. This feature needs internet."
   },
   "livraria": {
     "title": "Library",
@@ -449,7 +451,8 @@
     "volume": "Volume {{number}}",
     "lockedHint": "Not included in your purchases.",
     "finished": "Read",
-    "percentRead": "{{progress}}% read"
+    "percentRead": "{{progress}}% read",
+    "accessError": "Could not confirm your access. Check your internet connection."
   },
   "workspace": {
     "welcome": "Keep preparing what God has placed in your heart.",

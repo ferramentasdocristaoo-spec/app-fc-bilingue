@@ -266,7 +266,8 @@
     "removeImage": "Rimuovi immagine",
     "sent": "Richiesta inviata. Pregheremo con te.",
     "prayed": "Prego con te ({{count}})",
-    "prayingNow": "Richieste della comunità"
+    "prayingNow": "Richieste della comunità",
+    "loadError": "Impossibile caricare le richieste."
   },
   "voz": {
     "description": "Ricevi una parola da Dio per il giorno. Una promessa biblica scelta specialmente per te.",
@@ -402,7 +403,8 @@
     "close": "Chiudi",
     "aiError": "Non è stato possibile ottenere la risposta. Riprova.",
     "retry": "Riprova",
-    "backTo": "Indietro"
+    "backTo": "Indietro",
+    "offline": "Nessuna connessione a internet. Questa funzione richiede internet."
   },
   "livraria": {
     "title": "Libreria",
@@ -449,7 +451,8 @@
     "volume": "Volume {{number}}",
     "lockedHint": "Non incluso nei tuoi acquisti.",
     "finished": "Letto",
-    "percentRead": "{{progress}}% letto"
+    "percentRead": "{{progress}}% letto",
+    "accessError": "Impossibile confermare il tuo accesso. Controlla la connessione a internet."
   },
   "workspace": {
     "welcome": "Continua a preparare ciò che Dio ha posto nel tuo cuore.",

@@ -231,3 +231,11 @@
 .journey-sources li { padding: 10px 0; border-bottom: 1px solid hsl(var(--rule-soft)); font-size: 1rem; }
 .journey-sources em { font-style: italic; color: hsl(var(--ink-3)); }
 .journey-sources-link { max-width: 960px; margin: 48px auto 0; }
+
+/* Navegação entre capítulos */
+.chapter-step-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px; }
+.chapter-step-navigation a { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 12px 0; text-decoration: none; font: 600 1.125rem/1.25 var(--font-display); color: hsl(var(--ink)); }
+.chapter-step-navigation a:hover { color: hsl(var(--gold-ink)); }
+.chapter-step-navigation a:last-child:not(:first-child) { justify-content: flex-end; text-align: right; }
+.chapter-step-navigation small { display: block; font: 400 .8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); }
+.chapter-step-navigation svg { flex: none; width: 18px; height: 18px; color: hsl(var(--gold-ink)); }

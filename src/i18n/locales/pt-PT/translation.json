@@ -266,7 +266,8 @@
     "removeImage": "Remover imagem",
     "sent": "Pedido enviado. Vamos orar contigo.",
     "prayed": "A orar contigo ({{count}})",
-    "prayingNow": "Pedidos da comunidade"
+    "prayingNow": "Pedidos da comunidade",
+    "loadError": "Não foi possível carregar os pedidos."
   },
   "voz": {
     "description": "Recebe uma palavra de Deus para o dia. Uma promessa bíblica selecionada especialmente para ti.",
@@ -402,7 +403,8 @@
     "close": "Fechar",
     "aiError": "Não foi possível obter a resposta. Tenta de novo.",
     "retry": "Tentar de novo",
-    "backTo": "Voltar"
+    "backTo": "Voltar",
+    "offline": "Sem ligação à internet. Esta função precisa de internet."
   },
   "livraria": {
     "title": "Livraria",
@@ -449,7 +451,8 @@
     "volume": "Volume {{number}}",
     "lockedHint": "Não incluído nas tuas compras.",
     "finished": "Lido",
-    "percentRead": "{{progress}}% lido"
+    "percentRead": "{{progress}}% lido",
+    "accessError": "Não foi possível confirmar o teu acesso. Verifica a ligação à internet."
   },
   "workspace": {
     "welcome": "Continua a preparar aquilo que Deus colocou no teu coração.",

@@ -266,7 +266,8 @@
     "removeImage": "Quitar imagen",
     "sent": "Petición enviada. Oraremos contigo.",
     "prayed": "Orando contigo ({{count}})",
-    "prayingNow": "Peticiones de la comunidad"
+    "prayingNow": "Peticiones de la comunidad",
+    "loadError": "No se pudieron cargar las peticiones."
   },
   "voz": {
     "description": "Recibe una palabra de Dios para el día. Una promesa bíblica seleccionada especialmente para ti.",
@@ -402,7 +403,8 @@
     "close": "Cerrar",
     "aiError": "No se pudo obtener la respuesta. Inténtalo de nuevo.",
     "retry": "Reintentar",
-    "backTo": "Volver"
+    "backTo": "Volver",
+    "offline": "Sin conexión a internet. Esta función necesita internet."
   },
   "livraria": {
     "title": "Librería",
@@ -449,7 +451,8 @@
     "volume": "Volumen {{number}}",
     "lockedHint": "No incluido en tus compras.",
     "finished": "Leído",
-    "percentRead": "{{progress}}% leído"
+    "percentRead": "{{progress}}% leído",
+    "accessError": "No se pudo confirmar tu acceso. Comprueba tu conexión a internet."
   },
   "workspace": {
     "welcome": "Sigue preparando lo que Dios puso en tu corazón.",
