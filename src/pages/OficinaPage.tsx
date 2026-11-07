@@ -1,16 +1,13 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { ToolError, ToolWait } from "@/components/ToolKit";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
 import { useAi } from "@/hooks/use-ai";
-import { Sparkles, Save, Loader2, BookOpen, Lightbulb, MessageCircle, Copy, Download, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { escapeHtml } from "@/lib/utils";
+import { copySermonText, downloadSermonTxt, printSermon } from "@/lib/sermon-export";
 import "./WorkspaceDesign.css";
 
 const tempoMarks = [5, 10, 15, 20, 30, 45, 60, 90, 120];
@@ -28,40 +25,60 @@ interface EsbocoResult {
   conclusao: string;
 }
 
-const SectionCard = ({ id, titulo, icone, children }: { id?: string; titulo: string; icone: React.ReactNode; children: React.ReactNode }) => (
-  <div id={id} className="ed-panel">
-    <div className="flex items-center gap-2">
-      {icone}
-      <h3 className="ed-panel-title">{titulo}</h3>
-    </div>
-    <div className="ed-panel-body">{children}</div>
-  </div>
-);
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+const PROGRESS_KEY = "fc-oficina-atual";
+
+type Saved = { titulo: string; textoBase: string; tema: string; tipo: string; tempoIdx: number[]; resultado: EsbocoResult | null; conteudoEditavel: string; modoEdicao: boolean };
+
+function readSaved(): Partial<Saved> {
+  try {
+    return JSON.parse(localStorage.getItem(PROGRESS_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
 
 const OficinaPage = () => {
-  const { t } = useTranslation();
-  const [titulo, setTitulo] = useState("");
-  const [textoBase, setTextoBase] = useState("");
-  const [tema, setTema] = useState("");
-  const [tipo, setTipo] = useState("");
-  const [tempoIdx, setTempoIdx] = useState([2]);
-  const [resultado, setResultado] = useState<EsbocoResult | null>(null);
-  const [modoEdicao, setModoEdicao] = useState(false);
-  const [conteudoEditavel, setConteudoEditavel] = useState("");
-  const { callAi, loading } = useAi();
+  const { t, i18n } = useTranslation();
+  // Um esboço custa uma consulta de IA: recarregar a página não pode jogá-lo fora.
+  const [saved] = useState(readSaved);
+  const [titulo, setTitulo] = useState(saved.titulo ?? "");
+  const [textoBase, setTextoBase] = useState(saved.textoBase ?? "");
+  const [tema, setTema] = useState(saved.tema ?? "");
+  const [tipo, setTipo] = useState(saved.tipo ?? "");
+  const [tempoIdx, setTempoIdx] = useState(saved.tempoIdx ?? [2]);
+  const [resultado, setResultado] = useState<EsbocoResult | null>(saved.resultado ?? null);
+  const [modoEdicao, setModoEdicao] = useState(saved.modoEdicao ?? false);
+  const [conteudoEditavel, setConteudoEditavel] = useState(saved.conteudoEditavel ?? "");
+  const [faltaTema, setFaltaTema] = useState(false);
+  const temaRef = useRef<HTMLInputElement>(null);
+  const { callAi, loading, failed } = useAi();
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify({ titulo, textoBase, tema, tipo, tempoIdx, resultado, conteudoEditavel, modoEdicao } satisfies Saved));
+    } catch { /* armazenamento indisponível */ }
+  }, [titulo, textoBase, tema, tipo, tempoIdx, resultado, conteudoEditavel, modoEdicao]);
 
   const temas = [t("garimpo.suggestionAnxiety"), t("mural.categoryFamily"), t("garimpo.suggestionFaith"), t("garimpo.suggestionLove"), t("garimpo.suggestionHope"), t("garimpo.suggestionForgiveness"), t("workspace.holiness"), t("workspace.missions")];
   const tipos = t("workspace.types", { returnObjects: true }) as string[];
-  const journeySteps = t("workspace.journey.steps", { returnObjects: true }) as string[];
-
   const minutos = sliderToMinutes(tempoIdx[0]);
+  const emEstudio = (resultado || modoEdicao) && !loading;
 
   const handleGenerateAi = async () => {
+    if (!titulo.trim()) {
+      setFaltaTema(true);
+      temaRef.current?.focus();
+      return;
+    }
+    setFaltaTema(false);
     setResultado(null);
     setModoEdicao(false);
     const result = await callAi("gerar-esboco", { titulo, textoBase, tema, tipo, tempo: `${minutos} minutos` });
     if (result && typeof result === "object") {
       setResultado(result as unknown as EsbocoResult);
+      document.querySelector("main")?.scrollTo(0, 0);
+      window.scrollTo(0, 0);
     }
   };
 
@@ -76,41 +93,23 @@ const OficinaPage = () => {
     return text;
   };
 
-  const handleCopiar = () => {
-    if (!resultado) return;
-    const texto = modoEdicao ? conteudoEditavel : converterParaTexto(resultado);
-    navigator.clipboard.writeText(texto);
-    toast({ title: t("oficina.copiedNotif"), description: t("oficina.copiedMessage") });
-  };
+  const textoAtual = () => (modoEdicao ? conteudoEditavel : resultado ? converterParaTexto(resultado) : "");
+  const tituloAtual = () => resultado?.titulo || titulo;
 
-  const handleDownloadTxt = () => {
-    if (!resultado) return;
-    const texto = modoEdicao ? conteudoEditavel : converterParaTexto(resultado);
-    const blob = new Blob([texto], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${resultado.titulo || "sermao"}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleCopiar = async () => {
+    if (await copySermonText(textoAtual())) toast({ title: t("oficina.copiedNotif"), description: t("oficina.copiedMessage") });
+    else toast({ title: t("common.error"), description: t("oficina.copyFailed"), variant: "destructive" });
   };
 
   const handleDownloadPdf = () => {
-    if (!resultado) return;
-    const texto = modoEdicao ? conteudoEditavel : converterParaTexto(resultado);
-    const win = window.open("", "_blank");
-    if (!win) return;
-    win.document.write(`
-      <html><head><title>${escapeHtml(resultado.titulo || "")}</title>
-      <style>
-        body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; padding: 20px; line-height: 1.7; color: #333; }
-        h1 { text-align: center; color: #5C3D2E; }
-        pre { white-space: pre-wrap; font-family: Georgia, serif; font-size: 14px; }
-      </style></head>
-      <body><h1>${escapeHtml(resultado.titulo || "")}</h1><pre>${escapeHtml(texto || "")}</pre></body></html>
-    `);
-    win.document.close();
-    setTimeout(() => { win.print(); }, 500);
+    // O texto já começa com título e referência quando vem do gerador: não repetir no corpo.
+    const corpo = textoAtual().split("\n");
+    const semCabecalho = corpo[0] === tituloAtual() ? corpo.slice(corpo[1] === (resultado?.texto_base ?? "") ? 2 : 1).join("\n") : corpo.join("\n");
+    if (printSermon(tituloAtual(), resultado?.texto_base ?? textoBase, semCabecalho, i18n.resolvedLanguage || i18n.language)) {
+      toast({ title: t("oficina.pdfButton"), description: t("oficina.exportPrintHint") });
+    } else {
+      toast({ title: t("common.error"), description: t("oficina.popupBlocked"), variant: "destructive" });
+    }
   };
 
   const irPara = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -120,168 +119,150 @@ const OficinaPage = () => {
   };
 
   const handleSave = (status: "rascunho" | "finalizado") => {
-    const conteudo = modoEdicao ? conteudoEditavel : (resultado ? converterParaTexto(resultado) : "");
-    const sermao = { titulo: resultado?.titulo || titulo, textoBase: resultado?.texto_base || textoBase, tema, tipo, conteudo, status, data: new Date().toISOString() };
-    const existing = JSON.parse(localStorage.getItem("fc-sermoes") || "[]");
+    const sermao = { titulo: tituloAtual(), textoBase: resultado?.texto_base || textoBase, tema, tipo, conteudo: textoAtual(), status, data: new Date().toISOString() };
+    let existing: unknown[] = [];
+    try { existing = JSON.parse(localStorage.getItem("fc-sermoes") || "[]"); } catch { /* lista corrompida recomeça */ }
     existing.push(sermao);
     localStorage.setItem("fc-sermoes", JSON.stringify(existing));
-    setTitulo(""); setTextoBase(""); setTema(""); setTipo(""); setResultado(null); setModoEdicao(false);
+    setTitulo(""); setTextoBase(""); setTema(""); setTipo(""); setResultado(null); setModoEdicao(false); setConteudoEditavel("");
     toast({ title: status === "rascunho" ? t("oficina.draftSaved") : t("oficina.sermonFinalized") });
   };
 
+  const exportar = (
+    <div className="studio-export">
+      <button type="button" onClick={handleCopiar}>{t("oficina.copyButton")}</button>
+      <button type="button" onClick={handleDownloadPdf}>{t("oficina.pdfButton")}</button>
+      <button type="button" onClick={() => downloadSermonTxt(tituloAtual(), textoAtual())}>{t("oficina.txtButton")}</button>
+    </div>
+  );
+
+  const guardar = (
+    <div className="studio-save">
+      <button type="button" className="ed-btn ed-btn-ghost" onClick={() => handleSave("rascunho")}>{t("oficina.saveDraft")}</button>
+      <button type="button" className="ed-btn ed-btn-primary" onClick={() => handleSave("finalizado")}>{t("oficina.finish")}</button>
+    </div>
+  );
+
   return (
-    <PageShell title={resultado || modoEdicao ? t("workspace.studio.title") : t("sidebar.oficina.title")}>
-      <div className={`sermon-workflow ${resultado || modoEdicao ? "studio-active" : "journey-active"}`}>
-        {!resultado && !modoEdicao && <>
-          <div className="journey-rail">
-            {journeySteps.map((step, index) => <div className={index === 0 ? "active" : ""} key={step}><span>{index + 1}</span><small>{step}</small></div>)}
+    <PageShell
+      title={emEstudio ? t("workspace.studio.title") : t("sidebar.oficina.title")}
+      lede={emEstudio ? t("oficina.unsaved") : t("oficina.description")}
+      width={emEstudio ? "wide" : "read"}
+    >
+      {!resultado && !modoEdicao && !loading && (
+        <form className="sheet-form" noValidate onSubmit={(event) => { event.preventDefault(); handleGenerateAi(); }}>
+          <div className="sheet-field">
+            <label className="sheet-numeral" htmlFor="oficina-tema"><span className="ed-num" aria-hidden>I</span>{t("oficina.themeLabel")}</label>
+            <input
+              ref={temaRef}
+              id="oficina-tema"
+              className="ed-field sheet-lead w-full px-1"
+              placeholder={t("oficina.themeInputPlaceholder")}
+              value={titulo}
+              onChange={(event) => { setTitulo(event.target.value); if (event.target.value.trim()) setFaltaTema(false); }}
+              aria-invalid={faltaTema}
+              aria-describedby={faltaTema ? "oficina-tema-erro" : undefined}
+              required
+            />
+            {faltaTema && <p id="oficina-tema-erro" className="ed-error" role="alert">{t("oficina.themeRequired")}</p>}
           </div>
-          <div className="journey-heading"><span>{t("workspace.journey.kicker")}</span><h2>{t("workspace.journey.title")}</h2><p>{t("oficina.description")}</p></div>
-        </>}
 
-        {!resultado && !modoEdicao && <div className="journey-form ed-panel ed-panel-form">
-          <div className="space-y-1.5">
-            <Label className="text-sm font-semibold text-foreground">{t("oficina.themeLabel")}</Label>
-            <Input placeholder={t("oficina.themePlaceholder")} value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+          <div className="sheet-field">
+            <label className="sheet-numeral" htmlFor="oficina-versiculo"><span className="ed-num" aria-hidden>II</span>{t("oficina.verseLabel")}</label>
+            <input id="oficina-versiculo" className="ed-field sheet-lead w-full px-1" placeholder={t("oficina.versePlaceholder")} value={textoBase} onChange={(event) => setTextoBase(event.target.value)} />
           </div>
 
-          <div className="space-y-1.5">
-            <Label className="text-sm font-semibold text-foreground">{t("oficina.verseLabel")}</Label>
-            <Input placeholder={t("oficina.versePlaceholder")} value={textoBase} onChange={(e) => setTextoBase(e.target.value)} />
+          <div className="sheet-field">
+            <p className="sheet-numeral"><span className="ed-num" aria-hidden>III</span>{t("oficina.timeLabel", { minutes: minutos })}</p>
+            <Slider value={tempoIdx} onValueChange={setTempoIdx} min={0} max={tempoMarks.length - 1} step={1} thumbLabel={t("oficina.durationName")} aria-valuetext={`${minutos}`} />
+            <div className="sheet-marks" aria-hidden>{tempoMarks.map((m) => <span key={m}>{m}</span>)}</div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold text-foreground">
-              {t("oficina.timeLabel", { minutes: minutos })}
-            </Label>
-            <Slider value={tempoIdx} onValueChange={setTempoIdx} min={0} max={tempoMarks.length - 1} step={1} className="w-full" />
-            <div className="flex justify-between text-[10px] text-muted-foreground px-1">
-              {tempoMarks.map((m) => <span key={m}>{m}</span>)}
+          <div className="sheet-field sheet-pair">
+            <div>
+              <p className="sheet-numeral" id="oficina-assunto"><span className="ed-num" aria-hidden>IV</span>{t("oficina.subjectLabel")}</p>
+              <Select value={tema} onValueChange={setTema}>
+                <SelectTrigger aria-labelledby="oficina-assunto"><SelectValue placeholder={t("oficina.subjectPlaceholder")} /></SelectTrigger>
+                <SelectContent>{temas.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div>
+              <p className="sheet-numeral" id="oficina-tipo"><span className="ed-num" aria-hidden>V</span>{t("oficina.typeOptional")}</p>
+              <Select value={tipo} onValueChange={setTipo}>
+                <SelectTrigger aria-labelledby="oficina-tipo"><SelectValue placeholder={t("oficina.typeChoose")} /></SelectTrigger>
+                <SelectContent>{tipos.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Select value={tema} onValueChange={setTema}>
-              <SelectTrigger><SelectValue placeholder={t("oficina.themePlaceholder")} /></SelectTrigger>
-              <SelectContent>
-                {temas.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={tipo} onValueChange={setTipo}>
-              <SelectTrigger><SelectValue placeholder={t("oficina.typePlaceholder")} /></SelectTrigger>
-              <SelectContent>
-                {tipos.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
+          {failed && <ToolError />}
+          <button type="submit" className="ed-btn ed-btn-primary sheet-submit">{failed ? t("common.retry") : t("oficina.generateButton")}</button>
+        </form>
+      )}
 
-          <Button onClick={handleGenerateAi} disabled={loading} className="w-full gap-2">
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            {loading ? t("oficina.generating") : t("oficina.generateButton")}
-          </Button>
-        </div>}
+      {loading && <ToolWait label={t("oficina.generating")} />}
 
-        {loading && (
-          <div className="flex items-center justify-center py-12 gap-3 text-muted-foreground">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            <span className="text-sm">{t("common.loading")}</span>
-          </div>
-        )}
+      {resultado && !loading && !modoEdicao && (
+        <div className="studio-shell">
+          <nav className="studio-outline" aria-label={t("oficina.contents")}>
+            <span className="ed-eyebrow">{t("oficina.contents")}</span>
+            <ol>
+              <li><button type="button" onClick={() => irPara("sec-intro")}>{t("oficina.introduction")}</button></li>
+              {resultado.pontos.map((p, i) => <li key={p.titulo}><button type="button" onClick={() => irPara(`sec-ponto-${i}`)}>{p.titulo}</button></li>)}
+              <li><button type="button" onClick={() => irPara("sec-aplicacao")}>{t("oficina.application")}</button></li>
+              <li><button type="button" onClick={() => irPara("sec-conclusao")}>{t("oficina.conclusion")}</button></li>
+            </ol>
+            {exportar}
+            <button type="button" className="ed-link" onClick={() => setResultado(null)}>{t("oficina.backToForm")}</button>
+          </nav>
 
-        {resultado && !loading && !modoEdicao && (
-          <div className="studio-shell animate-fade-in">
-            <aside className="studio-outline">
-              <span className="studio-panel-label">{t("workspace.studio.message")}</span>
-              <button onClick={() => irPara("sec-intro")}><b>01</b>{t("oficina.introduction")}</button>
-              {resultado.pontos.map((p, i) => <button key={p.titulo} onClick={() => irPara(`sec-ponto-${i}`)}><b>0{i + 2}</b>{p.titulo}</button>)}
-              <button onClick={() => irPara("sec-conclusao")}><b>0{resultado.pontos.length + 2}</b>{t("oficina.conclusion")}</button>
-              <div className="studio-sources"><span>{t("workspace.studio.sources")}</span><p><BookOpen />{resultado.texto_base}</p><p><Lightbulb />{tema || tipo}</p></div>
-            </aside>
-            <div className="studio-document">
-            <div className="text-center space-y-1">
+          <article className="studio-document">
+            <header>
               <h2 className="ed-result-title">{resultado.titulo}</h2>
-              {resultado.texto_base && <p className="text-sm text-muted-foreground">{resultado.texto_base}</p>}
-            </div>
+              {resultado.texto_base && <p>{resultado.texto_base}</p>}
+            </header>
 
-            <SectionCard id="sec-intro" titulo={t("oficina.introduction")} icone={<BookOpen className="w-4 h-4 text-primary" />}>
-              <p className="font-medium mb-1">{resultado.introducao.gancho}</p>
+            <section id="sec-intro">
+              <h3 className="studio-eyebrow">{t("oficina.introduction")}</h3>
+              <p className="studio-hook">{resultado.introducao.gancho}</p>
               <p>{resultado.introducao.contextualizacao}</p>
-            </SectionCard>
+            </section>
 
             {resultado.pontos.map((p, i) => (
-              <div key={i} id={`sec-ponto-${i}`} className="ed-panel">
-                <h3 className="ed-panel-title">{i + 1}. {p.titulo}</h3>
-                <p className="ed-panel-body">{p.conteudo}</p>
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {p.versiculos.map((v, j) => (
-                    <span key={j} className="ed-chip">{v}</span>
-                  ))}
-                </div>
-              </div>
+              <section key={i} id={`sec-ponto-${i}`}>
+                <h3 className="studio-point"><span className="ed-num" aria-hidden>{ROMAN[i] ?? i + 1}</span>{p.titulo}</h3>
+                <p>{p.conteudo}</p>
+                {p.versiculos.length > 0 && <p className="studio-refs">{p.versiculos.join(" · ")}</p>}
+              </section>
             ))}
 
-            <SectionCard titulo={t("oficina.application")} icone={<Lightbulb className="w-4 h-4 text-primary" />}>
+            <section id="sec-aplicacao">
+              <h3 className="studio-eyebrow">{t("oficina.application")}</h3>
               <p>{resultado.aplicacao_pratica}</p>
-            </SectionCard>
-
-            <SectionCard id="sec-conclusao" titulo={t("oficina.conclusion")} icone={<MessageCircle className="w-4 h-4 text-primary" />}>
+            </section>
+            <section id="sec-conclusao">
+              <h3 className="studio-eyebrow">{t("oficina.conclusion")}</h3>
               <p>{resultado.conclusao}</p>
-            </SectionCard>
+            </section>
 
-            <div className="grid grid-cols-3 gap-2">
-              <Button variant="outline" size="sm" className="gap-1.5" onClick={handleCopiar}>
-                <Copy className="w-3.5 h-3.5" /> {t("oficina.copyButton")}
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1.5" onClick={handleDownloadPdf}>
-                <Download className="w-3.5 h-3.5" /> {t("oficina.pdfButton")}
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1.5" onClick={handleDownloadTxt}>
-                <FileText className="w-3.5 h-3.5" /> {t("oficina.txtButton")}
-              </Button>
-            </div>
+            <footer className="studio-footer">
+              <button type="button" className="ed-link" onClick={handleEditar}>{t("oficina.editFull")}</button>
+              {guardar}
+            </footer>
+          </article>
+        </div>
+      )}
 
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={handleEditar}>✏️ {t("oficina.editButton")}</Button>
-              <Button variant="outline" className="flex-1 gap-2" onClick={() => handleSave("rascunho")}>
-                <Save className="w-4 h-4" /> {t("oficina.draftButton")}
-              </Button>
-              <Button className="flex-1" onClick={() => handleSave("finalizado")}>{t("oficina.finalButton")}</Button>
-            </div>
-            </div>
-            <aside className="studio-assistant">
-              <div className="studio-assistant-title"><Sparkles /> <strong>{t("workspace.studio.assistant")}</strong></div>
-              <span>{t("workspace.studio.working")}</span>
-              <h3>{resultado.pontos[0]?.titulo || resultado.titulo}</h3>
-              <p>{t("workspace.studio.help")}</p>
-              <button onClick={handleEditar}>✏️ {t("workspace.studio.fullEditor")}</button>
-            </aside>
+      {modoEdicao && !loading && (
+        <div className="studio-editor">
+          <div className="studio-editor-bar">
+            <button type="button" className="ed-link" onClick={() => setModoEdicao(false)}>← {t("oficina.backToSheet")}</button>
+            {exportar}
           </div>
-        )}
-
-        {modoEdicao && (
-          <div className="flex flex-col gap-4 animate-fade-in">
-            <Textarea className="min-h-[400px]" value={conteudoEditavel} onChange={(e) => setConteudoEditavel(e.target.value)} />
-            <div className="grid grid-cols-3 gap-2">
-              <Button variant="outline" size="sm" className="gap-1.5" onClick={handleCopiar}>
-                <Copy className="w-3.5 h-3.5" /> {t("oficina.copyButton")}
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1.5" onClick={handleDownloadPdf}>
-                <Download className="w-3.5 h-3.5" /> {t("oficina.pdfButton")}
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1.5" onClick={handleDownloadTxt}>
-                <FileText className="w-3.5 h-3.5" /> {t("oficina.txtButton")}
-              </Button>
-            </div>
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={() => setModoEdicao(false)}>← {t("oficina.backButton")}</Button>
-              <Button variant="outline" className="flex-1 gap-2" onClick={() => handleSave("rascunho")}>
-                <Save className="w-4 h-4" /> {t("oficina.draftButton")}
-              </Button>
-              <Button className="flex-1" onClick={() => handleSave("finalizado")}>{t("oficina.finalButton")}</Button>
-            </div>
-          </div>
-        )}
-      </div>
+          <Textarea aria-label={t("oficina.editFull")} value={conteudoEditavel} onChange={(event) => setConteudoEditavel(event.target.value)} />
+          {guardar}
+        </div>
+      )}
     </PageShell>
   );
 };

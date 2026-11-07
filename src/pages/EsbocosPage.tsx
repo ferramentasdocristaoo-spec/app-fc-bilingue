@@ -1,12 +1,12 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
 import { Input } from "@/components/ui/input";
-import { Search, Copy, Download, FileText, X, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { escapeHtml } from "@/lib/utils";
+import { copySermonText, downloadSermonTxt, printSermon } from "@/lib/sermon-export";
 
 interface Sermao {
   titulo: string;
@@ -18,138 +18,120 @@ interface Sermao {
   data: string;
 }
 
+function readSermons(): Sermao[] {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("fc-sermoes") || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 const EsbocosPage = () => {
   const { t, i18n } = useTranslation();
+  const language = i18n.resolvedLanguage || i18n.language;
   const [busca, setBusca] = useState("");
-  const [sermoes, setSermoes] = useState<Sermao[]>(() =>
-    JSON.parse(localStorage.getItem("fc-sermoes") || "[]")
-  );
+  const [sermoes, setSermoes] = useState<Sermao[]>(readSermons);
   const [selecionado, setSelecionado] = useState<Sermao | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
 
   const filtrados = useMemo(() => {
-    if (!busca) return sermoes;
-    const q = busca.toLowerCase();
-    return sermoes.filter(
-      (s) => s.titulo.toLowerCase().includes(q) || s.tema.toLowerCase().includes(q) || s.conteudo.toLowerCase().includes(q)
-    );
+    const q = busca.trim().toLocaleLowerCase();
+    if (!q) return sermoes;
+    return sermoes.filter((s) => [s.titulo, s.tema, s.textoBase, s.conteudo].some((campo) => (campo ?? "").toLocaleLowerCase().includes(q)));
   }, [busca, sermoes]);
 
-  const handleCopiar = () => {
-    if (!selecionado) return;
-    navigator.clipboard.writeText(selecionado.conteudo);
-    toast({ title: t("esbocos.copiedNotif"), description: t("esbocos.copiedMessage") });
-  };
+  const statusLabel = (status: string) => (status === "finalizado" ? t("esbocos.statusFinal") : t("esbocos.statusDraft"));
+  const dataLabel = (data: string) => new Date(data).toLocaleDateString(language, { day: "numeric", month: "long", year: "numeric" });
 
-  const handleDownloadTxt = () => {
+  const handleCopiar = async () => {
     if (!selecionado) return;
-    const blob = new Blob([selecionado.conteudo], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${selecionado.titulo || "sermao"}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    if (await copySermonText(selecionado.conteudo)) toast({ title: t("esbocos.copiedNotif"), description: t("esbocos.copiedMessage") });
+    else toast({ title: t("common.error"), description: t("oficina.copyFailed"), variant: "destructive" });
   };
 
   const handleDownloadPdf = () => {
     if (!selecionado) return;
-    const win = window.open("", "_blank");
-    if (!win) return;
-    win.document.write(`
-      <html><head><title>${escapeHtml(selecionado.titulo || "")}</title>
-      <style>
-        body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; padding: 20px; line-height: 1.7; color: #333; }
-        h1 { text-align: center; color: #5C3D2E; }
-        pre { white-space: pre-wrap; font-family: Georgia, serif; font-size: 14px; }
-      </style></head>
-      <body><h1>${escapeHtml(selecionado.titulo || "")}</h1><pre>${escapeHtml(selecionado.conteudo || "")}</pre></body></html>
-    `);
-    win.document.close();
-    setTimeout(() => win.print(), 500);
+    const linhas = selecionado.conteudo.split("\n");
+    const corpo = linhas[0] === selecionado.titulo ? linhas.slice(linhas[1] === selecionado.textoBase ? 2 : 1).join("\n") : selecionado.conteudo;
+    if (printSermon(selecionado.titulo || t("esbocos.defaultTitle"), selecionado.textoBase, corpo, language)) {
+      toast({ title: t("esbocos.pdfButton"), description: t("oficina.exportPrintHint") });
+    } else {
+      toast({ title: t("common.error"), description: t("oficina.popupBlocked"), variant: "destructive" });
+    }
   };
 
-  const handleExcluir = (index: number) => {
-    const novos = sermoes.filter((_, i) => i !== index);
+  const handleExcluir = () => {
+    if (!selecionado) return;
+    const novos = sermoes.filter((s) => s !== selecionado);
     localStorage.setItem("fc-sermoes", JSON.stringify(novos));
     setSermoes(novos);
     setSelecionado(null);
+    setExcluindo(false);
     toast({ title: t("esbocos.deletedNotif"), description: t("esbocos.deletedMessage") });
   };
 
   return (
-    <PageShell title={t("sidebar.esbocos.title")}>
-      <div className="max-w-2xl mx-auto flex flex-col gap-4">
-        <p className="ed-lede">{t("esbocos.description")}</p>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder={t("esbocos.searchPlaceholder")} className="pl-10" value={busca} onChange={(e) => setBusca(e.target.value)} />
+    <PageShell title={t("sidebar.esbocos.title")} lede={sermoes.length > 0 ? t("esbocos.description") : undefined}>
+      {sermoes.length === 0 ? (
+        <div className="ed-void">
+          <h2>{t("esbocos.emptyTitle")}</h2>
+          <p>{t("esbocos.emptyHint")}</p>
+          <Link to="/oficina" className="ed-btn ed-btn-primary">{t("esbocos.emptyAction")}</Link>
         </div>
-
-        {filtrados.length === 0 ? (
-          <p className="text-center text-muted-foreground text-sm py-8">{t("esbocos.emptyState")}</p>
-        ) : (
-          filtrados.map((s, i) => (
-            <div
-              key={i}
-              className="menu-card flex-col items-start gap-2 cursor-pointer hover:border-primary/50 transition-colors"
-              onClick={() => setSelecionado(s)}
-            >
-              <div className="flex items-center justify-between w-full">
-                <h3 className="font-semibold text-sm text-foreground">{s.titulo || t("esbocos.defaultTitle")}</h3>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${s.status === "finalizado" ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
-                  {s.status}
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground">{s.textoBase} • {s.tema}</p>
-              <p className="text-xs text-muted-foreground">{new Date(s.data).toLocaleDateString(i18n.language)}</p>
-            </div>
-          ))
-        )}
-      </div>
+      ) : (
+        <>
+          <Input type="search" aria-label={t("esbocos.searchPlaceholder")} placeholder={t("esbocos.searchPlaceholder")} value={busca} onChange={(e) => setBusca(e.target.value)} />
+          {filtrados.length === 0 ? (
+            <p className="ed-empty mt-8">{t("esbocos.emptyState")}</p>
+          ) : (
+            <ul className="sermon-list">
+              {filtrados.map((s) => (
+                <li key={`${s.data}-${s.titulo}`}>
+                  <button type="button" onClick={() => setSelecionado(s)}>
+                    <strong>{s.titulo || t("esbocos.defaultTitle")}</strong>
+                    {s.textoBase && <em>{s.textoBase}</em>}
+                    <small>{statusLabel(s.status)} · {dataLabel(s.data)}{s.tema ? ` · ${s.tema}` : ""}</small>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
 
       <Dialog open={!!selecionado} onOpenChange={(open) => !open && setSelecionado(null)}>
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-primary font-display">{selecionado?.titulo || t("esbocos.defaultTitle")}</DialogTitle>
+        <DialogContent className="max-h-[90dvh] max-w-2xl overflow-y-auto rounded-sm">
+          <DialogHeader className="text-left">
+            <DialogTitle className="ed-result-title pr-8">{selecionado?.titulo || t("esbocos.defaultTitle")}</DialogTitle>
           </DialogHeader>
           {selecionado && (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span>{selecionado.textoBase}</span>
-                <span>•</span>
-                <span>{selecionado.tema}</span>
-                <span>•</span>
-                <span>{new Date(selecionado.data).toLocaleDateString(i18n.language)}</span>
+            <div className="sermon-open">
+              <p className="sermon-meta">{statusLabel(selecionado.status)} · {dataLabel(selecionado.data)}{selecionado.tema ? ` · ${selecionado.tema}` : ""}</p>
+              <div className="studio-export">
+                <button type="button" onClick={handleCopiar}>{t("esbocos.copyButton")}</button>
+                <button type="button" onClick={handleDownloadPdf}>{t("esbocos.pdfButton")}</button>
+                <button type="button" onClick={() => downloadSermonTxt(selecionado.titulo, selecionado.conteudo)}>{t("esbocos.txtButton")}</button>
               </div>
-              <pre className="text-sm text-foreground whitespace-pre-wrap leading-relaxed bg-muted/30 rounded-lg p-4">
-                {selecionado.conteudo}
-              </pre>
-              <div className="grid grid-cols-3 gap-2">
-                <Button variant="outline" size="sm" className="gap-1.5" onClick={handleCopiar}>
-                  <Copy className="w-3.5 h-3.5" /> {t("esbocos.copyButton")}
-                </Button>
-                <Button variant="outline" size="sm" className="gap-1.5" onClick={handleDownloadPdf}>
-                  <Download className="w-3.5 h-3.5" /> {t("esbocos.pdfButton")}
-                </Button>
-                <Button variant="outline" size="sm" className="gap-1.5" onClick={handleDownloadTxt}>
-                  <FileText className="w-3.5 h-3.5" /> {t("esbocos.txtButton")}
-                </Button>
-              </div>
-              <Button
-                variant="destructive"
-                size="sm"
-                className="gap-1.5"
-                onClick={() => {
-                  const idx = sermoes.indexOf(selecionado);
-                  if (idx >= 0) handleExcluir(idx);
-                }}
-              >
-                <Trash2 className="w-3.5 h-3.5" /> {t("esbocos.deleteButton")}
-              </Button>
+              <div className="sermon-text">{selecionado.conteudo}</div>
+              <button type="button" className="sermon-delete" onClick={() => setExcluindo(true)}>{t("esbocos.deleteButton")}</button>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={excluindo} onOpenChange={setExcluindo}>
+        <AlertDialogContent className="rounded-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display text-2xl">{t("esbocos.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("esbocos.deleteHint")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleExcluir} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{t("esbocos.deleteButton")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageShell>
   );
 };
