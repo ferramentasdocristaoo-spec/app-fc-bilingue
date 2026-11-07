@@ -631,7 +631,7 @@
       "openBible": "Coordonnées et degré d'identification des lieux bibliques.",
       "naturalEarth": "Côtes, fleuves et lacs de la carte de base.",
       "engravings": "Gravures",
-      "engravingsNote": "Gravures sur bois de Die Bibel in Bildern (1860), vérifiées une à une sur Wikimedia Commons.",
+      "engravingsNote": "Gravures sur bois du XIXe siècle, vérifiées une à une sur Wikimedia Commons.",
       "tabernacle": "Illustration du tabernacle",
       "tabernacleNote": "Générée par intelligence artificielle en 2026, avec une chromolithographie de la Bible Holman (1890) comme référence de style et Exode 25–27 comme référence de contenu. C'est une reconstitution illustrative.",
       "texts": "Textes du Parcours",
@@ -646,7 +646,7 @@
     "placesLabel": "Lieux",
     "referencesLabel": "À lire aussi",
     "notesSaved": "Enregistrées sur cet appareil.",
-    "sourcesPublicDomain": "Toutes dans le domaine public, de Julius Schnorr von Carolsfeld, 1860 :"
+    "sourcesPublicDomain": "Toutes dans le domaine public. Sauf mention, de Julius Schnorr von Carolsfeld, 1860 :"
   },
   "tools": {
     "youGet": "Ce que vous recevrez",

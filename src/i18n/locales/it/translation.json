@@ -631,7 +631,7 @@
       "openBible": "Coordinate e grado di identificazione dei luoghi biblici.",
       "naturalEarth": "Coste, fiumi e laghi della mappa di base.",
       "engravings": "Incisioni",
-      "engravingsNote": "Xilografie da Die Bibel in Bildern (1860), verificate una per una su Wikimedia Commons.",
+      "engravingsNote": "Xilografie del XIX secolo, verificate una per una su Wikimedia Commons.",
       "tabernacle": "Illustrazione del tabernacolo",
       "tabernacleNote": "Generata con intelligenza artificiale nel 2026, con una cromolitografia della Bibbia Holman (1890) come riferimento di stile ed Esodo 25–27 come riferimento di contenuto. È una ricostruzione illustrativa.",
       "texts": "Testi del Viaggio",
@@ -646,7 +646,7 @@
     "placesLabel": "Luoghi",
     "referencesLabel": "Leggi anche",
     "notesSaved": "Salvate su questo dispositivo.",
-    "sourcesPublicDomain": "Tutte di pubblico dominio, di Julius Schnorr von Carolsfeld, 1860:"
+    "sourcesPublicDomain": "Tutte di pubblico dominio. Salvo indicazione, di Julius Schnorr von Carolsfeld, 1860:"
   },
   "tools": {
     "youGet": "Cosa riceverai",

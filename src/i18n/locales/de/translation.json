@@ -631,7 +631,7 @@
       "openBible": "Koordinaten und Grad der Identifizierung biblischer Orte.",
       "naturalEarth": "Küsten, Flüsse und Seen der Grundkarte.",
       "engravings": "Stiche",
-      "engravingsNote": "Holzschnitte aus „Die Bibel in Bildern“ (1860), einzeln auf Wikimedia Commons geprüft.",
+      "engravingsNote": "Holzstiche aus dem 19. Jahrhundert, einzeln auf Wikimedia Commons geprüft.",
       "tabernacle": "Illustration der Stiftshütte",
       "tabernacleNote": "2026 mit künstlicher Intelligenz erzeugt, mit einer Chromolithografie aus der Holman-Bibel (1890) als Stilvorlage und 2. Mose 25–27 als inhaltlicher Vorlage. Sie ist eine illustrative Rekonstruktion.",
       "texts": "Texte der Reise",
@@ -646,7 +646,7 @@
     "placesLabel": "Orte",
     "referencesLabel": "Siehe auch",
     "notesSaved": "Auf diesem Gerät gespeichert.",
-    "sourcesPublicDomain": "Alle gemeinfrei, von Julius Schnorr von Carolsfeld, 1860:"
+    "sourcesPublicDomain": "Alle gemeinfrei. Sofern nicht anders angegeben, von Julius Schnorr von Carolsfeld, 1860:"
   },
   "tools": {
     "youGet": "Was Sie erhalten",

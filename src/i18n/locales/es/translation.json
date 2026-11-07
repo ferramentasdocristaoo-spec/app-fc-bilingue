@@ -631,7 +631,7 @@
       "openBible": "Coordenadas y grado de identificación de los lugares bíblicos.",
       "naturalEarth": "Costas, ríos y lagos del mapa base.",
       "engravings": "Grabados",
-      "engravingsNote": "Xilografías de Die Bibel in Bildern (1860), comprobadas una a una en Wikimedia Commons.",
+      "engravingsNote": "Xilografías del siglo XIX, verificadas una a una en Wikimedia Commons.",
       "tabernacle": "Ilustración del Tabernáculo",
       "tabernacleNote": "Generada por inteligencia artificial en 2026, con una cromolitografía de la Biblia Holman (1890) como referencia de estilo y Éxodo 25–27 como referencia de contenido. Es una reconstrucción ilustrativa.",
       "texts": "Textos de la Jornada",
@@ -646,7 +646,7 @@
     "placesLabel": "Lugares",
     "referencesLabel": "Leer también",
     "notesSaved": "Guardadas en este dispositivo.",
-    "sourcesPublicDomain": "Todas de dominio público, de Julius Schnorr von Carolsfeld, 1860:"
+    "sourcesPublicDomain": "Todas de dominio público. Salvo indicación, de Julius Schnorr von Carolsfeld, 1860:"
   },
   "tools": {
     "youGet": "Lo que recibirás",

@@ -33,7 +33,7 @@ export default function JornadaFontesPage() {
         <p>{t("journey.sourcesPage.engravingsNote")}</p>
         <p>{t("journey.sourcesPublicDomain")}</p>
         <ul>
-          {figures.map(figure => <li key={figure.src}><a href={figure.sourceUrl} {...external}>{figure.title[language]}</a></li>)}
+          {figures.map(figure => <li key={figure.src}><a href={figure.sourceUrl} {...external}>{figure.title[language]}</a>{figure.artist !== "Julius Schnorr von Carolsfeld" && <span> · {figure.artist}, {figure.year}</span>}</li>)}
         </ul>
       </section>
 

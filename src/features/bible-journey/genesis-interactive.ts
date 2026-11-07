@@ -124,8 +124,8 @@ export const genesisInteractive: Record<string, JourneyInteractiveSection> = {
       explanation: L("No sexto dia (Gn 1:27–31). No sétimo, Deus descansa e santifica o dia (Gn 2:2–3).", "On the sixth day (Gen 1:27–31). On the seventh, God rests and blesses the day (Gen 2:2–3).", "El sexto día (Gn 1:27-31). En el séptimo, Dios descansa y santifica el día (Gn 2:2-3).", "Le sixième jour (Gn 1,27-31). Le septième, Dieu se repose et bénit ce jour (Gn 2,2-3).", "Il sesto giorno (Gen 1,27-31). Il settimo, Dio si riposa e benedice quel giorno (Gen 2,2-3).", "Am sechsten Tag (1. Mose 1,27–31). Am siebten ruht Gott und segnet den Tag (1. Mose 2,2–3)."),
     },
     family: { ref: { chapter: 2, verse: 22, endVerse: 24 }, root: { person: "adam", spouses: ["eve"] } },
-    figure: { src: "/jornada/genesis/schnorr-003-criacao.webp", width: 720, height: 599, artist: "Julius Schnorr von Carolsfeld", year: "1860", license: "PD", sourceUrl: "https://commons.wikimedia.org/wiki/File:Schnorr_von_Carolsfeld_Bibel_in_Bildern_1860_003.png",
-      title: L("A terra e as plantas (3.º dia)", "The land and plants (third day)", "La tierra y las plantas (tercer día)", "La terre et les plantes (troisième jour)", "La terra e le piante (terzo giorno)", "Das Land und die Pflanzen (dritter Tag)") },
+    figure: { src: "/jornada/genesis/dore-001-criacao-da-luz.webp", width: 720, height: 908, artist: "Gustave Doré", year: "1866", license: "PD", sourceUrl: "https://commons.wikimedia.org/wiki/File:001.The_Creation_of_Light.jpg",
+      title: L("A criação da luz", "The creation of light", "La creación de la luz", "La création de la lumière", "La creazione della luce", "Die Erschaffung des Lichts") },
     era: [],
   },
   fall: {
