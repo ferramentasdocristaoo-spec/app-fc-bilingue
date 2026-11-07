@@ -35,7 +35,7 @@
   border-bottom: 1px solid hsl(var(--rule));
 }
 .journey-toc-head .ed-num { font-size: 1rem; }
-.journey-toc-head h3 { margin: 0; font: 600 clamp(1.625rem, 4vw, 2rem)/1.15 var(--font-display); }
+.journey-toc-head h2 { margin: 0; font: 600 clamp(1.625rem, 4vw, 2rem)/1.15 var(--font-display); }
 .journey-toc-head p { margin: 4px 0 0; font: italic 400 1rem/1.5 var(--font-text); color: hsl(var(--ink-2)); }
 .journey-toc-head small { font: 500 0.8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); white-space: nowrap; }
 
@@ -88,7 +88,7 @@
 }
 .journey-bignum {
   font: 500 clamp(4rem, 12vw, 6.5rem)/0.8 var(--font-display);
-  color: hsl(var(--gold));
+  color: hsl(var(--gold-ink));
   font-variant-numeric: lining-nums;
 }
 .journey-opener-title h1 {

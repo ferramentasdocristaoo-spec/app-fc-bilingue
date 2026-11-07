@@ -51,14 +51,14 @@ export default function JornadaPage() {
           <header className="journey-toc-head">
             <span className="ed-num">{testament.numeral}</span>
             <div>
-              <h3 id={`${testament.slug}-title`}>{testament.title}</h3>
+              <h2 id={`${testament.slug}-title`}>{testament.title}</h2>
               <p>{testament.description}</p>
             </div>
             <small>{count} {t("journey.books")}</small>
           </header>
 
           {testament.groups.map((group) => <div className="journey-toc-group" key={`${testament.slug}-${group.category}-${group.books[0].slug}`}>
-            <h4 className="ed-eyebrow">{journeyCategoryLabel(group.category, language)}</h4>
+            <h3 className="ed-eyebrow">{journeyCategoryLabel(group.category, language)}</h3>
             <ol>
               {group.books.map((book) => {
                 const overview = book.overview[language];

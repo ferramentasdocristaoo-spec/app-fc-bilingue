@@ -24,7 +24,7 @@
 .jstep-bar i { display: block; height: 100%; background: hsl(var(--gold)); transition: width .3s ease; }
 .jstep-num { font: 500 0.875rem/1.2 var(--font-brand); letter-spacing: .06em; color: hsl(var(--gold-ink)); }
 .jstep-title { font: 600 1.0625rem/1.25 var(--font-display); color: hsl(var(--ink-2)); }
-.jstep-meta { font: 400 0.75rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
+.jstep-meta { font: 400 0.8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
 .jstep-check { color: hsl(var(--gold-ink)); font-weight: 600; }
 .jstep-item:hover .jstep-title { color: hsl(var(--ink)); }
 .jstep-item.is-done .jstep-title { color: hsl(var(--ink)); }
@@ -57,7 +57,7 @@
 .jstage { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 32px; align-items: start; }
 @media (min-width: 900px) { .jstage { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 0; } .jstage-stop { padding-left: 28px; margin-left: 28px; border-left: 1px solid hsl(var(--rule)); } }
 .jstage-map { margin: 0; border: 1px solid hsl(var(--rule)); border-radius: 4px; overflow: hidden; background: hsl(var(--journey-sea)); }
-.jstage-map figcaption { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px 12px; background: hsl(var(--paper-2)); border-top: 1px solid hsl(var(--rule)); font: 400 0.75rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.jstage-map figcaption { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px 12px; background: hsl(var(--paper-2)); border-top: 1px solid hsl(var(--rule)); font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
 
 .jmap { display: block; width: 100%; height: auto; aspect-ratio: 1000 / 765; touch-action: manipulation; }
 .jmap-sea { fill: hsl(var(--journey-sea)); }
@@ -170,7 +170,7 @@
 /* No escuro a gravura fica como prancha clara, ligeiramente atenuada (sem inverter a obra). */
 :root:not(.light) .jfigure img { filter: brightness(.86) sepia(.12); }
 .jfigure-missing { aspect-ratio: 6 / 5; border: 1px dashed hsl(var(--rule)); border-radius: 4px; background: repeating-linear-gradient(45deg, hsl(var(--gold) / .06) 0 12px, transparent 12px 24px); }
-.jfigure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.75rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.jfigure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
 .jfigure figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
 .jfigure figcaption a { color: hsl(var(--gold-ink)); text-decoration: none; }
 
@@ -187,10 +187,10 @@
 .jtab-pin:hover { background: #7a2e3a; }
 .jtab-pin.is-active { background: #8a2a3a; transform: scale(1.15); }
 .jtab-pin:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 2px; }
-.jtab-figure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.75rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.jtab-figure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
 .jtab-figure figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
 .jtab-plan { margin-top: 24px; }
-.jtab-plan figcaption { font: 400 0.75rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); margin-top: 8px; }
+.jtab-plan figcaption { font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); margin-top: 8px; }
 .jtab-plan figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
 .jtab-plan svg { display: block; width: 100%; height: auto; margin-top: 8px; }
 .jtab-room { fill: hsl(var(--paper-2)); stroke: hsl(var(--ink-2)); stroke-width: 1.5; }

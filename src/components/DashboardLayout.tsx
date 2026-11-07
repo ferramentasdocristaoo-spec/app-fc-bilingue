@@ -50,7 +50,7 @@ const DashboardLayout = () => {
   return (
     <SidebarProvider defaultOpen={!isMobile}>
       <div className="min-h-screen flex w-full">
-        <AppSidebar />
+        <nav aria-label={t("dashboard.menu")} className="contents"><AppSidebar /></nav>
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-14 flex items-center justify-between gap-1 border-b border-rule-soft bg-background px-1 shrink-0 md:px-6">
             <div className="flex min-w-0 items-center">

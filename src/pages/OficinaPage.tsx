@@ -174,7 +174,7 @@ const OficinaPage = () => {
 
           <div className="sheet-field">
             <p className="sheet-numeral"><span className="ed-num" aria-hidden>III</span>{t("oficina.timeLabel", { minutes: minutos })}</p>
-            <Slider value={tempoIdx} onValueChange={setTempoIdx} min={0} max={tempoMarks.length - 1} step={1} thumbLabel={t("oficina.durationName")} aria-valuetext={`${minutos}`} />
+            <Slider value={tempoIdx} onValueChange={setTempoIdx} min={0} max={tempoMarks.length - 1} step={1} thumbLabel={t("oficina.durationName")} />
             <div className="sheet-marks" aria-hidden>{tempoMarks.map((m) => <span key={m}>{m}</span>)}</div>
           </div>
 
