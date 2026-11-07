@@ -51,22 +51,68 @@ const firstSamuelPlaces: Record<JourneyLanguage, Record<string, string>> = {
   it: { samuel: "Silo · Kiriat-Iearim", monarchy: "Rama · Gàlgala", "saul-fall": "Gàlgala · Valle di Ela", "david-rises": "Betlemme · Ghibea", "david-fugitive": "Deserto di Giuda", "saul-end": "Endor · Monte Gelboe" },
   de: { samuel: "Silo · Kirjat-Jearim", monarchy: "Rama · Gilgal", "saul-fall": "Gilgal · Tal Ela", "david-rises": "Bethlehem · Gibea", "david-fugitive": "Wüste Juda", "saul-end": "En-Dor · Berg Gilboa" },
 };
-const secondSamuelPlaces: Record<JourneyLanguage, Record<string, string>> = Object.fromEntries((["pt-PT","en","es","fr","it","de"] as JourneyLanguage[]).map(language => [language, {
-  judah: "Hebron", "united-kingdom": "Jerusalem", victories: "Jerusalem · Israel", fall: "Jerusalem", "family-crisis": "Jerusalem · Mahanaim", epilogue: "Israel · Jerusalem",
-}])) as Record<JourneyLanguage, Record<string, string>>;
-const firstKingsPlaces: Record<JourneyLanguage, Record<string, string>> = Object.fromEntries((["pt-PT","en","es","fr","it","de"] as JourneyLanguage[]).map(language => [language, {
-  succession: "Jerusalem", "wisdom-temple": "Jerusalem · Temple", "solomon-decline": "Jerusalem", "divided-kingdom": "Jerusalem · Shechem", elijah: "Cherith · Carmel · Horeb", ahab: "Samaria · Jezreel",
-}])) as Record<JourneyLanguage, Record<string, string>>;
-const secondKingsPlaces: Record<JourneyLanguage, Record<string, string>> = Object.fromEntries((["pt-PT","en","es","fr","it","de"] as JourneyLanguage[]).map(language => [language, {
-  "elijah-elisha": "Jordan · Jericho", elisha: "Samaria · Shunem", jehu: "Jezreel · Samaria", "israel-falls": "Samaria · Assyria", "judah-kings": "Jerusalem", "judah-falls": "Jerusalem · Babylon",
-}])) as Record<JourneyLanguage, Record<string, string>>;
-const firstChroniclesPlaces: Record<JourneyLanguage, Record<string, string>> = Object.fromEntries((["pt-PT","en","es","fr","it","de"] as JourneyLanguage[]).map(language => [language, {
-  genealogies: "Israel · Judah", "david-crowned": "Hebron · Jerusalem", ark: "Jerusalem", kingdom: "Israel · Jerusalem", worship: "Jerusalem · Temple", legacy: "Jerusalem",
-}])) as Record<JourneyLanguage, Record<string, string>>;
-const bookPlaces: Record<string, string> = {
-  matthew: "Galilee · Judea · Jerusalem", mark: "Galilee · Jerusalem", luke: "Galilee · Samaria · Jerusalem", john: "Galilee · Judea · Jerusalem", acts: "Jerusalem · Judea · Samaria · Rome",
-  romans: "Rome", "1-corinthians": "Corinth", "2-corinthians": "Corinth · Macedonia", galatians: "Galatia", ephesians: "Ephesus", philippians: "Philippi", colossians: "Colossae", "1-thessalonians": "Thessalonica", "2-thessalonians": "Thessalonica", "1-timothy": "Ephesus", "2-timothy": "Rome", titus: "Crete", philemon: "Colossae",
-  hebrews: "Christian communities", james: "The Diaspora", "1-peter": "Asia Minor", "2-peter": "Asia Minor", "1-john": "Asia Minor", "2-john": "Asia Minor", "3-john": "Asia Minor", jude: "Christian communities", revelation: "Patmos · Asia Minor",
+// Lugares nos 6 idiomas (antes ficavam em inglês em todos). Pendente de revisão humana.
+const secondSamuelPlaces: Record<JourneyLanguage, Record<string, string>> = {
+  "pt-PT": { judah: "Hebrom", "united-kingdom": "Jerusalém", victories: "Jerusalém · Israel", fall: "Jerusalém", "family-crisis": "Jerusalém · Maanaim", epilogue: "Israel · Jerusalém" },
+  en: { judah: "Hebron", "united-kingdom": "Jerusalem", victories: "Jerusalem · Israel", fall: "Jerusalem", "family-crisis": "Jerusalem · Mahanaim", epilogue: "Israel · Jerusalem" },
+  es: { judah: "Hebrón", "united-kingdom": "Jerusalén", victories: "Jerusalén · Israel", fall: "Jerusalén", "family-crisis": "Jerusalén · Mahanaim", epilogue: "Israel · Jerusalén" },
+  fr: { judah: "Hébron", "united-kingdom": "Jérusalem", victories: "Jérusalem · Israël", fall: "Jérusalem", "family-crisis": "Jérusalem · Mahanaïm", epilogue: "Israël · Jérusalem" },
+  it: { judah: "Ebron", "united-kingdom": "Gerusalemme", victories: "Gerusalemme · Israele", fall: "Gerusalemme", "family-crisis": "Gerusalemme · Macanaim", epilogue: "Israele · Gerusalemme" },
+  de: { judah: "Hebron", "united-kingdom": "Jerusalem", victories: "Jerusalem · Israel", fall: "Jerusalem", "family-crisis": "Jerusalem · Mahanajim", epilogue: "Israel · Jerusalem" },
+};
+const firstKingsPlaces: Record<JourneyLanguage, Record<string, string>> = {
+  "pt-PT": { succession: "Jerusalém", "wisdom-temple": "Jerusalém · Templo", "solomon-decline": "Jerusalém", "divided-kingdom": "Jerusalém · Siquém", elijah: "Querite · Carmelo · Horebe", ahab: "Samaria · Jezreel" },
+  en: { succession: "Jerusalem", "wisdom-temple": "Jerusalem · Temple", "solomon-decline": "Jerusalem", "divided-kingdom": "Jerusalem · Shechem", elijah: "Cherith · Carmel · Horeb", ahab: "Samaria · Jezreel" },
+  es: { succession: "Jerusalén", "wisdom-temple": "Jerusalén · Templo", "solomon-decline": "Jerusalén", "divided-kingdom": "Jerusalén · Siquem", elijah: "Querit · Carmelo · Horeb", ahab: "Samaria · Jezreel" },
+  fr: { succession: "Jérusalem", "wisdom-temple": "Jérusalem · Temple", "solomon-decline": "Jérusalem", "divided-kingdom": "Jérusalem · Sichem", elijah: "Kerith · Carmel · Horeb", ahab: "Samarie · Jizreel" },
+  it: { succession: "Gerusalemme", "wisdom-temple": "Gerusalemme · Tempio", "solomon-decline": "Gerusalemme", "divided-kingdom": "Gerusalemme · Sichem", elijah: "Cherit · Carmelo · Oreb", ahab: "Samaria · Izreel" },
+  de: { succession: "Jerusalem", "wisdom-temple": "Jerusalem · Tempel", "solomon-decline": "Jerusalem", "divided-kingdom": "Jerusalem · Sichem", elijah: "Krit · Karmel · Horeb", ahab: "Samaria · Jesreel" },
+};
+const secondKingsPlaces: Record<JourneyLanguage, Record<string, string>> = {
+  "pt-PT": { "elijah-elisha": "Jordão · Jericó", elisha: "Samaria · Suném", jehu: "Jezreel · Samaria", "israel-falls": "Samaria · Assíria", "judah-kings": "Jerusalém", "judah-falls": "Jerusalém · Babilónia" },
+  en: { "elijah-elisha": "Jordan · Jericho", elisha: "Samaria · Shunem", jehu: "Jezreel · Samaria", "israel-falls": "Samaria · Assyria", "judah-kings": "Jerusalem", "judah-falls": "Jerusalem · Babylon" },
+  es: { "elijah-elisha": "Jordán · Jericó", elisha: "Samaria · Sunem", jehu: "Jezreel · Samaria", "israel-falls": "Samaria · Asiria", "judah-kings": "Jerusalén", "judah-falls": "Jerusalén · Babilonia" },
+  fr: { "elijah-elisha": "Jourdain · Jéricho", elisha: "Samarie · Sunem", jehu: "Jizreel · Samarie", "israel-falls": "Samarie · Assyrie", "judah-kings": "Jérusalem", "judah-falls": "Jérusalem · Babylone" },
+  it: { "elijah-elisha": "Giordano · Gerico", elisha: "Samaria · Sunem", jehu: "Izreel · Samaria", "israel-falls": "Samaria · Assiria", "judah-kings": "Gerusalemme", "judah-falls": "Gerusalemme · Babilonia" },
+  de: { "elijah-elisha": "Jordan · Jericho", elisha: "Samaria · Schunem", jehu: "Jesreel · Samaria", "israel-falls": "Samaria · Assyrien", "judah-kings": "Jerusalem", "judah-falls": "Jerusalem · Babylon" },
+};
+const firstChroniclesPlaces: Record<JourneyLanguage, Record<string, string>> = {
+  "pt-PT": { genealogies: "Israel · Judá", "david-crowned": "Hebrom · Jerusalém", ark: "Jerusalém", kingdom: "Israel · Jerusalém", worship: "Jerusalém · Templo", legacy: "Jerusalém" },
+  en: { genealogies: "Israel · Judah", "david-crowned": "Hebron · Jerusalem", ark: "Jerusalem", kingdom: "Israel · Jerusalem", worship: "Jerusalem · Temple", legacy: "Jerusalem" },
+  es: { genealogies: "Israel · Judá", "david-crowned": "Hebrón · Jerusalén", ark: "Jerusalén", kingdom: "Israel · Jerusalén", worship: "Jerusalén · Templo", legacy: "Jerusalén" },
+  fr: { genealogies: "Israël · Juda", "david-crowned": "Hébron · Jérusalem", ark: "Jérusalem", kingdom: "Israël · Jérusalem", worship: "Jérusalem · Temple", legacy: "Jérusalem" },
+  it: { genealogies: "Israele · Giuda", "david-crowned": "Ebron · Gerusalemme", ark: "Gerusalemme", kingdom: "Israele · Gerusalemme", worship: "Gerusalemme · Tempio", legacy: "Gerusalemme" },
+  de: { genealogies: "Israel · Juda", "david-crowned": "Hebron · Jerusalem", ark: "Jerusalem", kingdom: "Israel · Jerusalem", worship: "Jerusalem · Tempel", legacy: "Jerusalem" },
+};
+/** Um lugar por livro (Novo Testamento), nos 6 idiomas. */
+const bookPlaces: Record<string, Record<JourneyLanguage, string>> = {
+  matthew: { "pt-PT": "Galileia · Judeia · Jerusalém", en: "Galilee · Judea · Jerusalem", es: "Galilea · Judea · Jerusalén", fr: "Galilée · Judée · Jérusalem", it: "Galilea · Giudea · Gerusalemme", de: "Galiläa · Judäa · Jerusalem" },
+  mark: { "pt-PT": "Galileia · Jerusalém", en: "Galilee · Jerusalem", es: "Galilea · Jerusalén", fr: "Galilée · Jérusalem", it: "Galilea · Gerusalemme", de: "Galiläa · Jerusalem" },
+  luke: { "pt-PT": "Galileia · Samaria · Jerusalém", en: "Galilee · Samaria · Jerusalem", es: "Galilea · Samaria · Jerusalén", fr: "Galilée · Samarie · Jérusalem", it: "Galilea · Samaria · Gerusalemme", de: "Galiläa · Samaria · Jerusalem" },
+  john: { "pt-PT": "Galileia · Judeia · Jerusalém", en: "Galilee · Judea · Jerusalem", es: "Galilea · Judea · Jerusalén", fr: "Galilée · Judée · Jérusalem", it: "Galilea · Giudea · Gerusalemme", de: "Galiläa · Judäa · Jerusalem" },
+  acts: { "pt-PT": "Jerusalém · Judeia · Samaria · Roma", en: "Jerusalem · Judea · Samaria · Rome", es: "Jerusalén · Judea · Samaria · Roma", fr: "Jérusalem · Judée · Samarie · Rome", it: "Gerusalemme · Giudea · Samaria · Roma", de: "Jerusalem · Judäa · Samaria · Rom" },
+  romans: { "pt-PT": "Roma", en: "Rome", es: "Roma", fr: "Rome", it: "Roma", de: "Rom" },
+  "1-corinthians": { "pt-PT": "Corinto", en: "Corinth", es: "Corinto", fr: "Corinthe", it: "Corinto", de: "Korinth" },
+  "2-corinthians": { "pt-PT": "Corinto · Macedónia", en: "Corinth · Macedonia", es: "Corinto · Macedonia", fr: "Corinthe · Macédoine", it: "Corinto · Macedonia", de: "Korinth · Mazedonien" },
+  galatians: { "pt-PT": "Galácia", en: "Galatia", es: "Galacia", fr: "Galatie", it: "Galazia", de: "Galatien" },
+  ephesians: { "pt-PT": "Éfeso", en: "Ephesus", es: "Éfeso", fr: "Éphèse", it: "Efeso", de: "Ephesus" },
+  philippians: { "pt-PT": "Filipos", en: "Philippi", es: "Filipos", fr: "Philippes", it: "Filippi", de: "Philippi" },
+  colossians: { "pt-PT": "Colossos", en: "Colossae", es: "Colosas", fr: "Colosses", it: "Colossi", de: "Kolossä" },
+  "1-thessalonians": { "pt-PT": "Tessalónica", en: "Thessalonica", es: "Tesalónica", fr: "Thessalonique", it: "Tessalonica", de: "Thessalonich" },
+  "2-thessalonians": { "pt-PT": "Tessalónica", en: "Thessalonica", es: "Tesalónica", fr: "Thessalonique", it: "Tessalonica", de: "Thessalonich" },
+  "1-timothy": { "pt-PT": "Éfeso", en: "Ephesus", es: "Éfeso", fr: "Éphèse", it: "Efeso", de: "Ephesus" },
+  "2-timothy": { "pt-PT": "Roma", en: "Rome", es: "Roma", fr: "Rome", it: "Roma", de: "Rom" },
+  titus: { "pt-PT": "Creta", en: "Crete", es: "Creta", fr: "Crète", it: "Creta", de: "Kreta" },
+  philemon: { "pt-PT": "Colossos", en: "Colossae", es: "Colosas", fr: "Colosses", it: "Colossi", de: "Kolossä" },
+  hebrews: { "pt-PT": "Comunidades cristãs", en: "Christian communities", es: "Comunidades cristianas", fr: "Communautés chrétiennes", it: "Comunità cristiane", de: "Christliche Gemeinden" },
+  james: { "pt-PT": "A Diáspora", en: "The Diaspora", es: "La Diáspora", fr: "La Diaspora", it: "La Diaspora", de: "Die Diaspora" },
+  "1-peter": { "pt-PT": "Ásia Menor", en: "Asia Minor", es: "Asia Menor", fr: "Asie Mineure", it: "Asia Minore", de: "Kleinasien" },
+  jude: { "pt-PT": "Comunidades cristãs", en: "Christian communities", es: "Comunidades cristianas", fr: "Communautés chrétiennes", it: "Comunità cristiane", de: "Christliche Gemeinden" },
+  revelation: { "pt-PT": "Patmos · Ásia Menor", en: "Patmos · Asia Minor", es: "Patmos · Asia Menor", fr: "Patmos · Asie Mineure", it: "Patmo · Asia Minore", de: "Patmos · Kleinasien" },
+  "2-peter": { "pt-PT": "Ásia Menor", en: "Asia Minor", es: "Asia Menor", fr: "Asie Mineure", it: "Asia Minore", de: "Kleinasien" },
+  "1-john": { "pt-PT": "Ásia Menor", en: "Asia Minor", es: "Asia Menor", fr: "Asie Mineure", it: "Asia Minore", de: "Kleinasien" },
+  "2-john": { "pt-PT": "Ásia Menor", en: "Asia Minor", es: "Asia Menor", fr: "Asie Mineure", it: "Asia Minore", de: "Kleinasien" },
+  "3-john": { "pt-PT": "Ásia Menor", en: "Asia Minor", es: "Asia Menor", fr: "Asie Mineure", it: "Asia Minore", de: "Kleinasien" },
 };
 
 const susa = (name: string) => ({ palace: `${name} · palácio`, threat: name, reversal: name, deliverance: name });
@@ -80,6 +126,8 @@ const placesByBook: Record<string, Record<JourneyLanguage, Record<string, string
   "1-samuel": firstSamuelPlaces, "2-samuel": secondSamuelPlaces, "1-kings": firstKingsPlaces, "2-kings": secondKingsPlaces, "1-chronicles": firstChroniclesPlaces, esther: estherPlaces,
 };
 
+const Isr: Record<JourneyLanguage, string> = { "pt-PT": "Israel", en: "Israel", es: "Israel", fr: "Israël", it: "Israele", de: "Israel" };
+
 export function getJourneySectionDetails(book: JourneyBook, section: JourneySection, language: JourneyLanguage): JourneySectionDetails {
   const editorial = book.slug === "genesis" ? genesisJourneyDetails[section.slug]?.[language] : undefined;
   if (editorial) return editorial;
@@ -90,7 +138,7 @@ export function getJourneySectionDetails(book: JourneyBook, section: JourneySect
     characters: overview.characters,
     // Cada livro só lê a sua própria tabela. Antes, qualquer livro fora da lista caía nos lugares
     // do Êxodo e um slug coincidente (ex.: "deliverance" em Ester) mostrava "Mar Vermelho".
-    place: placesByBook[book.slug]?.[language]?.[section.slug] ?? bookPlaces[book.slug] ?? "Israel",
+    place: placesByBook[book.slug]?.[language]?.[section.slug] ?? bookPlaces[book.slug]?.[language] ?? Isr[language],
     connection: overview.principles[sectionIndex % overview.principles.length],
   };
 }

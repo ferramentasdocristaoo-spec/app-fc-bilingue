@@ -179,3 +179,20 @@ describe("Mapa: rótulos", () => {
     expect(boxesTouch(name, dotBox(100, 140, 9))).toBe(false);
   });
 });
+
+describe("lugares traduzidos (2 Samuel, Reis, 1 Crônicas e NT)", async () => {
+  const { getJourneySectionDetails } = await import("@/features/bible-journey/journey-details");
+  const { journeyCatalogRepository } = await import("@/features/bible-journey/catalog");
+  it("não mostra o nome inglês em português e alemão", async () => {
+    for (const slug of ["2-samuel", "1-kings", "2-kings", "1-chronicles", "matthew", "acts", "revelation", "hebrews"]) {
+      const book = await journeyCatalogRepository.getBook(slug);
+      expect(book, slug).toBeTruthy();
+      for (const section of book!.sections) {
+        const pt = getJourneySectionDetails(book!, section, "pt-PT").place;
+        const de = getJourneySectionDetails(book!, section, "de").place;
+        expect(pt, `${slug}/${section.slug}`).not.toMatch(/Jerusalem\b|Galilee|Judea\b|Rome\b|Asia Minor|Christian communities|Temple\b|Shechem|Babylon\b|Assyria/);
+        expect(de, `${slug}/${section.slug}`).not.toMatch(/Galilee|Rome\b|Asia Minor|Christian communities|Temple\b|Assyria/);
+      }
+    }
+  });
+});
