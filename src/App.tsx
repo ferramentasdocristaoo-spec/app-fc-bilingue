@@ -24,7 +24,6 @@ import AdminPage from "./pages/AdminPage.tsx";
 import LivrariaPage from "./pages/LivrariaPage.tsx";
 import ColecaoPage from "./pages/ColecaoPage.tsx";
 import LeitorPage from "./pages/LeitorPage.tsx";
-import LayoutDemoPage from "./pages/LayoutDemoPage.tsx";
 import JornadaPage from "./pages/JornadaPage.tsx";
 import JornadaLivroPage from "./pages/JornadaLivroPage.tsx";
 import JornadaCapituloPage from "./pages/JornadaCapituloPage.tsx";
@@ -35,11 +34,7 @@ const queryClient = new QueryClient();
 const ProtectedRoutes = () => {
   const { email, loading } = useAuth();
   const isAdminRoute = typeof window !== "undefined" && window.location.pathname.startsWith("/fc-control-panel");
-  const isLayoutDemo = typeof window !== "undefined" && window.location.pathname.startsWith("/layout-demo");
 
-  if (isLayoutDemo) {
-    return <Routes><Route path="/layout-demo" element={<LayoutDemoPage />} /></Routes>;
-  }
   if (isAdminRoute) {
     return (
       <Routes>
@@ -80,8 +75,8 @@ const ProtectedRoutes = () => {
         <Route path="/livraria" element={<LivrariaPage />} />
         <Route path="/livraria/:productSlug" element={<ColecaoPage />} />
         <Route path="/livraria/:productSlug/:volumeSlug" element={<LeitorPage />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
-      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
