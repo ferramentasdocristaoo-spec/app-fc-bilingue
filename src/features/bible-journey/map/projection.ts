@@ -30,3 +30,15 @@ export function fitViewBox(points: [number, number][], minWidth = 220, padding =
   const y = Math.min(Math.max(cy - height / 2, 0), MAP_HEIGHT - height);
   return { x, y, width, height };
 }
+
+export interface LabelBox { x1: number; y1: number; x2: number; y2: number }
+
+/** Retângulo aproximado do nome à direita do ponto (largura média de 0,56 em por letra). */
+export function labelBox(x: number, y: number, text: string, fontSize: number, radius: number, gap: number): LabelBox {
+  const start = x + radius + gap;
+  return { x1: start, x2: start + text.length * fontSize * 0.56, y1: y - fontSize * 0.75, y2: y + fontSize * 0.75 };
+}
+
+export const dotBox = (x: number, y: number, radius: number): LabelBox => ({ x1: x - radius, x2: x + radius, y1: y - radius, y2: y + radius });
+
+export const boxesTouch = (a: LabelBox, b: LabelBox) => a.x1 < b.x2 && b.x1 < a.x2 && a.y1 < b.y2 && b.y1 < a.y2;

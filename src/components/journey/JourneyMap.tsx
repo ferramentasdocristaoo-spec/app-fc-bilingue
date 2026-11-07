@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { journeyBaseMap } from "@/features/bible-journey/map/base-map";
-import { MAP_PX_PER_KM, fitViewBox, projectLonLat, type MapViewBox } from "@/features/bible-journey/map/projection";
+import { MAP_PX_PER_KM, boxesTouch, dotBox, fitViewBox, labelBox, projectLonLat, type LabelBox, type MapViewBox } from "@/features/bible-journey/map/projection";
 import { journeyMapLabels, journeyPlaces, type JourneyPlace } from "@/features/bible-journey/places";
 import type { JourneyStop } from "@/features/bible-journey/genesis-interactive";
 import type { JourneyLanguage } from "@/features/bible-journey/types";
@@ -81,14 +81,16 @@ export function JourneyMap({ stops, activeIndex, onSelect, language, label }: Pr
   const legs = route.slice(1).map((point, i) => ({ from: route[i], to: point }));
   const activePoint = points.find(p => p.index === activeIndex);
 
-  // Nomes: o ativo sempre; os outros só se não colidirem (≈ 26 px no ecrã) com um nome já posto.
+  // Nomes: o ativo sempre; os outros só se o retângulo do nome não tocar noutro nome nem noutro ponto.
   const named = new Set<string>();
-  const placed: [number, number][] = [];
+  const placed: LabelBox[] = [];
   const order = [...markers].sort((a, b) => Number(b.some(p => p.index === activeIndex)) - Number(a.some(p => p.index === activeIndex)) || a[0].index - b[0].index);
   for (const group of order) {
     const { x, y, place } = group[0];
-    const free = placed.every(([px, py]) => Math.abs(px - x) > 70 * s || Math.abs(py - y) > 26 * s);
-    if (free || group.some(p => p.index === activeIndex)) { named.add(place.id); placed.push([x, y]); }
+    const isActive = group.some(p => p.index === activeIndex);
+    const box = labelBox(x, y, place.names[language], (isActive ? 14 : 12) * s, (isActive ? 9 : 7) * s, 4 * s);
+    const others = markers.filter(other => other !== group).map(other => dotBox(other[0].x, other[0].y, 9 * s));
+    if (isActive || ![...placed, ...others].some(other => boxesTouch(box, other))) { named.add(place.id); placed.push(box); }
   }
 
   const onKey = (event: KeyboardEvent, index: number) => {
