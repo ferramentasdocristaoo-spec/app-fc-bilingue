@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const sermoesPub: { autor: string; titulo: string; tema: string; textoBase: string; resumo: string }[] = [];
@@ -23,11 +24,13 @@ const PulpitoPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.pulpito.title")}>
-      <div className="max-w-2xl mx-auto flex flex-col gap-3">
-        <p className="ed-lede">{t("pulpito.description")}</p>
+    <PageShell title={t("sidebar.pulpito.title")} lede={t("pulpito.description")}>
+      <div className="flex flex-col gap-3">
         {sermoesPub.length === 0 && (
-          <p className="ed-empty">{t("pulpito.empty")}</p>
+          <div className="ed-void">
+            <p>{t("pulpito.empty")}</p>
+            <Link to="/oficina" className="ed-btn ed-btn-ghost">{t("esbocos.emptyAction")}</Link>
+          </div>
         )}
         {sermoesPub.map((s, i) => (
           <div key={i} className="menu-card flex-col items-start gap-2">

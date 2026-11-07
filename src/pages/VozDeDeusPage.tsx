@@ -1,8 +1,7 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
-import { Button } from "@/components/ui/button";
-import { Loader2, Sparkles } from "lucide-react";
+import { ToolError } from "@/components/ToolKit";
 import { fetchVerse, type DailyVerse } from "@/lib/daily-verse";
 
 // Promessas (numeração de livros da bolls.life). O texto vem da Bíblia do idioma do leitor.
@@ -41,24 +40,20 @@ const VozDeDeusPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.voz.title")}>
-      <div className="max-w-xl mx-auto flex flex-col items-center gap-6 pt-8">
-        <p className="ed-lede text-center">{t("voz.description")}</p>
-
-        <Button onClick={sortear} size="lg" disabled={loading} className="gap-2 text-base px-8">
-          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-          {failed ? t("common.retry") : t("voz.button")}
-        </Button>
-
-        {failed && <p className="text-center text-sm text-muted-foreground" role="alert">{t("workspace.verseUnavailable")}</p>}
-
-        {promessa && !loading && (
-          <figure className="ed-verse animate-fade-in">
-            <blockquote>“{promessa.text}”</blockquote>
-            <figcaption>{bookNames[promessa.book - 1]} {promessa.chapter}:{promessa.verse}</figcaption>
-          </figure>
-        )}
-      </div>
+    <PageShell title={t("sidebar.voz.title")} lede={t("voz.description")}>
+      {!failed && (
+        <button type="button" onClick={sortear} disabled={loading} className="ed-btn ed-btn-primary">
+          {promessa ? t("voz.again") : t("voz.button")}
+        </button>
+      )}
+      {loading && <p className="ed-wait" role="status">{t("common.loading")}</p>}
+      {failed && !loading && <ToolError onRetry={sortear}>{t("workspace.verseUnavailable")}</ToolError>}
+      {promessa && !loading && !failed && (
+        <figure className="ed-verse ed-verse-large">
+          <blockquote>“{promessa.text}”</blockquote>
+          <figcaption>{bookNames[promessa.book - 1]} {promessa.chapter}:{promessa.verse}</figcaption>
+        </figure>
+      )}
     </PageShell>
   );
 };

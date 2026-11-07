@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Loader2, BookOpen, Globe } from "lucide-react";
+import { ToolError, ToolForm, ToolPromise, ToolWait } from "@/components/ToolKit";
 import { useAi } from "@/hooks/use-ai";
-import { escapeHtml } from "@/lib/utils";
 
 interface NomeResultado {
   significado_geral: string;
@@ -18,21 +15,11 @@ interface NomeResultado {
   variacoes: string[];
 }
 
-const LinguaCard = ({ titulo, dados, cor }: { titulo: string; dados: { original: string; transliteracao: string; significado: string }; cor: string }) => (
-  <div className="ed-panel">
-    <h3 className="ed-panel-title">{titulo}</h3>
-    <p className="text-foreground text-lg font-medium">{dados.original} <span className="text-muted-foreground">({dados.transliteracao})</span></p>
-    <p className="text-sm text-muted-foreground">{dados.significado}</p>
-  </div>
-);
-
-const SectionCard = ({ titulo, icone, children }: { titulo: string; icone: React.ReactNode; children: React.ReactNode }) => (
-  <div className="ed-panel">
-    <div className="flex items-center gap-2">
-      {icone}
-      <h3 className="ed-panel-title">{titulo}</h3>
-    </div>
-    <div className="ed-panel-body">{children}</div>
+const Lingua = ({ titulo, dados }: { titulo: string; dados: { original: string; transliteracao: string; significado: string } }) => (
+  <div className="ed-result-item">
+    <h4>{titulo}</h4>
+    <p><span className="ed-original">{dados.original}</span> <span className="ed-sub">{dados.transliteracao}</span></p>
+    <p className="ed-sub">{dados.significado}</p>
   </div>
 );
 
@@ -41,7 +28,7 @@ const NomesPage = () => {
   const [nome, setNome] = useState("");
   const [nomePesquisado, setNomePesquisado] = useState("");
   const [resultado, setResultado] = useState<NomeResultado | null>(null);
-  const { callAi, loading } = useAi();
+  const { callAi, loading, failed } = useAi();
 
   const pesquisar = async () => {
     if (!nome.trim()) return;
@@ -56,63 +43,33 @@ const NomesPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.nomes.title")}>
-      <div className="max-w-2xl mx-auto flex flex-col gap-5">
-        <p className="ed-lede">{t("nomes.description")}</p>
+    <PageShell title={t("sidebar.nomes.title")} lede={t("nomes.description")}>
+      <ToolForm id="nome-busca" label={t("nomes.label")} placeholder={t("nomes.placeholder")} value={nome} onChange={setNome} onSubmit={pesquisar} submitLabel={t("nomes.submit")} loading={loading} examples={t("nomes.examples", { returnObjects: true }) as string[]} />
 
-        <div className="ed-panel">
-          <p className="text-sm text-muted-foreground font-medium">{t("nomes.label")}</p>
-          <div className="flex gap-2">
-            <Input placeholder={t("nomes.placeholder")} value={nome} onChange={(e) => setNome(e.target.value)} onKeyDown={(e) => e.key === "Enter" && pesquisar()} className="flex-1" />
-            <Button onClick={pesquisar} disabled={loading || !nome.trim()} className="gap-2 px-5">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            </Button>
-          </div>
-        </div>
+      {!resultado && !loading && !failed && <ToolPromise items={[t("nomes.result"), t("nomes.etymology"), t("nomes.history"), t("nomes.variations")]} />}
+      {loading && <ToolWait label={t("nomes.loading", { name: nomePesquisado })} />}
+      {failed && !loading && <ToolError onRetry={pesquisar} />}
 
-        {loading && (
-          <div className="flex items-center justify-center py-12 gap-3 text-muted-foreground">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            <span className="text-sm" dangerouslySetInnerHTML={{ __html: t("nomes.loading", { name: `<strong class="text-primary">${escapeHtml(nomePesquisado)}</strong>` }) }} />
-          </div>
-        )}
-
-        {resultado && !loading && (
-          <div className="flex flex-col gap-4 animate-fade-in">
-            <div className="text-center space-y-1">
-              <h2 className="ed-result-title">{nomePesquisado}</h2>
-              <p className="text-sm text-muted-foreground italic">"{resultado.significado_geral}"</p>
-            </div>
-
-            <h3 className="ed-section-title mt-2">{t("nomes.result")}</h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {resultado.hebraico && <LinguaCard titulo={t("nomes.hebrew")} dados={resultado.hebraico} cor="text-primary" />}
-              {resultado.grego && <LinguaCard titulo={t("nomes.greek")} dados={resultado.grego} cor="text-primary" />}
-              {resultado.aramaico && <LinguaCard titulo={t("nomes.aramaic")} dados={resultado.aramaico} cor="text-primary" />}
-              {resultado.latim && <LinguaCard titulo={t("nomes.latin")} dados={resultado.latim} cor="text-primary" />}
-            </div>
-
-            <SectionCard titulo={t("nomes.etymology")} icone={<BookOpen className="w-4 h-4 text-primary" />}>
-              <p>{resultado.etimologia}</p>
-            </SectionCard>
-            <SectionCard titulo={t("nomes.history")} icone={<Globe className="w-4 h-4 text-primary" />}>
-              <p>{resultado.historia}</p>
-            </SectionCard>
-
-            {resultado.variacoes && resultado.variacoes.length > 0 && (
-              <div className="ed-panel">
-                <h3 className="ed-panel-title">{t("nomes.variations")}</h3>
-                <div className="flex flex-wrap gap-2">
-                  {resultado.variacoes.map((v, i) => (
-                    <span key={i} className="ed-chip">{v}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      {resultado && !loading && (
+        <article className="ed-result">
+          <header>
+            <h2 className="ed-result-title">{nomePesquisado}</h2>
+            <p>{resultado.significado_geral}</p>
+          </header>
+          <section className="ed-result-section">
+            <h3>{t("nomes.result")}</h3>
+            {resultado.hebraico && <Lingua titulo={t("nomes.hebrew")} dados={resultado.hebraico} />}
+            {resultado.grego && <Lingua titulo={t("nomes.greek")} dados={resultado.grego} />}
+            {resultado.aramaico && <Lingua titulo={t("nomes.aramaic")} dados={resultado.aramaico} />}
+            {resultado.latim && <Lingua titulo={t("nomes.latin")} dados={resultado.latim} />}
+          </section>
+          <section className="ed-result-section"><h3>{t("nomes.etymology")}</h3><p>{resultado.etimologia}</p></section>
+          <section className="ed-result-section"><h3>{t("nomes.history")}</h3><p>{resultado.historia}</p></section>
+          {resultado.variacoes && resultado.variacoes.length > 0 && (
+            <section className="ed-result-section"><h3>{t("nomes.variations")}</h3><p>{resultado.variacoes.join(" · ")}</p></section>
+          )}
+        </article>
+      )}
     </PageShell>
   );
 };

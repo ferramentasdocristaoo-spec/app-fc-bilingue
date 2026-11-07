@@ -134,7 +134,24 @@
     "copiedNotif": "Copy",
     "copiedMessage": "Sermon copied to clipboard.",
     "draftSaved": "Draft saved!",
-    "sermonFinalized": "Sermon finalized!"
+    "sermonFinalized": "Sermon finalized!",
+    "themeInputPlaceholder": "E.g. the faith that crosses the desert",
+    "themeRequired": "Enter the sermon theme to continue.",
+    "subjectLabel": "Subject (optional)",
+    "subjectPlaceholder": "Choose a subject",
+    "typeOptional": "Outline type (optional)",
+    "typeChoose": "Choose a type",
+    "durationName": "Sermon length",
+    "contents": "Message outline",
+    "backToForm": "Change request",
+    "saveDraft": "Save draft",
+    "finish": "Finish sermon",
+    "editFull": "Edit text",
+    "backToSheet": "Back to outline",
+    "unsaved": "Not saved yet. Save the draft to find it in My Outlines.",
+    "copyFailed": "Could not copy. Select the text and copy it by hand.",
+    "popupBlocked": "The browser blocked the print window. Allow pop-ups for this site and try again.",
+    "exportPrintHint": "In the print window, choose “Save as PDF”."
   },
   "esbocos": {
     "description": "Manage all your saved outlines. Edit, share, or delete as needed.",
@@ -148,7 +165,14 @@
     "copiedNotif": "Copy",
     "deletedNotif": "Deleted",
     "deletedMessage": "Sermon removed successfully.",
-    "copiedMessage": "The outline was copied to the clipboard."
+    "copiedMessage": "The outline was copied to the clipboard.",
+    "emptyTitle": "No outlines yet",
+    "emptyHint": "Outlines you save in the Workshop appear here, on this device.",
+    "emptyAction": "Prepare a message",
+    "statusDraft": "Draft",
+    "statusFinal": "Finished",
+    "deleteTitle": "Delete this outline?",
+    "deleteHint": "You will not be able to recover it."
   },
   "raioX": {
     "description": "Analyze Bible verses in depth with version comparison, etymology, and historical context.",
@@ -159,7 +183,8 @@
     "keywords": "Keywords in Original",
     "historical": "Historical Context",
     "literary": "Literary Context",
-    "theological": "Theological Application"
+    "theological": "Theological Application",
+    "submit": "Analyze"
   },
   "devocional": {
     "description": "Generate personalized devotionals with reading, meditation, and suggested prayer for spiritual growth.",
@@ -168,7 +193,8 @@
     "loading": "Generating devotional...",
     "reading": "Daily Reading",
     "meditation": "Meditation",
-    "prayer": "Suggested Prayer"
+    "prayer": "Suggested Prayer",
+    "submit": "Create devotional"
   },
   "nomes": {
     "description": "Discover the meaning of biblical names through etymology and history.",
@@ -182,7 +208,14 @@
     "hebrew": "Hebrew",
     "greek": "Greek",
     "aramaic": "Aramaic",
-    "latin": "Latin"
+    "latin": "Latin",
+    "submit": "Search",
+    "examples": [
+      "John",
+      "Mary",
+      "Immanuel",
+      "Abraham"
+    ]
   },
   "garimpo": {
     "description": "Search Bible verses by theme. Discover what the Bible says about subjects you're looking for.",
@@ -201,7 +234,8 @@
     "suggestionHope": "Hope",
     "suggestionJoy": "Joy",
     "suggestionWisdom": "Wisdom",
-    "suggestionGratitude": "Gratitude"
+    "suggestionGratitude": "Gratitude",
+    "submit": "Search"
   },
   "mural": {
     "description": "Share your prayer requests with the community and pray for others' requests.",
@@ -222,11 +256,22 @@
     "categoryWork": "Work",
     "categorySpirituality": "Spirituality",
     "categoryGeneral": "General",
-    "anonymous": "Anonymous"
+    "anonymous": "Anonymous",
+    "writeButton": "Write a request",
+    "cancelWrite": "Close form",
+    "nameLabel": "Your name (optional)",
+    "nameShort": "Left blank, it shows as Anonymous",
+    "requestLabel": "Your request",
+    "categoryChoose": "Choose a category",
+    "removeImage": "Remove image",
+    "sent": "Request sent. We will pray with you.",
+    "prayed": "Praying with you ({{count}})",
+    "prayingNow": "Community requests"
   },
   "voz": {
     "description": "Receive a word from God for the day. A Bible promise selected especially for you.",
-    "button": "Receive Word"
+    "button": "Receive Word",
+    "again": "Receive another word"
   },
   "pulpito": {
     "description": "Check outlines shared by other preachers in the community.",
@@ -315,7 +360,11 @@
       "3 John",
       "Jude",
       "Revelation"
-    ]
+    ],
+    "chapterName": "Chapter",
+    "verseName": "Go to verse",
+    "listenChapter": "Listen to chapter",
+    "choose": "Choose passage"
   },
   "install": {
     "title": "Install Christian's Tools",
@@ -328,7 +377,14 @@
     "small": "S",
     "medium": "M",
     "large": "L",
-    "xlarge": "XL"
+    "xlarge": "XL",
+    "label": "Text size",
+    "names": [
+      "Small",
+      "Medium",
+      "Large",
+      "Extra large"
+    ]
   },
   "notFound": {
     "title": "Page Not Found",
@@ -345,7 +401,8 @@
     "edit": "Edit",
     "close": "Close",
     "aiError": "We couldn't get a response. Please try again.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "backTo": "Back"
   },
   "livraria": {
     "title": "Library",
@@ -371,11 +428,28 @@
       "changeTheme": "Change theme",
       "close": "Close reader",
       "listen": "Listen to chapter",
-      "stopListening": "Stop listening"
+      "stopListening": "Stop listening",
+      "appearance": "Reading appearance",
+      "size": "Text size",
+      "background": "Background",
+      "themePaper": "Paper",
+      "themeSepia": "Sepia",
+      "themeNight": "Night",
+      "listening": "Listening to the chapter",
+      "pausedLabel": "Paused",
+      "pause": "Pause",
+      "resume": "Resume",
+      "stop": "Stop",
+      "noSpeech": "This device has no read-aloud feature.",
+      "prevChapter": "Previous chapter"
     },
-    "badge_one": "1 book • 1 product",
-    "badge_other": "{{count}} volumes • 1 product",
-    "readNow": "Read now"
+    "badge_one": "1 book",
+    "badge_other": "{{count}} volumes",
+    "readNow": "Read now",
+    "volume": "Volume {{number}}",
+    "lockedHint": "Not included in your purchases.",
+    "finished": "Read",
+    "percentRead": "{{progress}}% read"
   },
   "workspace": {
     "welcome": "Keep preparing what God has placed in your heart.",
@@ -448,7 +522,9 @@
     ],
     "sermonsPrepared_one": "{{count}} message prepared",
     "sermonsPrepared_other": "{{count}} messages prepared",
-    "verseUnavailable": "The verse couldn't be loaded right now."
+    "verseUnavailable": "The verse couldn't be loaded right now.",
+    "prepareMessage": "Prepare a message",
+    "exploreJourney": "Explore the Journey"
   },
   "journey": {
     "title": "Journey through the Bible",
@@ -560,6 +636,18 @@
       "bible": "Biblical text",
       "bibleNote": "Chapters are obtained, in the versions shown in the Bible selector, from:",
       "fonts": "Typefaces"
-    }
+    },
+    "chapterProgress": "Chapter {{current}} of {{total}}",
+    "backToBook": "Back to the book",
+    "charactersLabel": "Characters",
+    "placesLabel": "Places",
+    "referencesLabel": "Read also",
+    "notesSaved": "Saved on this device.",
+    "sourcesPublicDomain": "All in the public domain, by Julius Schnorr von Carolsfeld, 1860:"
+  },
+  "tools": {
+    "youGet": "What you will get",
+    "examples": "Examples",
+    "slowHint": "This may take up to a minute."
   }
 }

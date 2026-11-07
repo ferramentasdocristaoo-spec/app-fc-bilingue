@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Loader2, BookOpen } from "lucide-react";
+import { ToolError, ToolForm, ToolWait } from "@/components/ToolKit";
 import { useAi } from "@/hooks/use-ai";
-import { escapeHtml } from "@/lib/utils";
 
 interface GarimpoResult {
   tema: string;
@@ -17,7 +14,7 @@ const GarimpoPage = () => {
   const { t } = useTranslation();
   const [busca, setBusca] = useState("");
   const [resultado, setResultado] = useState<GarimpoResult | null>(null);
-  const { callAi, loading } = useAi();
+  const { callAi, loading, failed } = useAi();
 
   const categoriasSugeridas = [
     t("garimpo.suggestionAnxiety"), t("garimpo.suggestionFaith"), t("garimpo.suggestionStrength"),
@@ -35,71 +32,31 @@ const GarimpoPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.garimpo.title")}>
-      <div className="max-w-2xl mx-auto flex flex-col gap-5">
-        <p className="ed-lede">{t("garimpo.description")}</p>
+    <PageShell title={t("sidebar.garimpo.title")} lede={t("garimpo.description")}>
+      <ToolForm id="garimpo-busca" label={t("garimpo.label")} placeholder={t("garimpo.placeholder")} value={busca} onChange={setBusca} onSubmit={() => pesquisar(busca)} submitLabel={t("garimpo.submit")} loading={loading} examples={!resultado ? categoriasSugeridas : undefined} examplesLabel={t("garimpo.suggestions")} />
 
-        <div className="ed-panel">
-          <p className="text-sm text-muted-foreground font-medium">{t("garimpo.label")}</p>
-          <div className="flex gap-2">
-            <Input
-              placeholder={t("garimpo.placeholder")}
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && busca.trim() && pesquisar(busca)}
-            />
-            <Button onClick={() => pesquisar(busca)} disabled={loading || !busca.trim()} className="gap-2 px-5">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            </Button>
-          </div>
-        </div>
+      {loading && <ToolWait label={t("garimpo.loading", { theme: busca })} />}
+      {failed && !loading && <ToolError onRetry={() => pesquisar(busca)} />}
 
-        {!resultado && !loading && (
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground font-medium">{t("garimpo.suggestions")}</p>
-            <div className="flex flex-wrap gap-2">
-              {categoriasSugeridas.map((cat) => (
-                <Button key={cat} variant="outline" size="sm" className="text-xs border-primary/20 hover:bg-primary/10" onClick={() => pesquisar(cat)}>
-                  {cat}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {loading && (
-          <div className="flex items-center justify-center py-12 gap-3 text-muted-foreground">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            <span className="text-sm" dangerouslySetInnerHTML={{ __html: t("garimpo.loading", { theme: `<strong class="text-primary">${escapeHtml(busca)}</strong>` }) }} />
-          </div>
-        )}
-
-        {resultado && !loading && (
-          <div className="flex flex-col gap-4 animate-fade-in">
-            <div className="text-center space-y-1">
-              <h2 className="ed-result-title">{resultado.tema}</h2>
-              <p className="text-sm text-muted-foreground">{resultado.resumo}</p>
-            </div>
-
-            <h3 className="ed-section-title">{t("garimpo.results")}</h3>
-
+      {resultado && !loading && (
+        <article className="ed-result">
+          <header>
+            <h2 className="ed-result-title">{resultado.tema}</h2>
+            <p>{resultado.resumo}</p>
+          </header>
+          <section className="ed-result-section">
+            <h3>{t("garimpo.results")}</h3>
             {resultado.versiculos.map((v, i) => (
-              <div key={i} className="ed-panel">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-primary shrink-0" />
-                  <h4 className="ed-panel-title">{v.referencia}</h4>
-                </div>
-                <p className="ed-quote">"{v.texto}"</p>
-                <p className="text-xs text-muted-foreground">{v.aplicacao}</p>
+              <div key={i} className="ed-result-item">
+                <h4>{v.referencia}</h4>
+                <p className="italic">“{v.texto}”</p>
+                <p className="ed-sub">{v.aplicacao}</p>
               </div>
             ))}
-
-            <Button variant="ghost" size="sm" className="text-primary self-start" onClick={() => { setResultado(null); setBusca(""); }}>
-              ← {t("garimpo.newSearch")}
-            </Button>
-          </div>
-        )}
-      </div>
+          </section>
+          <button type="button" className="ed-btn ed-btn-ghost" onClick={() => { setResultado(null); setBusca(""); }}>{t("garimpo.newSearch")}</button>
+        </article>
+      )}
     </PageShell>
   );
 };

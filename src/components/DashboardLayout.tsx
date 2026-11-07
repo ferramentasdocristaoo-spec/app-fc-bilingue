@@ -1,15 +1,19 @@
 import { useEffect, useRef } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/hooks/use-theme";
-import { Sun, Moon, Menu } from "lucide-react";
+import { ArrowLeft, Sun, Moon, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import InstallButton from "@/components/InstallButton";
 import { usePageTracking } from "@/hooks/use-tracking";
+import FontSizeSelector from "@/components/FontSizeSelector";
+import { useFontSize } from "@/hooks/use-font-size";
+import { appLogo } from "@/lib/branding";
+import { parentPath } from "@/lib/parent-path";
 
 const MenuButton = () => {
   const { t } = useTranslation();
@@ -19,7 +23,7 @@ const MenuButton = () => {
       variant="ghost"
       size="icon"
       onClick={toggleSidebar}
-      className="menu-toggle h-10 w-10 hover:bg-transparent"
+      className="menu-toggle h-11 w-11 hover:bg-transparent"
       aria-label={t("dashboard.menu")}
     >
       <Menu className="!h-6 !w-6" strokeWidth={1.75} />
@@ -28,11 +32,13 @@ const MenuButton = () => {
 };
 
 const DashboardLayout = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
+  const { fontSizeClass } = useFontSize();
   const { theme, toggleTheme } = useTheme();
   usePageTracking();
   const { pathname, hash } = useLocation();
+  const parent = parentPath(pathname);
   const mainRef = useRef<HTMLElement>(null);
   // Sem isto, ir ao capítulo seguinte abre a página nova já rolada até ao fim.
   useEffect(() => {
@@ -46,14 +52,22 @@ const DashboardLayout = () => {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-14 flex items-center justify-between gap-2 border-b border-rule-soft bg-background px-3 shrink-0 md:px-6">
+          <header className="h-14 flex items-center justify-between gap-1 border-b border-rule-soft bg-background px-1 shrink-0 md:px-6">
             <div className="flex min-w-0 items-center">
               <MenuButton />
-              <span className="ml-2 truncate font-brand text-[0.8125rem] font-semibold tracking-[0.04em] text-primary md:hidden">{t("appName")}</span>
+              {/* Celular: o nome inteiro não cabe, então entra o brasão; fora do início, a seta para o nível acima. */}
+              {parent ? (
+                <Link to={parent} aria-label={t("common.backTo")} className="flex h-11 w-11 items-center justify-center text-ink-2 hover:text-foreground md:hidden">
+                  <ArrowLeft className="h-5 w-5" />
+                </Link>
+              ) : (
+                <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="ml-1 h-9 w-9 object-contain md:hidden" />
+              )}
             </div>
-            <div className="flex shrink-0 items-center gap-1 md:gap-3">
+            <div className="flex shrink-0 items-center md:gap-2">
               <InstallButton />
-              <LanguageSwitcher variant="horizontal" />
+              <FontSizeSelector />
+              <LanguageSwitcher variant="horizontal" compact />
               <Button
                 variant="ghost"
                 size="icon"
@@ -67,7 +81,7 @@ const DashboardLayout = () => {
             </div>
           </header>
           <main ref={mainRef} className="flex-1 overflow-auto">
-            <Outlet />
+            <div className={fontSizeClass}><Outlet /></div>
           </main>
         </div>
       </div>

@@ -68,7 +68,7 @@ const InstallButton = () => {
         variant="ghost"
         size="sm"
         aria-label={t("install.button")}
-        className="gap-2 px-2 text-ink-2 hover:bg-transparent hover:text-foreground"
+        className="h-11 min-w-11 gap-2 px-2 text-ink-2 hover:bg-transparent hover:text-foreground"
       >
         <Download className="w-4 h-4" />
         <span className="hidden sm:inline">{t("install.button")}</span>
@@ -89,10 +89,10 @@ const InstallButton = () => {
             <AndroidSteps steps={t("install.androidSteps")} />
           ) : (
             <div className="space-y-4">
-              <p className="text-sm font-semibold text-foreground">iPhone (Safari):</p>
+              <p className="text-sm font-semibold text-foreground">iPhone (Safari)</p>
               <IosSteps steps={t("install.iosSteps")} />
               <div className="border-t border-border my-2" />
-              <p className="text-sm font-semibold text-foreground">Android (Chrome):</p>
+              <p className="text-sm font-semibold text-foreground">Android (Chrome)</p>
               <AndroidSteps steps={t("install.androidSteps")} />
             </div>
           )}

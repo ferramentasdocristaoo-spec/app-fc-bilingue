@@ -15,6 +15,8 @@ const languages = [
 interface LanguageSwitcherProps {
   className?: string;
   variant?: 'horizontal' | 'vertical';
+  /** Sigla em vez do nome em telas estreitas (topo do app). */
+  compact?: boolean;
 }
 
 const matchLanguage = (current: string) => {
@@ -28,24 +30,29 @@ const matchLanguage = (current: string) => {
  * "horizontal": um único seletor discreto em texto ("Português ▾"), em vez de 6 bandeiras.
  * "vertical": lista de botões (mantida para quem já usa).
  */
-export const LanguageSwitcher = ({ className = '', variant = 'horizontal' }: LanguageSwitcherProps) => {
+export const LanguageSwitcher = ({ className = '', variant = 'horizontal', compact = false }: LanguageSwitcherProps) => {
   const { t, i18n } = useTranslation();
   const current = matchLanguage(i18n.resolvedLanguage || i18n.language || 'pt-PT');
 
   if (variant === 'horizontal') {
     return (
-      <label className={`relative inline-flex items-center ${className}`}>
+      <label className={`relative inline-flex h-11 min-w-11 items-center justify-center rounded-sm px-2 font-body text-sm font-medium text-ink-2 hover:text-foreground focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-gold-ink ${className}`}>
         <span className="sr-only">{t('dashboard.selectLanguage')}</span>
+        {/* O select fica por cima, invisível: abre a lista nativa; por baixo, o nome (ou a sigla, no celular). */}
+        <span aria-hidden className="pointer-events-none flex items-center gap-1">
+          <span className={compact ? 'sm:hidden' : 'hidden'}>{current.split('-')[0].toUpperCase()}</span>
+          <span className={compact ? 'hidden sm:inline' : ''}>{languages.find((lang) => lang.code === current)?.name}</span>
+          <span className="text-xs text-ink-3">▾</span>
+        </span>
         <select
           value={current}
           onChange={(event) => void setLanguageManually(event.target.value as AppLanguage)}
-          className="h-9 appearance-none rounded-md border-0 bg-transparent py-1 pl-2 pr-6 font-body text-sm font-medium text-ink-2 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+          className="absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
         >
           {languages.map((lang) => (
-            <option key={lang.code} value={lang.code} className="bg-popover text-popover-foreground">{lang.name}</option>
+            <option key={lang.code} value={lang.code}>{lang.name}</option>
           ))}
         </select>
-        <span aria-hidden className="pointer-events-none absolute right-1.5 text-xs text-ink-3">▾</span>
       </label>
     );
   }

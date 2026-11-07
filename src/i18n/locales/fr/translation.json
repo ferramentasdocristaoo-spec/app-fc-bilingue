@@ -134,7 +134,24 @@
     "copiedNotif": "Copier",
     "copiedMessage": "Sermon copié dans le presse-papiers.",
     "draftSaved": "Brouillon enregistré!",
-    "sermonFinalized": "Sermon finalisé!"
+    "sermonFinalized": "Sermon finalisé!",
+    "themeInputPlaceholder": "Ex. : la foi qui traverse le désert",
+    "themeRequired": "Saisissez le thème du sermon pour continuer.",
+    "subjectLabel": "Sujet (facultatif)",
+    "subjectPlaceholder": "Choisir un sujet",
+    "typeOptional": "Type de plan (facultatif)",
+    "typeChoose": "Choisir un type",
+    "durationName": "Durée du sermon",
+    "contents": "Sommaire du message",
+    "backToForm": "Modifier la demande",
+    "saveDraft": "Enregistrer le brouillon",
+    "finish": "Finaliser le sermon",
+    "editFull": "Modifier le texte",
+    "backToSheet": "Retour au plan",
+    "unsaved": "Pas encore enregistré. Enregistrez le brouillon pour le retrouver dans Mes Plans.",
+    "copyFailed": "Copie impossible. Sélectionnez le texte et copiez-le manuellement.",
+    "popupBlocked": "Le navigateur a bloqué la fenêtre d'impression. Autorisez les fenêtres de ce site et réessayez.",
+    "exportPrintHint": "Dans la fenêtre d'impression, choisissez « Enregistrer au format PDF »."
   },
   "esbocos": {
     "description": "Gérez tous vos plans sauvegardés. Modifiez, partagez ou supprimez selon les besoins.",
@@ -148,7 +165,14 @@
     "copiedNotif": "Copier",
     "deletedNotif": "Supprimé",
     "deletedMessage": "Sermon supprimé avec succès.",
-    "copiedMessage": "Le plan a été copié dans le presse-papiers."
+    "copiedMessage": "Le plan a été copié dans le presse-papiers.",
+    "emptyTitle": "Aucun plan pour l'instant",
+    "emptyHint": "Les plans enregistrés dans l'Atelier apparaissent ici, sur cet appareil.",
+    "emptyAction": "Préparer un message",
+    "statusDraft": "Brouillon",
+    "statusFinal": "Finalisé",
+    "deleteTitle": "Supprimer ce plan ?",
+    "deleteHint": "Vous ne pourrez pas le récupérer."
   },
   "raioX": {
     "description": "Analysez les versets bibliques en profondeur avec comparaison de versions, étymologie et contexte historique.",
@@ -159,7 +183,8 @@
     "keywords": "Mots-clés dans l'Original",
     "historical": "Contexte Historique",
     "literary": "Contexte Littéraire",
-    "theological": "Application Théologique"
+    "theological": "Application Théologique",
+    "submit": "Analyser"
   },
   "devocional": {
     "description": "Générez des dévotionnelles personnalisées avec lecture, méditation et prière suggérée pour la croissance spirituelle.",
@@ -168,7 +193,8 @@
     "loading": "Génération de la dévotionnelle...",
     "reading": "Lecture du Jour",
     "meditation": "Méditation",
-    "prayer": "Prière Suggérée"
+    "prayer": "Prière Suggérée",
+    "submit": "Créer la méditation"
   },
   "nomes": {
     "description": "Découvrez le sens des noms bibliques par l'étymologie et l'histoire.",
@@ -182,7 +208,14 @@
     "hebrew": "Hébreu",
     "greek": "Grec",
     "aramaic": "Araméen",
-    "latin": "Latin"
+    "latin": "Latin",
+    "submit": "Rechercher",
+    "examples": [
+      "Jean",
+      "Marie",
+      "Emmanuel",
+      "Abraham"
+    ]
   },
   "garimpo": {
     "description": "Recherchez des versets bibliques par thème. Découvrez ce que la Bible dit sur les sujets que vous recherchez.",
@@ -201,7 +234,8 @@
     "suggestionHope": "Espérance",
     "suggestionJoy": "Joie",
     "suggestionWisdom": "Sagesse",
-    "suggestionGratitude": "Gratitude"
+    "suggestionGratitude": "Gratitude",
+    "submit": "Rechercher"
   },
   "mural": {
     "description": "Partagez vos demandes de prière avec la communauté et priez pour les demandes des autres.",
@@ -222,11 +256,22 @@
     "categoryWork": "Travail",
     "categorySpirituality": "Spiritualité",
     "categoryGeneral": "Général",
-    "anonymous": "Anonyme"
+    "anonymous": "Anonyme",
+    "writeButton": "Écrire une demande",
+    "cancelWrite": "Fermer le formulaire",
+    "nameLabel": "Votre nom (facultatif)",
+    "nameShort": "Vide : affiché comme Anonyme",
+    "requestLabel": "Votre demande",
+    "categoryChoose": "Choisir une catégorie",
+    "removeImage": "Retirer l'image",
+    "sent": "Demande envoyée. Nous prierons avec vous.",
+    "prayed": "En prière avec vous ({{count}})",
+    "prayingNow": "Demandes de la communauté"
   },
   "voz": {
     "description": "Recevez une parole de Dieu pour le jour. Une promesse biblique choisie spécialement pour vous.",
-    "button": "Recevoir une Parole"
+    "button": "Recevoir une Parole",
+    "again": "Recevoir une autre parole"
   },
   "pulpito": {
     "description": "Consultez les plans partagés par d'autres prédicateurs de la communauté.",
@@ -315,7 +360,11 @@
       "3 Jean",
       "Jude",
       "Apocalypse"
-    ]
+    ],
+    "chapterName": "Chapitre",
+    "verseName": "Aller au verset",
+    "listenChapter": "Écouter le chapitre",
+    "choose": "Choisir un passage"
   },
   "install": {
     "title": "Installer Outils du Chrétien",
@@ -328,7 +377,14 @@
     "small": "P",
     "medium": "M",
     "large": "G",
-    "xlarge": "TG"
+    "xlarge": "TG",
+    "label": "Taille du texte",
+    "names": [
+      "Petit",
+      "Moyen",
+      "Grand",
+      "Très grand"
+    ]
   },
   "notFound": {
     "title": "Page non trouvée",
@@ -345,7 +401,8 @@
     "edit": "Modifier",
     "close": "Fermer",
     "aiError": "Impossible d'obtenir la réponse. Veuillez réessayer.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "backTo": "Retour"
   },
   "livraria": {
     "title": "Librairie",
@@ -371,11 +428,28 @@
       "changeTheme": "Changer de thème",
       "close": "Fermer la lecture",
       "listen": "Écouter le chapitre",
-      "stopListening": "Arrêter la lecture"
+      "stopListening": "Arrêter la lecture",
+      "appearance": "Apparence de lecture",
+      "size": "Taille du texte",
+      "background": "Fond",
+      "themePaper": "Papier",
+      "themeSepia": "Sépia",
+      "themeNight": "Nuit",
+      "listening": "Écoute du chapitre",
+      "pausedLabel": "En pause",
+      "pause": "Pause",
+      "resume": "Reprendre",
+      "stop": "Arrêter",
+      "noSpeech": "Cet appareil ne propose pas la lecture à voix haute.",
+      "prevChapter": "Chapitre précédent"
     },
-    "badge_one": "1 livre • 1 produit",
-    "badge_other": "{{count}} volumes • 1 produit",
-    "readNow": "Lire maintenant"
+    "badge_one": "1 livre",
+    "badge_other": "{{count}} volumes",
+    "readNow": "Lire maintenant",
+    "volume": "Volume {{number}}",
+    "lockedHint": "Non inclus dans vos achats.",
+    "finished": "Lu",
+    "percentRead": "{{progress}} % lu"
   },
   "workspace": {
     "welcome": "Continuez à préparer ce que Dieu a placé dans votre cœur.",
@@ -448,7 +522,9 @@
     ],
     "sermonsPrepared_one": "{{count}} message préparé",
     "sermonsPrepared_other": "{{count}} messages préparés",
-    "verseUnavailable": "Le verset n'a pas pu être chargé pour le moment."
+    "verseUnavailable": "Le verset n'a pas pu être chargé pour le moment.",
+    "prepareMessage": "Préparer un message",
+    "exploreJourney": "Parcourir le Voyage"
   },
   "journey": {
     "title": "Parcours de la Bible",
@@ -560,6 +636,18 @@
       "bible": "Texte biblique",
       "bibleNote": "Les chapitres proviennent, dans les versions indiquées dans le sélecteur de la Bible, de :",
       "fonts": "Polices"
-    }
+    },
+    "chapterProgress": "Chapitre {{current}} sur {{total}}",
+    "backToBook": "Retour au livre",
+    "charactersLabel": "Personnages",
+    "placesLabel": "Lieux",
+    "referencesLabel": "À lire aussi",
+    "notesSaved": "Enregistrées sur cet appareil.",
+    "sourcesPublicDomain": "Toutes dans le domaine public, de Julius Schnorr von Carolsfeld, 1860 :"
+  },
+  "tools": {
+    "youGet": "Ce que vous recevrez",
+    "examples": "Exemples",
+    "slowHint": "Cela peut prendre jusqu'à une minute."
   }
 }

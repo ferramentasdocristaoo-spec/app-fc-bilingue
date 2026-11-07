@@ -134,7 +134,24 @@
     "copiedNotif": "Kopieren",
     "copiedMessage": "Predigt in die Zwischenablage kopiert.",
     "draftSaved": "Entwurf gespeichert!",
-    "sermonFinalized": "Predigt abgeschlossen!"
+    "sermonFinalized": "Predigt abgeschlossen!",
+    "themeInputPlaceholder": "Z. B. der Glaube, der die Wüste durchquert",
+    "themeRequired": "Geben Sie das Thema der Predigt ein, um fortzufahren.",
+    "subjectLabel": "Bereich (optional)",
+    "subjectPlaceholder": "Bereich wählen",
+    "typeOptional": "Gliederungsart (optional)",
+    "typeChoose": "Art wählen",
+    "durationName": "Predigtdauer",
+    "contents": "Inhalt der Botschaft",
+    "backToForm": "Anfrage ändern",
+    "saveDraft": "Entwurf speichern",
+    "finish": "Predigt abschließen",
+    "editFull": "Text bearbeiten",
+    "backToSheet": "Zurück zur Gliederung",
+    "unsaved": "Noch nicht gespeichert. Speichern Sie den Entwurf, um ihn bei Ihren Gliederungen wiederzufinden.",
+    "copyFailed": "Kopieren nicht möglich. Bitte markieren und von Hand kopieren.",
+    "popupBlocked": "Der Browser hat das Druckfenster blockiert. Erlauben Sie Pop-ups für diese Seite und versuchen Sie es erneut.",
+    "exportPrintHint": "Wählen Sie im Druckfenster „Als PDF speichern“."
   },
   "esbocos": {
     "description": "Verwalten Sie alle Ihre gespeicherten Gliederungen. Bearbeiten, teilen oder löschen Sie nach Bedarf.",
@@ -148,7 +165,14 @@
     "copiedNotif": "Kopieren",
     "deletedNotif": "Gelöscht",
     "deletedMessage": "Predigt erfolgreich entfernt.",
-    "copiedMessage": "Die Gliederung wurde in die Zwischenablage kopiert."
+    "copiedMessage": "Die Gliederung wurde in die Zwischenablage kopiert.",
+    "emptyTitle": "Noch keine Gliederungen",
+    "emptyHint": "Gliederungen, die Sie in der Werkstatt speichern, erscheinen hier auf diesem Gerät.",
+    "emptyAction": "Botschaft vorbereiten",
+    "statusDraft": "Entwurf",
+    "statusFinal": "Abgeschlossen",
+    "deleteTitle": "Diese Gliederung löschen?",
+    "deleteHint": "Sie kann danach nicht wiederhergestellt werden."
   },
   "raioX": {
     "description": "Analysieren Sie Bibelverse gründlich mit Übersetzungsvergleich, Etymologie und historischem Kontext.",
@@ -159,7 +183,8 @@
     "keywords": "Schlüsselwörter im Urtext",
     "historical": "Historischer Kontext",
     "literary": "Literarischer Kontext",
-    "theological": "Theologische Anwendung"
+    "theological": "Theologische Anwendung",
+    "submit": "Analysieren"
   },
   "devocional": {
     "description": "Erstellen Sie persönliche Andachten mit Lesung, Meditation und Gebetsvorschlag für geistliches Wachstum.",
@@ -168,7 +193,8 @@
     "loading": "Andacht wird erstellt...",
     "reading": "Tageslesung",
     "meditation": "Meditation",
-    "prayer": "Gebetsvorschlag"
+    "prayer": "Gebetsvorschlag",
+    "submit": "Andacht erstellen"
   },
   "nomes": {
     "description": "Entdecken Sie die Bedeutung biblischer Namen durch Etymologie und Geschichte.",
@@ -182,7 +208,14 @@
     "hebrew": "Hebräisch",
     "greek": "Griechisch",
     "aramaic": "Aramäisch",
-    "latin": "Lateinisch"
+    "latin": "Lateinisch",
+    "submit": "Suchen",
+    "examples": [
+      "Johannes",
+      "Maria",
+      "Immanuel",
+      "Abraham"
+    ]
   },
   "garimpo": {
     "description": "Suchen Sie Bibelverse nach Themen. Entdecken Sie, was die Bibel zu Ihren Fragen sagt.",
@@ -201,7 +234,8 @@
     "suggestionHope": "Hoffnung",
     "suggestionJoy": "Freude",
     "suggestionWisdom": "Weisheit",
-    "suggestionGratitude": "Dankbarkeit"
+    "suggestionGratitude": "Dankbarkeit",
+    "submit": "Suchen"
   },
   "mural": {
     "description": "Teilen Sie Ihre Gebetsanliegen mit der Gemeinschaft und beten Sie für die Anliegen anderer.",
@@ -222,11 +256,22 @@
     "categoryWork": "Arbeit",
     "categorySpirituality": "Geistliches Leben",
     "categoryGeneral": "Allgemein",
-    "anonymous": "Anonym"
+    "anonymous": "Anonym",
+    "writeButton": "Anliegen schreiben",
+    "cancelWrite": "Formular schließen",
+    "nameLabel": "Ihr Name (optional)",
+    "nameShort": "Leer: erscheint als Anonym",
+    "requestLabel": "Ihr Anliegen",
+    "categoryChoose": "Kategorie wählen",
+    "removeImage": "Bild entfernen",
+    "sent": "Anliegen gesendet. Wir beten mit Ihnen.",
+    "prayed": "Ich bete mit Ihnen ({{count}})",
+    "prayingNow": "Anliegen der Gemeinschaft"
   },
   "voz": {
     "description": "Erhalten Sie ein Wort Gottes für den Tag. Eine Bibelverheißung, besonders für Sie ausgewählt.",
-    "button": "Wort empfangen"
+    "button": "Wort empfangen",
+    "again": "Weiteres Wort empfangen"
   },
   "pulpito": {
     "description": "Sehen Sie Gliederungen, die andere Prediger mit der Gemeinschaft geteilt haben.",
@@ -315,7 +360,11 @@
       "3. Johannes",
       "Judas",
       "Offenbarung"
-    ]
+    ],
+    "chapterName": "Kapitel",
+    "verseName": "Zum Vers",
+    "listenChapter": "Kapitel anhören",
+    "choose": "Stelle wählen"
   },
   "install": {
     "title": "Werkzeuge des Christen installieren",
@@ -328,7 +377,14 @@
     "small": "S",
     "medium": "M",
     "large": "L",
-    "xlarge": "XL"
+    "xlarge": "XL",
+    "label": "Textgröße",
+    "names": [
+      "Klein",
+      "Mittel",
+      "Groß",
+      "Sehr groß"
+    ]
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -345,7 +401,8 @@
     "edit": "Bearbeiten",
     "close": "Schließen",
     "aiError": "Die Antwort konnte nicht abgerufen werden. Bitte versuche es erneut.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "backTo": "Zurück"
   },
   "livraria": {
     "title": "Bibliothek",
@@ -370,12 +427,29 @@
       "changeTheme": "Design wechseln",
       "close": "Lesemodus schließen",
       "listen": "Kapitel anhören",
-      "stopListening": "Vorlesen beenden"
+      "stopListening": "Vorlesen beenden",
+      "appearance": "Leseansicht",
+      "size": "Schriftgröße",
+      "background": "Hintergrund",
+      "themePaper": "Papier",
+      "themeSepia": "Sepia",
+      "themeNight": "Nacht",
+      "listening": "Kapitel wird vorgelesen",
+      "pausedLabel": "Pausiert",
+      "pause": "Pause",
+      "resume": "Fortsetzen",
+      "stop": "Stopp",
+      "noSpeech": "Dieses Gerät bietet kein Vorlesen.",
+      "prevChapter": "Vorheriges Kapitel"
     },
-    "badge_one": "1 Buch • 1 Produkt",
-    "badge_other": "{{count}} Bände • 1 Produkt",
+    "badge_one": "1 Buch",
+    "badge_other": "{{count}} Bände",
     "readNow": "Jetzt lesen",
-    "productDescription": "Eine vollständige Sammlung, um die wichtigsten Ereignisse und Personen des Buches der Offenbarung zu verstehen."
+    "productDescription": "Eine vollständige Sammlung, um die wichtigsten Ereignisse und Personen des Buches der Offenbarung zu verstehen.",
+    "volume": "Band {{number}}",
+    "lockedHint": "Nicht in Ihren Käufen enthalten.",
+    "finished": "Gelesen",
+    "percentRead": "{{progress}} % gelesen"
   },
   "workspace": {
     "welcome": "Bereite weiter vor, was Gott dir aufs Herz gelegt hat.",
@@ -448,7 +522,9 @@
     ],
     "sermonsPrepared_one": "{{count}} Predigt vorbereitet",
     "sermonsPrepared_other": "{{count}} Predigten vorbereitet",
-    "verseUnavailable": "Der Vers konnte gerade nicht geladen werden."
+    "verseUnavailable": "Der Vers konnte gerade nicht geladen werden.",
+    "prepareMessage": "Botschaft vorbereiten",
+    "exploreJourney": "Die Reise erkunden"
   },
   "journey": {
     "title": "Reise durch die Bibel",
@@ -560,6 +636,18 @@
       "bible": "Bibeltext",
       "bibleNote": "Die Kapitel stammen, in den in der Bibelauswahl angegebenen Fassungen, von:",
       "fonts": "Schriften"
-    }
+    },
+    "chapterProgress": "Kapitel {{current}} von {{total}}",
+    "backToBook": "Zurück zum Buch",
+    "charactersLabel": "Personen",
+    "placesLabel": "Orte",
+    "referencesLabel": "Siehe auch",
+    "notesSaved": "Auf diesem Gerät gespeichert.",
+    "sourcesPublicDomain": "Alle gemeinfrei, von Julius Schnorr von Carolsfeld, 1860:"
+  },
+  "tools": {
+    "youGet": "Was Sie erhalten",
+    "examples": "Beispiele",
+    "slowHint": "Das kann bis zu einer Minute dauern."
   }
 }

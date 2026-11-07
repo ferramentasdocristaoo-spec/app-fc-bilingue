@@ -134,7 +134,24 @@
     "copiedNotif": "Copiar",
     "copiedMessage": "Sermón copiado al portapapeles.",
     "draftSaved": "¡Borrador guardado!",
-    "sermonFinalized": "¡Sermón finalizado!"
+    "sermonFinalized": "¡Sermón finalizado!",
+    "themeInputPlaceholder": "Ej.: la fe que cruza el desierto",
+    "themeRequired": "Escribe el tema del sermón para continuar.",
+    "subjectLabel": "Asunto (opcional)",
+    "subjectPlaceholder": "Elegir un asunto",
+    "typeOptional": "Tipo de bosquejo (opcional)",
+    "typeChoose": "Elegir un tipo",
+    "durationName": "Duración del sermón",
+    "contents": "Índice del mensaje",
+    "backToForm": "Cambiar petición",
+    "saveDraft": "Guardar borrador",
+    "finish": "Finalizar sermón",
+    "editFull": "Editar texto",
+    "backToSheet": "Volver al bosquejo",
+    "unsaved": "Aún sin guardar. Guarda el borrador para encontrarlo en Mis Bosquejos.",
+    "copyFailed": "No se pudo copiar. Selecciona el texto y cópialo a mano.",
+    "popupBlocked": "El navegador bloqueó la ventana de impresión. Permite ventanas de este sitio e inténtalo de nuevo.",
+    "exportPrintHint": "En la ventana de impresión, elige «Guardar como PDF»."
   },
   "esbocos": {
     "description": "Administra todos tus esquemas guardados. Edita, comparte o elimina según sea necesario.",
@@ -148,7 +165,14 @@
     "copiedNotif": "Copiar",
     "deletedNotif": "Eliminado",
     "deletedMessage": "Sermón eliminado con éxito.",
-    "copiedMessage": "El esquema se copió al portapapeles."
+    "copiedMessage": "El esquema se copió al portapapeles.",
+    "emptyTitle": "Aún no tienes bosquejos",
+    "emptyHint": "Los bosquejos que guardes en el Taller aparecen aquí, en este dispositivo.",
+    "emptyAction": "Preparar un mensaje",
+    "statusDraft": "Borrador",
+    "statusFinal": "Finalizado",
+    "deleteTitle": "¿Eliminar este bosquejo?",
+    "deleteHint": "No podrás recuperarlo después."
   },
   "raioX": {
     "description": "Analiza versículos bíblicos en profundidad con comparación de versiones, etimología y contexto histórico.",
@@ -159,7 +183,8 @@
     "keywords": "Palabras Clave en el Original",
     "historical": "Contexto Histórico",
     "literary": "Contexto Literario",
-    "theological": "Aplicación Teológica"
+    "theological": "Aplicación Teológica",
+    "submit": "Analizar"
   },
   "devocional": {
     "description": "Genera devocionales personalizados con lectura, meditación y oración sugerida para el crecimiento espiritual.",
@@ -168,7 +193,8 @@
     "loading": "Generando devocional...",
     "reading": "Lectura del Día",
     "meditation": "Meditación",
-    "prayer": "Oración Sugerida"
+    "prayer": "Oración Sugerida",
+    "submit": "Crear devocional"
   },
   "nomes": {
     "description": "Descubre el significado de nombres bíblicos a través de la etimología e historia.",
@@ -182,7 +208,14 @@
     "hebrew": "Hebreo",
     "greek": "Griego",
     "aramaic": "Arameo",
-    "latin": "Latín"
+    "latin": "Latín",
+    "submit": "Buscar",
+    "examples": [
+      "Juan",
+      "María",
+      "Emanuel",
+      "Abraham"
+    ]
   },
   "garimpo": {
     "description": "Busca versículos bíblicos por tema. Descubre lo que la Biblia dice sobre los temas que buscas.",
@@ -201,7 +234,8 @@
     "suggestionHope": "Esperanza",
     "suggestionJoy": "Alegría",
     "suggestionWisdom": "Sabiduría",
-    "suggestionGratitude": "Gratitud"
+    "suggestionGratitude": "Gratitud",
+    "submit": "Buscar"
   },
   "mural": {
     "description": "Comparte tus peticiones de oración con la comunidad y ora por las peticiones de otros.",
@@ -222,11 +256,22 @@
     "categoryWork": "Trabajo",
     "categorySpirituality": "Espiritualidad",
     "categoryGeneral": "General",
-    "anonymous": "Anónimo"
+    "anonymous": "Anónimo",
+    "writeButton": "Escribir una petición",
+    "cancelWrite": "Cerrar formulario",
+    "nameLabel": "Tu nombre (opcional)",
+    "nameShort": "En blanco, aparece como Anónimo",
+    "requestLabel": "Tu petición",
+    "categoryChoose": "Elegir categoría",
+    "removeImage": "Quitar imagen",
+    "sent": "Petición enviada. Oraremos contigo.",
+    "prayed": "Orando contigo ({{count}})",
+    "prayingNow": "Peticiones de la comunidad"
   },
   "voz": {
     "description": "Recibe una palabra de Dios para el día. Una promesa bíblica seleccionada especialmente para ti.",
-    "button": "Recibir Palabra"
+    "button": "Recibir Palabra",
+    "again": "Recibir otra palabra"
   },
   "pulpito": {
     "description": "Consulta esquemas compartidos por otros predicadores de la comunidad.",
@@ -315,7 +360,11 @@
       "3 Juan",
       "Judas",
       "Apocalipsis"
-    ]
+    ],
+    "chapterName": "Capítulo",
+    "verseName": "Ir al versículo",
+    "listenChapter": "Escuchar capítulo",
+    "choose": "Elegir pasaje"
   },
   "install": {
     "title": "Instalar Herramientas del Cristiano",
@@ -328,7 +377,14 @@
     "small": "P",
     "medium": "M",
     "large": "G",
-    "xlarge": "MG"
+    "xlarge": "MG",
+    "label": "Tamaño del texto",
+    "names": [
+      "Pequeño",
+      "Mediano",
+      "Grande",
+      "Muy grande"
+    ]
   },
   "notFound": {
     "title": "¡Oops! Página no encontrada",
@@ -345,7 +401,8 @@
     "edit": "Editar",
     "close": "Cerrar",
     "aiError": "No se pudo obtener la respuesta. Inténtalo de nuevo.",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "backTo": "Volver"
   },
   "livraria": {
     "title": "Librería",
@@ -371,11 +428,28 @@
       "changeTheme": "Cambiar tema",
       "close": "Cerrar lectura",
       "listen": "Escuchar capítulo",
-      "stopListening": "Detener lectura"
+      "stopListening": "Detener lectura",
+      "appearance": "Apariencia de lectura",
+      "size": "Tamaño de letra",
+      "background": "Fondo",
+      "themePaper": "Papel",
+      "themeSepia": "Sepia",
+      "themeNight": "Nocturno",
+      "listening": "Escuchando el capítulo",
+      "pausedLabel": "En pausa",
+      "pause": "Pausar",
+      "resume": "Continuar",
+      "stop": "Detener",
+      "noSpeech": "Este dispositivo no tiene lectura en voz alta.",
+      "prevChapter": "Capítulo anterior"
     },
-    "badge_one": "1 libro • 1 producto",
-    "badge_other": "{{count}} volúmenes • 1 producto",
-    "readNow": "Leer ahora"
+    "badge_one": "1 libro",
+    "badge_other": "{{count}} volúmenes",
+    "readNow": "Leer ahora",
+    "volume": "Volumen {{number}}",
+    "lockedHint": "No incluido en tus compras.",
+    "finished": "Leído",
+    "percentRead": "{{progress}}% leído"
   },
   "workspace": {
     "welcome": "Sigue preparando lo que Dios puso en tu corazón.",
@@ -448,7 +522,9 @@
     ],
     "sermonsPrepared_one": "{{count}} mensaje preparado",
     "sermonsPrepared_other": "{{count}} mensajes preparados",
-    "verseUnavailable": "No se pudo cargar el versículo en este momento."
+    "verseUnavailable": "No se pudo cargar el versículo en este momento.",
+    "prepareMessage": "Preparar un mensaje",
+    "exploreJourney": "Recorrer la Jornada"
   },
   "journey": {
     "title": "Recorrido por la Biblia",
@@ -560,6 +636,18 @@
       "bible": "Texto bíblico",
       "bibleNote": "Los capítulos se obtienen, en las versiones indicadas en el selector de la Biblia, de:",
       "fonts": "Tipografías"
-    }
+    },
+    "chapterProgress": "Capítulo {{current}} de {{total}}",
+    "backToBook": "Volver al libro",
+    "charactersLabel": "Personajes",
+    "placesLabel": "Lugares",
+    "referencesLabel": "Leer también",
+    "notesSaved": "Guardadas en este dispositivo.",
+    "sourcesPublicDomain": "Todas de dominio público, de Julius Schnorr von Carolsfeld, 1860:"
+  },
+  "tools": {
+    "youGet": "Lo que recibirás",
+    "examples": "Ejemplos",
+    "slowHint": "Puede tardar hasta un minuto."
   }
 }

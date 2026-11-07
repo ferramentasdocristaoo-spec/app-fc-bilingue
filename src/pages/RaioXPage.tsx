@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Loader2, BookOpen, BookText, Globe, Lightbulb } from "lucide-react";
+import { ToolError, ToolForm, ToolPromise, ToolWait } from "@/components/ToolKit";
 import { useAi } from "@/hooks/use-ai";
-import { escapeHtml } from "@/lib/utils";
 
 interface RaioXResult {
   referencia: string;
@@ -16,22 +13,14 @@ interface RaioXResult {
   aplicacao: string;
 }
 
-const SectionCard = ({ titulo, icone, children }: { titulo: string; icone: React.ReactNode; children: React.ReactNode }) => (
-  <div className="ed-panel">
-    <div className="flex items-center gap-2">
-      {icone}
-      <h3 className="ed-panel-title">{titulo}</h3>
-    </div>
-    <div className="ed-panel-body">{children}</div>
-  </div>
-);
-
 const RaioXPage = () => {
   const { t } = useTranslation();
   const [referencia, setReferencia] = useState("");
   const [refPesquisada, setRefPesquisada] = useState("");
   const [resultado, setResultado] = useState<RaioXResult | null>(null);
-  const { callAi, loading } = useAi();
+  const { callAi, loading, failed } = useAi();
+  const books = t("biblia.books", { returnObjects: true }) as string[];
+  const exemplos = [`${books[42]} 3:16`, `${books[18]} 23:1`, `${books[44]} 8:28`];
 
   const buscar = async () => {
     if (!referencia.trim()) return;
@@ -42,68 +31,40 @@ const RaioXPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.raioX.title")}>
-      <div className="max-w-2xl mx-auto flex flex-col gap-5">
-        <p className="ed-lede">{t("raioX.description")}</p>
+    <PageShell title={t("sidebar.raioX.title")} lede={t("raioX.description")}>
+      <ToolForm id="raio-x-ref" label={t("raioX.label")} placeholder={t("raioX.placeholder")} value={referencia} onChange={setReferencia} onSubmit={buscar} submitLabel={t("raioX.submit")} loading={loading} examples={exemplos} />
 
-        <div className="ed-panel">
-          <p className="text-sm text-muted-foreground font-medium">{t("raioX.label")}</p>
-          <div className="flex gap-2">
-            <Input placeholder={t("raioX.placeholder")} value={referencia} onChange={(e) => setReferencia(e.target.value)} onKeyDown={(e) => e.key === "Enter" && buscar()} />
-            <Button onClick={buscar} disabled={loading || !referencia.trim()} className="gap-2 px-5">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            </Button>
-          </div>
-        </div>
+      {!resultado && !loading && !failed && <ToolPromise items={[t("raioX.comparative"), t("raioX.keywords"), t("raioX.historical"), t("raioX.literary"), t("raioX.theological")]} />}
+      {loading && <ToolWait label={t("raioX.loading", { reference: refPesquisada })} />}
+      {failed && !loading && <ToolError onRetry={buscar} />}
 
-        {loading && (
-          <div className="flex items-center justify-center py-12 gap-3 text-muted-foreground">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            <span className="text-sm" dangerouslySetInnerHTML={{ __html: t("raioX.loading", { reference: `<strong class="text-primary">${escapeHtml(refPesquisada)}</strong>` }) }} />
-          </div>
-        )}
-
-        {resultado && !loading && (
-          <div className="flex flex-col gap-4 animate-fade-in">
-            <div className="text-center">
-              <h2 className="ed-result-title">{resultado.referencia}</h2>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="ed-section-title">{t("raioX.comparative")}</h3>
-              {resultado.versoes.map((v, i) => (
-                <div key={i} className="ed-panel">
-                  <h4 className="ed-panel-title">{v.sigla}</h4>
-                  <p className="ed-quote">"{v.texto}"</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="ed-section-title">{t("raioX.keywords")}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {resultado.palavras_chave.map((p, i) => (
-                  <div key={i} className="ed-panel">
-                    <h4 className="ed-panel-title">{p.palavra}</h4>
-                    <p className="text-foreground text-base font-medium">{p.original} <span className="text-muted-foreground text-sm">({p.transliteracao})</span></p>
-                    <p className="text-xs text-muted-foreground">{p.significado}</p>
-                  </div>
-                ))}
+      {resultado && !loading && (
+        <article className="ed-result">
+          <header><h2 className="ed-result-title">{resultado.referencia}</h2></header>
+          <section className="ed-result-section">
+            <h3>{t("raioX.comparative")}</h3>
+            {resultado.versoes.map((v, i) => (
+              <div key={i} className="ed-result-item">
+                <h4>{v.sigla}</h4>
+                <p className="italic">“{v.texto}”</p>
               </div>
-            </div>
-
-            <SectionCard titulo={t("raioX.historical")} icone={<Globe className="w-4 h-4 text-primary" />}>
-              <p>{resultado.contexto_historico}</p>
-            </SectionCard>
-            <SectionCard titulo={t("raioX.literary")} icone={<BookText className="w-4 h-4 text-primary" />}>
-              <p>{resultado.contexto_literario}</p>
-            </SectionCard>
-            <SectionCard titulo={t("raioX.theological")} icone={<Lightbulb className="w-4 h-4 text-primary" />}>
-              <p>{resultado.aplicacao}</p>
-            </SectionCard>
-          </div>
-        )}
-      </div>
+            ))}
+          </section>
+          <section className="ed-result-section">
+            <h3>{t("raioX.keywords")}</h3>
+            {resultado.palavras_chave.map((p, i) => (
+              <div key={i} className="ed-result-item">
+                <h4>{p.palavra}</h4>
+                <p><span className="ed-original">{p.original}</span> <span className="ed-sub">{p.transliteracao}</span></p>
+                <p className="ed-sub">{p.significado}</p>
+              </div>
+            ))}
+          </section>
+          <section className="ed-result-section"><h3>{t("raioX.historical")}</h3><p>{resultado.contexto_historico}</p></section>
+          <section className="ed-result-section"><h3>{t("raioX.literary")}</h3><p>{resultado.contexto_literario}</p></section>
+          <section className="ed-result-section"><h3>{t("raioX.theological")}</h3><p>{resultado.aplicacao}</p></section>
+        </article>
+      )}
     </PageShell>
   );
 };
