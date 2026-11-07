@@ -46,6 +46,19 @@ export interface DailyVerse {
   verse: number;
 }
 
+/** Versículo avulso na versão do idioma; null se a Bíblia não responder. */
+export async function fetchVerse(language: string, ref: { book: number; chapter: number; verse: number }): Promise<DailyVerse | null> {
+  const lang = language.toLowerCase().split("-")[0];
+  const version = VERSION_BY_LANG[lang] ?? "OL";
+  try {
+    const verses = (await fetchBibleChapter({ version, bookId: ref.book, chapter: ref.chapter })) as Array<{ verse?: number; text?: string }>;
+    const found = verses.find((v) => v?.verse === ref.verse);
+    return found?.text ? { text: cleanBibleText(found.text), ...ref } : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchDailyVerse(language: string): Promise<DailyVerse | null> {
   const lang = language.toLowerCase().split("-")[0];
   const version = VERSION_BY_LANG[lang] ?? "OL";
