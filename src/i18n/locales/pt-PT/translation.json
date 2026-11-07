@@ -528,6 +528,38 @@
     "figureCredit": "{{artist}}, {{year}}. {{license}}. Fonte: Wikimedia Commons.",
     "publicDomain": "Domínio público",
     "seeOnMap": "Ver este movimento no mapa",
-    "sources": "Fontes e licenças"
+    "sources": "Fontes e licenças",
+    "timeExodus": "Do Egito ao Sinai",
+    "timeNoteExodus": "Datas aproximadas pela cronologia tradicional, a partir de 1 Rs 6:1. Muitos estudiosos propõem uma data mais tardia, por volta de 1270 a.C.",
+    "nextBookExodus": "Levítico",
+    "tabernacle": {
+      "kicker": "O Tabernáculo",
+      "title": "Deus no meio do seu povo",
+      "intro": "Toca num número da gravura para conhecer cada parte. Mais abaixo, a planta mostra o interior da tenda.",
+      "credit": "Ilustração gerada por IA em estilo de gravura; reconstituição, não registo histórico.",
+      "planTitle": "Por dentro da tenda",
+      "planNote": "Planta esquemática, com o leste à esquerda como na gravura; por isso o norte fica em baixo. As proporções seguem a leitura tradicional.",
+      "holyPlace": "Lugar Santo",
+      "mostHoly": "Santo dos Santos",
+      "veil": "véu",
+      "entrance": "entrada (leste)",
+      "partOf": "Parte {{n}} de {{total}}",
+      "next": "Próxima parte"
+    },
+    "sourcesPage": {
+      "intro": "De onde vem o material da Jornada e em que condições é usado.",
+      "maps": "Mapas",
+      "openBible": "Coordenadas e grau de identificação dos lugares bíblicos.",
+      "naturalEarth": "Litoral, rios e lagos do mapa-base.",
+      "engravings": "Gravuras",
+      "engravingsNote": "Xilogravuras de Die Bibel in Bildern (1860), conferidas uma a uma no Wikimedia Commons.",
+      "tabernacle": "Ilustração do Tabernáculo",
+      "tabernacleNote": "Gerada por inteligência artificial em 2026, com uma cromolitografia da Bíblia Holman (1890) como referência de estilo e Êxodo 25–27 como referência de conteúdo. É uma reconstituição ilustrativa.",
+      "texts": "Textos da Jornada",
+      "textsNote": "Paragens, perguntas, famílias e linhas do tempo foram escritas para a Jornada a partir do texto bíblico citado em cada uma.",
+      "bible": "Texto bíblico",
+      "bibleNote": "Os capítulos são obtidos, nas versões indicadas no seletor da Bíblia, a partir de:",
+      "fonts": "Tipos de letra"
+    }
   }
 }

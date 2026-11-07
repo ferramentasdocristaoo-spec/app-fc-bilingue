@@ -528,6 +528,38 @@
     "figureCredit": "{{artist}}, {{year}}. {{license}}. Source : Wikimedia Commons.",
     "publicDomain": "Domaine public",
     "seeOnMap": "Voir ce mouvement sur la carte",
-    "sources": "Sources et licences"
+    "sources": "Sources et licences",
+    "timeExodus": "De l'Égypte au Sinaï",
+    "timeNoteExodus": "Dates approximatives selon la chronologie traditionnelle, à partir de 1 R 6,1. De nombreux spécialistes proposent une date plus tardive, vers 1270 av. J.-C.",
+    "nextBookExodus": "Lévitique",
+    "tabernacle": {
+      "kicker": "Le tabernacle",
+      "title": "Dieu au milieu de son peuple",
+      "intro": "Touchez un numéro sur la gravure pour découvrir chaque partie. Plus bas, le plan montre l'intérieur de la tente.",
+      "credit": "Illustration générée par IA dans le style de la gravure ; une reconstitution, non un document historique.",
+      "planTitle": "À l'intérieur de la tente",
+      "planNote": "Plan schématique, l'est à gauche comme sur la gravure ; le nord se trouve donc en bas. Les proportions suivent la lecture traditionnelle.",
+      "holyPlace": "Lieu saint",
+      "mostHoly": "Lieu très saint",
+      "veil": "voile",
+      "entrance": "entrée (est)",
+      "partOf": "Partie {{n}} sur {{total}}",
+      "next": "Partie suivante"
+    },
+    "sourcesPage": {
+      "intro": "D'où vient le contenu du Parcours et à quelles conditions il est utilisé.",
+      "maps": "Cartes",
+      "openBible": "Coordonnées et degré d'identification des lieux bibliques.",
+      "naturalEarth": "Côtes, fleuves et lacs de la carte de base.",
+      "engravings": "Gravures",
+      "engravingsNote": "Gravures sur bois de Die Bibel in Bildern (1860), vérifiées une à une sur Wikimedia Commons.",
+      "tabernacle": "Illustration du tabernacle",
+      "tabernacleNote": "Générée par intelligence artificielle en 2026, avec une chromolithographie de la Bible Holman (1890) comme référence de style et Exode 25–27 comme référence de contenu. C'est une reconstitution illustrative.",
+      "texts": "Textes du Parcours",
+      "textsNote": "Les étapes, questions, familles et chronologies ont été écrites pour le Parcours à partir du texte biblique cité dans chacune.",
+      "bible": "Texte biblique",
+      "bibleNote": "Les chapitres proviennent, dans les versions indiquées dans le sélecteur de la Bible, de :",
+      "fonts": "Polices"
+    }
   }
 }

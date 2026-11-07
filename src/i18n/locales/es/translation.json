@@ -528,6 +528,38 @@
     "figureCredit": "{{artist}}, {{year}}. {{license}}. Fuente: Wikimedia Commons.",
     "publicDomain": "Dominio público",
     "seeOnMap": "Ver este movimiento en el mapa",
-    "sources": "Fuentes y licencias"
+    "sources": "Fuentes y licencias",
+    "timeExodus": "De Egipto al Sinaí",
+    "timeNoteExodus": "Fechas aproximadas según la cronología tradicional, a partir de 1 R 6:1. Muchos estudiosos proponen una fecha posterior, hacia 1270 a.C.",
+    "nextBookExodus": "Levítico",
+    "tabernacle": {
+      "kicker": "El Tabernáculo",
+      "title": "Dios en medio de su pueblo",
+      "intro": "Toca un número del grabado para conocer cada parte. Más abajo, el plano muestra el interior de la tienda.",
+      "credit": "Ilustración generada por IA en estilo de grabado; reconstrucción, no registro histórico.",
+      "planTitle": "Dentro de la tienda",
+      "planNote": "Plano esquemático, con el este a la izquierda como en el grabado; por eso el norte queda abajo. Las proporciones siguen la lectura tradicional.",
+      "holyPlace": "Lugar Santo",
+      "mostHoly": "Lugar Santísimo",
+      "veil": "velo",
+      "entrance": "entrada (este)",
+      "partOf": "Parte {{n}} de {{total}}",
+      "next": "Siguiente parte"
+    },
+    "sourcesPage": {
+      "intro": "De dónde procede el material de la Jornada y en qué condiciones se usa.",
+      "maps": "Mapas",
+      "openBible": "Coordenadas y grado de identificación de los lugares bíblicos.",
+      "naturalEarth": "Costas, ríos y lagos del mapa base.",
+      "engravings": "Grabados",
+      "engravingsNote": "Xilografías de Die Bibel in Bildern (1860), comprobadas una a una en Wikimedia Commons.",
+      "tabernacle": "Ilustración del Tabernáculo",
+      "tabernacleNote": "Generada por inteligencia artificial en 2026, con una cromolitografía de la Biblia Holman (1890) como referencia de estilo y Éxodo 25–27 como referencia de contenido. Es una reconstrucción ilustrativa.",
+      "texts": "Textos de la Jornada",
+      "textsNote": "Paradas, preguntas, familias y líneas de tiempo se escribieron para la Jornada a partir del texto bíblico citado en cada una.",
+      "bible": "Texto bíblico",
+      "bibleNote": "Los capítulos se obtienen, en las versiones indicadas en el selector de la Biblia, de:",
+      "fonts": "Tipografías"
+    }
   }
 }

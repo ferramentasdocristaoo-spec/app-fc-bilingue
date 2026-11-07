@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getJourneySectionDetails } from "@/features/bible-journey/journey-details";
-import { getGenesisInteractive, journeyPeople } from "@/features/bible-journey/genesis-interactive";
+import { journeyPeople } from "@/features/bible-journey/genesis-interactive";
+import { getJourneyInteractive } from "@/features/bible-journey/interactive";
 import { journeyPlaces } from "@/features/bible-journey/places";
-import { formatGenesisRef } from "@/features/bible-journey/references";
+import { formatBibleRef } from "@/features/bible-journey/references";
 import type { JourneyBook, JourneyLanguage, JourneySection } from "@/features/bible-journey/types";
 import { JourneyMap } from "./JourneyMap";
+import { JourneyTabernacle } from "./JourneyTabernacle";
 import { JourneyCheckpointQuiz, JourneyEra, JourneyFamily } from "./JourneyStudyAids";
 import { chapterRange, roman } from "./journey-utils";
 import "./JourneyInteractive.css";
@@ -25,7 +27,7 @@ export function JourneyMovement({ book, section, language, testament, onProgress
   const index = book.sections.findIndex(item => item.slug === section.slug);
   const content = section.content[language];
   const details = getJourneySectionDetails(book, section, language);
-  const interactive = getGenesisInteractive(book.slug, section.slug);
+  const interactive = getJourneyInteractive(book.slug, section.slug);
   const [stopIndex, setStopIndex] = useState(0);
   const [figureFailed, setFigureFailed] = useState(false);
   useEffect(() => { setStopIndex(0); setFigureFailed(false); }, [section.slug]);
@@ -40,6 +42,12 @@ export function JourneyMovement({ book, section, language, testament, onProgress
   const place = stop?.placeId ? journeyPlaces[stop.placeId] : undefined;
   const stopTitle = stop ? stop.title?.[language] ?? place?.names[language] ?? "" : "";
 
+  // No Êxodo os dados gerais repetem os personagens do livro e um princípio em rodízio: usa quem aparece nas paragens.
+  const isExodus = book.slug === "exodus";
+  const headerPeople = isExodus
+    ? [...new Set(stops.flatMap(item => item.people))].filter(id => id !== "god").map(id => journeyPeople[id]?.[language] ?? id)
+    : details.characters;
+
   return <section className="jmove" id="jornada-movimento" aria-labelledby="jmove-title">
     <header className="jmove-head">
       <span className="ed-eyebrow">{t("journey.movement")} {roman(index)} · {t("journey.chapterRange", { range: chapterRange(section.startChapter, section.endChapter) })}</span>
@@ -47,9 +55,9 @@ export function JourneyMovement({ book, section, language, testament, onProgress
       <p className="ed-lede">{details.event || content.description}</p>
       <dl className="jtags">
         {details.place && <div><dt>{t("journey.place")}</dt><dd>{details.place}</dd></div>}
-        {details.characters.length > 0 && <div><dt>{t("journey.people")}</dt><dd>{details.characters.join(" · ")}</dd></div>}
+        {headerPeople.length > 0 && <div><dt>{t("journey.people")}</dt><dd>{headerPeople.join(" · ")}</dd></div>}
       </dl>
-      {details.connection && <p className="jmove-connection"><span>{t("journey.connection")}</span> {details.connection}</p>}
+      {!isExodus && details.connection && <p className="jmove-connection"><span>{t("journey.connection")}</span> {details.connection}</p>}
     </header>
 
     {interactive && stop && <>
@@ -58,14 +66,14 @@ export function JourneyMovement({ book, section, language, testament, onProgress
           <JourneyMap stops={stops} activeIndex={stopIndex} onSelect={setStopIndex} language={language} label={`${t("journey.mapTitle")}: ${content.title}`} />
           <figcaption>
             <span>{t("journey.mapNote")}</span>
-            <span>{t("journey.mapCredit")}</span>
+            <span>{t("journey.mapCredit")} <Link to="/jornada/fontes">{t("journey.sources")}</Link></span>
           </figcaption>
         </figure>
 
         <div className="jstage-stop" aria-live="polite">
           <span className="jstage-count">{t("journey.stopOf", { n: stopIndex + 1, total: stops.length })}</span>
           <h4>{stopTitle}</h4>
-          <span className="jstage-ref">{formatGenesisRef(stop.ref, language)}</span>
+          <span className="jstage-ref">{formatBibleRef(stop.ref, language)}</span>
           <p>{stop.text[language]}</p>
           <dl className="jtags jtags-small">
             {place && <div><dt>{t("journey.place")}</dt><dd>{place.names[language]} <em>· {t(`journey.confidence.${place.confidence}`)}</em></dd></div>}
@@ -100,6 +108,11 @@ export function JourneyMovement({ book, section, language, testament, onProgress
           })}
         </ol>
       </nav>
+
+      {interactive.tabernacle && <>
+        <div className="ed-orn" aria-hidden>✦</div>
+        <JourneyTabernacle figure={interactive.tabernacle.figure} parts={interactive.tabernacle.parts} language={language} />
+      </>}
 
       <div className="ed-orn" aria-hidden>✦</div>
 

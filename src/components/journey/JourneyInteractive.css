@@ -173,3 +173,34 @@
 .jfigure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.75rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
 .jfigure figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
 .jfigure figcaption a { color: hsl(var(--gold-ink)); text-decoration: none; }
+
+/* ---------- Tabernáculo: gravura com pontos, planta da tenda e texto da parte ---------- */
+.jfigure figcaption a, .jstage-map figcaption a, .jtab-figure figcaption a { color: hsl(var(--gold-ink)); text-decoration: underline; text-underline-offset: 2px; }
+.jtab > h3 { margin: 6px 0 10px; font: 600 clamp(1.625rem, 4vw, 2.125rem)/1.15 var(--font-display); color: hsl(var(--ink)); }
+.jtab > .ed-lede { max-width: 62ch; }
+.jtab .jstage { margin-top: 24px; }
+.jtab-figure, .jtab-plan { margin: 0; }
+.jtab-image { position: relative; line-height: 0; border: 1px solid hsl(var(--rule)); border-radius: 4px; overflow: hidden; background: hsl(var(--paper-2)); }
+.jtab-image img { display: block; width: 100%; height: auto; }
+:root:not(.light) .jtab-image img { filter: brightness(.9); }
+.jtab-pin { position: absolute; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin: -14px 0 0 -14px; padding: 0; border: 1.5px solid #fff8e8; border-radius: 50%; background: #1b2a41; color: #fff8e8; font: 700 0.75rem/1 var(--font-ui); cursor: pointer; box-shadow: 0 1px 4px rgb(0 0 0 / .45); }
+.jtab-pin:hover { background: #7a2e3a; }
+.jtab-pin.is-active { background: #8a2a3a; transform: scale(1.15); }
+.jtab-pin:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 2px; }
+.jtab-figure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.75rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.jtab-figure figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
+.jtab-plan { margin-top: 24px; }
+.jtab-plan figcaption { font: 400 0.75rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); margin-top: 8px; }
+.jtab-plan figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
+.jtab-plan svg { display: block; width: 100%; height: auto; margin-top: 8px; }
+.jtab-room { fill: hsl(var(--paper-2)); stroke: hsl(var(--ink-2)); stroke-width: 1.5; }
+.jtab-veil { stroke: hsl(var(--journey-wine)); stroke-width: 3; stroke-dasharray: 8 4; }
+.jtab-label { font: italic 400 19px var(--font-display); fill: hsl(var(--ink-2)); }
+.jtab-small { font: 400 12px var(--font-ui); fill: hsl(var(--ink-3)); }
+.jtab-spot { cursor: pointer; outline: none; }
+.jtab-hit { fill: transparent; }
+.jtab-dot { fill: hsl(var(--paper)); stroke: hsl(var(--gold-ink)); stroke-width: 2; }
+.jtab-num { font: 700 13px var(--font-ui); fill: hsl(var(--ink)); pointer-events: none; }
+.jtab-spot.is-active .jtab-dot { fill: hsl(var(--journey-wine)); stroke: hsl(var(--paper)); }
+.jtab-spot.is-active .jtab-num { fill: hsl(var(--paper)); }
+.jtab-spot:focus-visible .jtab-dot { stroke: hsl(var(--gold)); stroke-width: 4; }

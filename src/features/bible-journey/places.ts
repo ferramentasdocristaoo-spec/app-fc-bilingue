@@ -43,12 +43,23 @@ export const journeyPlaces: Record<string, JourneyPlace> = {
   dothan: { id: "dothan", openBibleId: "ab635e4", lon: 35.239861, lat: 32.413528, confidence: "probable", names: n("Dotã", "Dothan", "Dotán", "Dothan", "Dotan", "Dotan") },
   goshen: { id: "goshen", openBibleId: "a60f092", lon: 31.834217, lat: 30.79937, confidence: "probable", areaKm: 40, names: n("Gósen", "Goshen", "Gosén", "Gosen", "Gosen", "Goschen") },
   machpelah: { id: "machpelah", openBibleId: "ae00861", lon: 35.110758, lat: 31.524672, confidence: "probable", names: n("Caverna de Macpela", "Cave of Machpelah", "Cueva de Macpela", "Grotte de Makpéla", "Grotta di Macpela", "Höhle Machpela") },
+  // Êxodo. Quase todos debatidos: o ponto é a identificação mais votada no OpenBible.
+  rameses: { id: "rameses", openBibleId: "a079b21", lon: 31.834217, lat: 30.79937, confidence: "probable", names: n("Ramessés", "Rameses", "Ramesés", "Ramsès", "Ramses", "Ramses") },
+  succoth: { id: "succoth", openBibleId: "aa28709", lon: 32.099, lat: 30.5527, confidence: "probable", names: n("Sucote", "Succoth", "Sucot", "Soukkoth", "Succot", "Sukkot") },
+  "red-sea": { id: "red-sea", openBibleId: "a3d18b2", lon: 32.377778, lat: 30.338333, confidence: "debated", names: n("Mar Vermelho", "Red Sea", "Mar Rojo", "Mer Rouge", "Mar Rosso", "Rotes Meer") },
+  marah: { id: "marah", openBibleId: "ad3970d", lon: 32.94284, lat: 29.34604, confidence: "debated", names: n("Mara", "Marah", "Mara", "Mara", "Mara", "Mara") },
+  elim: { id: "elim", openBibleId: "a2410c1", lon: 32.915833, lat: 29.254722, confidence: "debated", names: n("Elim", "Elim", "Elim", "Élim", "Elim", "Elim") },
+  rephidim: { id: "rephidim", openBibleId: "a05ebb7", lon: 33.880278, lat: 28.623056, confidence: "debated", names: n("Refidim", "Rephidim", "Refidim", "Rephidim", "Refidim", "Refidim") },
+  sinai: { id: "sinai", openBibleId: "abfba2a", lon: 33.973333, lat: 28.539722, confidence: "debated", names: n("Monte Sinai", "Mount Sinai", "Monte Sinaí", "Mont Sinaï", "Monte Sinai", "Berg Sinai") },
+  midian: { id: "midian", openBibleId: "acc6d8e", lon: 35.0122, lat: 28.4947, confidence: "probable", areaKm: 60, names: n("Midiã", "Midian", "Madián", "Madian", "Madian", "Midian") },
+  "kadesh-barnea": { id: "kadesh-barnea", openBibleId: "ac2cef0", lon: 34.422222, lat: 30.648333, confidence: "probable", names: n("Cades-Barneia", "Kadesh-barnea", "Cades-barnea", "Kadès-Barnéa", "Kades-Barnea", "Kadesch-Barnea") },
+  nebo: { id: "nebo", openBibleId: "aefaa2d", lon: 35.75, lat: 31.766667, confidence: "probable", names: n("Monte Nebo", "Mount Nebo", "Monte Nebo", "Mont Nebo", "Monte Nebo", "Berg Nebo") },
 };
 
 /** Rótulos de regiões e águas desenhados no mapa-base (sem ponto). */
 export const journeyMapLabels: { id: string; lon: number; lat: number; kind: "water" | "region"; names: Record<JourneyLanguage, string> }[] = [
   { id: "great-sea", lon: 32.4, lat: 33.6, kind: "water", names: n("Mar Grande", "Great Sea", "Mar Grande", "Grande Mer", "Mar Grande", "Großes Meer") },
-  { id: "red-sea", lon: 34.0, lat: 28.4, kind: "water", names: n("Mar Vermelho", "Red Sea", "Mar Rojo", "Mer Rouge", "Mar Rosso", "Rotes Meer") },
+  { id: "red-sea", lon: 34.7, lat: 27.85, kind: "water", names: n("Mar Vermelho", "Red Sea", "Mar Rojo", "Mer Rouge", "Mar Rosso", "Rotes Meer") },
   { id: "gulf", lon: 49.0, lat: 28.6, kind: "water", names: n("Golfo Pérsico", "Persian Gulf", "Golfo Pérsico", "Golfe Persique", "Golfo Persico", "Persischer Golf") },
   { id: "canaan", lon: 34.0, lat: 31.85, kind: "region", names: n("Canaã", "Canaan", "Canaán", "Canaan", "Canaan", "Kanaan") },
   { id: "aram", lon: 38.0, lat: 35.6, kind: "region", names: n("Arã", "Aram", "Aram", "Aram", "Aram", "Aram") },

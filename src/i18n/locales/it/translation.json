@@ -528,6 +528,38 @@
     "figureCredit": "{{artist}}, {{year}}. {{license}}. Fonte: Wikimedia Commons.",
     "publicDomain": "Pubblico dominio",
     "seeOnMap": "Vedi questo movimento sulla mappa",
-    "sources": "Fonti e licenze"
+    "sources": "Fonti e licenze",
+    "timeExodus": "Dall'Egitto al Sinai",
+    "timeNoteExodus": "Date approssimative secondo la cronologia tradizionale, a partire da 1 Re 6,1. Molti studiosi propongono una data più tarda, intorno al 1270 a.C.",
+    "nextBookExodus": "Levitico",
+    "tabernacle": {
+      "kicker": "Il tabernacolo",
+      "title": "Dio in mezzo al suo popolo",
+      "intro": "Tocca un numero sull'incisione per conoscere ogni parte. Più in basso, la pianta mostra l'interno della tenda.",
+      "credit": "Illustrazione generata con IA in stile incisione; una ricostruzione, non un documento storico.",
+      "planTitle": "Dentro la tenda",
+      "planNote": "Pianta schematica, con l'est a sinistra come nell'incisione; perciò il nord è in basso. Le proporzioni seguono la lettura tradizionale.",
+      "holyPlace": "Luogo Santo",
+      "mostHoly": "Santissimo",
+      "veil": "velo",
+      "entrance": "ingresso (est)",
+      "partOf": "Parte {{n}} di {{total}}",
+      "next": "Parte successiva"
+    },
+    "sourcesPage": {
+      "intro": "Da dove proviene il materiale del Viaggio e a quali condizioni è usato.",
+      "maps": "Mappe",
+      "openBible": "Coordinate e grado di identificazione dei luoghi biblici.",
+      "naturalEarth": "Coste, fiumi e laghi della mappa di base.",
+      "engravings": "Incisioni",
+      "engravingsNote": "Xilografie da Die Bibel in Bildern (1860), verificate una per una su Wikimedia Commons.",
+      "tabernacle": "Illustrazione del tabernacolo",
+      "tabernacleNote": "Generata con intelligenza artificiale nel 2026, con una cromolitografia della Bibbia Holman (1890) come riferimento di stile ed Esodo 25–27 come riferimento di contenuto. È una ricostruzione illustrativa.",
+      "texts": "Testi del Viaggio",
+      "textsNote": "Tappe, domande, famiglie e linee del tempo sono state scritte per il Viaggio a partire dal testo biblico citato in ciascuna.",
+      "bible": "Testo biblico",
+      "bibleNote": "I capitoli sono ottenuti, nelle versioni indicate nel selettore della Bibbia, da:",
+      "fonts": "Caratteri"
+    }
   }
 }

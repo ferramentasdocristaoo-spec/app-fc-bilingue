@@ -5,8 +5,8 @@ import type { BibleRef } from "./references";
  * Camada interativa de Génesis: paragens no mapa, ponto de paragem (quiz),
  * família e tempo por movimento. Textos escritos para a Jornada, nos 6 idiomas.
  */
-type L<T = string> = Record<JourneyLanguage, T>;
-const L = <T = string>(pt: T, en: T, es: T, fr: T, it: T, de: T): L<T> => ({ "pt-PT": pt, en, es, fr, it, de });
+export type L<T = string> = Record<JourneyLanguage, T>;
+export const L = <T = string>(pt: T, en: T, es: T, fr: T, it: T, de: T): L<T> => ({ "pt-PT": pt, en, es, fr, it, de });
 
 export interface JourneyStop {
   id: string;
@@ -23,6 +23,9 @@ export interface JourneyCheckpoint { ref: BibleRef; question: L; options: L<stri
 export interface FamilyNode { person: string; spouses?: string[]; highlight?: boolean; children?: FamilyNode[] }
 export interface JourneyFigure { src: string; width: number; height: number; title: L; artist: string; year: string; sourceUrl: string; license: string }
 
+/** Parte do Tabernáculo: ponto na gravura (x, y em %) e/ou na planta da tenda (plan). */
+export interface TabernaclePart { id: string; x?: number; y?: number; plan?: { x: number; y: number }; name: L; refs: BibleRef[]; text: L }
+
 export interface JourneyInteractiveSection {
   stops: JourneyStop[];
   checkpoint: JourneyCheckpoint;
@@ -30,6 +33,8 @@ export interface JourneyInteractiveSection {
   /** Marcos de tempo deste movimento (anos a.C. negativos); vazio = história primordial sem datação. */
   era: { label: L; year?: number }[];
   figure?: JourneyFigure;
+  /** Figura interativa do Tabernáculo (Êxodo). */
+  tabernacle?: { figure: JourneyFigure; parts: TabernaclePart[] };
 }
 
 export const journeyPeople: Record<string, L> = {
@@ -74,6 +79,24 @@ export const journeyPeople: Record<string, L> = {
   manasseh: L("Manassés", "Manasseh", "Manasés", "Manassé", "Manasse", "Manasse"),
   ephraim: L("Efraim", "Ephraim", "Efraín", "Éphraïm", "Efraim", "Ephraim"),
   pharaoh: L("Faraó", "Pharaoh", "Faraón", "Pharaon", "Faraone", "Pharao"),
+  // Êxodo
+  moses: L("Moisés", "Moses", "Moisés", "Moïse", "Mosè", "Mose"),
+  aaron: L("Arão", "Aaron", "Aarón", "Aaron", "Aronne", "Aaron"),
+  miriam: L("Miriam", "Miriam", "María", "Miriam", "Miriam", "Mirjam"),
+  kohath: L("Coate", "Kohath", "Coat", "Qehath", "Keat", "Kehat"),
+  amram: L("Anrão", "Amram", "Amram", "Amram", "Amram", "Amram"),
+  jochebed: L("Joquebede", "Jochebed", "Jocabed", "Jokébed", "Iochebed", "Jochebed"),
+  zipporah: L("Zípora", "Zipporah", "Séfora", "Séphora", "Zippora", "Zippora"),
+  gershom: L("Gérson", "Gershom", "Gersón", "Guershom", "Ghersom", "Gerschom"),
+  eliezer: L("Eliézer", "Eliezer", "Eliezer", "Éliézer", "Eliezer", "Elieser"),
+  jethro: L("Jetro", "Jethro", "Jetro", "Jéthro", "Ietro", "Jitro"),
+  joshua: L("Josué", "Joshua", "Josué", "Josué", "Giosuè", "Josua"),
+  caleb: L("Calebe", "Caleb", "Caleb", "Caleb", "Caleb", "Kaleb"),
+  hur: L("Hur", "Hur", "Hur", "Hur", "Cur", "Hur"),
+  nadab: L("Nadabe", "Nadab", "Nadab", "Nadab", "Nadab", "Nadab"),
+  abihu: L("Abiú", "Abihu", "Abiú", "Abihu", "Abiu", "Abihu"),
+  eleazar: L("Eleazar", "Eleazar", "Eleazar", "Éléazar", "Eleazar", "Eleasar"),
+  ithamar: L("Itamar", "Ithamar", "Itamar", "Ithamar", "Itamar", "Itamar"),
 };
 
 export const genesisInteractive: Record<string, JourneyInteractiveSection> = {

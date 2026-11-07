@@ -528,6 +528,38 @@
     "figureCredit": "{{artist}}, {{year}}. {{license}}. Quelle: Wikimedia Commons.",
     "publicDomain": "Gemeinfrei",
     "seeOnMap": "Diesen Abschnitt auf der Karte ansehen",
-    "sources": "Quellen und Lizenzen"
+    "sources": "Quellen und Lizenzen",
+    "timeExodus": "Von Ägypten zum Sinai",
+    "timeNoteExodus": "Ungefähre Daten nach der traditionellen Chronologie, ausgehend von 1. Könige 6,1. Viele Fachleute schlagen ein späteres Datum vor, um 1270 v. Chr.",
+    "nextBookExodus": "Levitikus",
+    "tabernacle": {
+      "kicker": "Die Stiftshütte",
+      "title": "Gott mitten unter seinem Volk",
+      "intro": "Tippe auf eine Zahl im Bild, um jeden Teil kennenzulernen. Weiter unten zeigt der Grundriss das Innere des Zeltes.",
+      "credit": "KI-generierte Illustration im Stil eines Stichs; eine Rekonstruktion, kein historisches Zeugnis.",
+      "planTitle": "Im Inneren des Zeltes",
+      "planNote": "Schematischer Grundriss, Osten links wie im Bild, daher liegt Norden unten. Die Proportionen folgen der traditionellen Lesart.",
+      "holyPlace": "Das Heilige",
+      "mostHoly": "Allerheiligstes",
+      "veil": "Vorhang",
+      "entrance": "Eingang (Osten)",
+      "partOf": "Teil {{n}} von {{total}}",
+      "next": "Nächster Teil"
+    },
+    "sourcesPage": {
+      "intro": "Woher das Material der Reise stammt und unter welchen Bedingungen es genutzt wird.",
+      "maps": "Karten",
+      "openBible": "Koordinaten und Grad der Identifizierung biblischer Orte.",
+      "naturalEarth": "Küsten, Flüsse und Seen der Grundkarte.",
+      "engravings": "Stiche",
+      "engravingsNote": "Holzschnitte aus „Die Bibel in Bildern“ (1860), einzeln auf Wikimedia Commons geprüft.",
+      "tabernacle": "Illustration der Stiftshütte",
+      "tabernacleNote": "2026 mit künstlicher Intelligenz erzeugt, mit einer Chromolithografie aus der Holman-Bibel (1890) als Stilvorlage und 2. Mose 25–27 als inhaltlicher Vorlage. Sie ist eine illustrative Rekonstruktion.",
+      "texts": "Texte der Reise",
+      "textsNote": "Stationen, Fragen, Stammbäume und Zeitleisten wurden für die Reise anhand des jeweils angegebenen Bibeltextes geschrieben.",
+      "bible": "Bibeltext",
+      "bibleNote": "Die Kapitel stammen, in den in der Bibelauswahl angegebenen Fassungen, von:",
+      "fonts": "Schriften"
+    }
   }
 }

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { journeyCheckpointRepository } from "@/features/bible-journey/checkpoints";
-import { formatGenesisRef } from "@/features/bible-journey/references";
-import { genesisInteractive, journeyPeople, type FamilyNode, type JourneyCheckpoint, type JourneyInteractiveSection } from "@/features/bible-journey/genesis-interactive";
+import { formatBibleRef } from "@/features/bible-journey/references";
+import { journeyInteractiveBooks } from "@/features/bible-journey/interactive";
+import { journeyPeople, type FamilyNode, type JourneyCheckpoint, type JourneyInteractiveSection } from "@/features/bible-journey/genesis-interactive";
 import type { JourneyBook, JourneyLanguage } from "@/features/bible-journey/types";
 import { roman } from "./journey-utils";
 
@@ -24,35 +25,38 @@ export function JourneyFamily({ section, language }: { section: JourneyInteracti
     <span className="ed-eyebrow">{t("journey.family")}</span>
     <h3 id="jfam-title">{t("journey.familyTitle")}</h3>
     <ul className="jfam"><FamilyBranch node={section.family.root} language={language} /></ul>
-    <p className="jaid-note">{formatGenesisRef(section.family.ref, language)}{section.family.abridged ? ` · ${t("journey.familyAbridged")}` : ""}</p>
+    <p className="jaid-note">{formatBibleRef(section.family.ref, language)}{section.family.abridged ? ` · ${t("journey.familyAbridged")}` : ""}</p>
   </section>;
 }
 
 /* ---------- Tempo (faixa: história primordial sem números → patriarcas com datas tradicionais) ---------- */
 export function JourneyEra({ book, sectionSlug, language }: { book: JourneyBook; sectionSlug: string; language: JourneyLanguage }) {
   const { t } = useTranslation();
-  const primeval = book.sections.filter(section => !genesisInteractive[section.slug]?.era.length);
-  const dated = book.sections.filter(section => genesisInteractive[section.slug]?.era.length);
-  const activeDated = dated.some(section => section.slug === sectionSlug);
-  const marks = dated.flatMap(section => genesisInteractive[section.slug].era);
+  const data = journeyInteractiveBooks[book.slug];
+  if (!data) return null;
+  const eraOf = (slug: string) => data.sections[slug]?.era ?? [];
+  const primeval = data.primeval ? book.sections.filter(section => !eraOf(section.slug).length) : [];
+  const dated = book.sections.filter(section => eraOf(section.slug).length);
+  const activeDated = !data.primeval || dated.some(section => section.slug === sectionSlug);
+  const marks = dated.flatMap(section => eraOf(section.slug));
   return <section className="jaid" aria-labelledby="jera-title">
     <span className="ed-eyebrow">{t("journey.time")}</span>
     <h3 id="jera-title">{t("journey.timeTitle")}</h3>
     <div className="jera">
-      <div className={`jera-zone is-primeval${activeDated ? "" : " is-active"}`}>
+      {primeval.length > 0 &&       <div className={`jera-zone is-primeval${activeDated ? "" : " is-active"}`}>
         <small>{t("journey.timePrimeval")}</small>
         <ol>{primeval.map(section => {
           const index = book.sections.findIndex(item => item.slug === section.slug);
           return <li key={section.slug} className={section.slug === sectionSlug ? "is-active" : ""} title={section.content[language].title}><i />{roman(index)}</li>;
         })}</ol>
-      </div>
+      </div>}
       <div className={`jera-zone is-dated${activeDated ? " is-active" : ""}`}>
-        <small>{t("journey.timePatriarchs")}</small>
+        <small>{t(data.zoneKey)}</small>
         <ol>{marks.map(mark => <li key={mark.year} className={activeDated ? "is-active" : ""}><i /><span>{t("journey.yearBC", { year: Math.abs(mark.year ?? 0) })}</span><em>{mark.label[language]}</em></li>)}</ol>
       </div>
-      <div className="jera-next" aria-hidden>→ {t("journey.nextBook")}</div>
+      <div className="jera-next" aria-hidden>→ {t(data.nextKey)}</div>
     </div>
-    <p className="jaid-note">{activeDated ? t("journey.timeNote") : t("journey.timePrimevalNote")}</p>
+    <p className="jaid-note">{activeDated ? t(data.noteKey) : t("journey.timePrimevalNote")}</p>
   </section>;
 }
 
@@ -75,7 +79,7 @@ export function JourneyCheckpointQuiz({ bookSlug, sectionSlug, checkpoint, langu
     <span className="ed-eyebrow">{t("journey.checkpoint")}</span>
     <h3 id={`${name}-title`}>{t("journey.checkpointTitle")}</h3>
     <fieldset>
-      <legend>{checkpoint.question[language]} <small>{formatGenesisRef(checkpoint.ref, language)}</small></legend>
+      <legend>{checkpoint.question[language]} <small>{formatBibleRef(checkpoint.ref, language)}</small></legend>
       {checkpoint.options[language].map((option, index) => {
         const state = !answered ? "" : index === checkpoint.answer ? " is-right" : index === choice ? " is-wrong" : " is-muted";
         return <label key={option} className={`jquiz-option${state}`}>
