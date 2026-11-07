@@ -27,6 +27,7 @@ import LeitorPage from "./pages/LeitorPage.tsx";
 import JornadaPage from "./pages/JornadaPage.tsx";
 import JornadaLivroPage from "./pages/JornadaLivroPage.tsx";
 import JornadaCapituloPage from "./pages/JornadaCapituloPage.tsx";
+import JornadaFontesPage from "./pages/JornadaFontesPage.tsx";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,7 @@ const ProtectedRoutes = () => {
         <Route path="/pulpito" element={<PulpitoPage />} />
         <Route path="/biblia" element={<BibliaPage />} />
         <Route path="/jornada" element={<JornadaPage />} />
+        <Route path="/jornada/fontes" element={<JornadaFontesPage />} />
         <Route path="/jornada/:testament/:bookSlug" element={<JornadaLivroPage />} />
         <Route path="/jornada/:testament/:bookSlug/capitulos/:chapter" element={<JornadaCapituloPage />} />
         <Route path="/livraria" element={<LivrariaPage />} />

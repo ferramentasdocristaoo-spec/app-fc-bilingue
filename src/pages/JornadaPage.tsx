@@ -85,5 +85,6 @@ export default function JornadaPage() {
         </section>;
       })}
     </div>
+    <p className="journey-sources-link"><Link className="ed-link" to="/jornada/fontes">{t("journey.sources")}</Link></p>
   </PageShell>;
 }
