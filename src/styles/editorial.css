@@ -1,7 +1,7 @@
 /*
  * Gramática editorial "Livro de Estudo", compartilhada pelas páginas.
  * Estrutura vem de tipografia e filetes, não de cartões.
- * Tamanho mínimo de texto de interface: 12px. Leitura: 17–18px.
+ * Tamanho mínimo de texto de interface: 13px (só eyebrow em caixa alta fica em 12px). Leitura: 17–18px.
  */
 
 .ed-eyebrow {
@@ -59,13 +59,15 @@
 
 .ed-link {
   display: inline-block;
+  padding: 11px 0;
   font: 500 0.875rem/1.4 var(--font-ui);
   color: hsl(var(--gold-ink));
-  text-decoration: none;
-  border-bottom: 1px solid hsl(var(--gold-soft));
-  padding-bottom: 1px;
+  text-decoration: underline;
+  text-decoration-color: hsl(var(--gold));
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
-.ed-link:hover { border-bottom-color: hsl(var(--gold-ink)); }
+.ed-link:hover { text-decoration-color: hsl(var(--gold-ink)); }
 
 /* Filete ornamental: linha · ✦ · linha */
 .ed-orn {
@@ -98,3 +100,27 @@
 .ed-notfound .ed-num { font-size: 4rem; line-height: 1; color: hsl(var(--gold-ink)); }
 .ed-notfound h1 { margin: 0; font: 600 clamp(2rem, 5vw, 2.75rem)/1.1 var(--font-display); color: hsl(var(--ink)); }
 .ed-notfound .ed-btn { margin-top: 12px; text-decoration: none; }
+
+/* ---------- Campos "de formulário de livro": só linha inferior, texto em 16px para o iPhone não dar zoom ---------- */
+.ed-field {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid hsl(var(--ink) / .45);
+  border-radius: 0;
+  font: 400 1rem/1.5 var(--font-ui);
+  color: hsl(var(--ink));
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.ed-field::placeholder { color: hsl(var(--ink-3)); opacity: 1; }
+.ed-field[data-placeholder] > span { color: hsl(var(--ink-3)); }
+.ed-field:hover { border-bottom-color: hsl(var(--ink)); }
+.ed-field:focus, .ed-field:focus-visible, .ed-field[data-state="open"] {
+  outline: none;
+  border-bottom-color: hsl(var(--gold-ink));
+  box-shadow: 0 1px 0 0 hsl(var(--gold-ink));
+}
+.ed-field[aria-invalid="true"] { border-bottom-color: hsl(var(--destructive)); box-shadow: 0 1px 0 0 hsl(var(--destructive)); }
+.ed-select svg { flex: none; }
+.ed-label { display: block; font: 500 .8125rem/1.4 var(--font-ui); color: hsl(var(--ink-2)); }
+.ed-hint { margin-top: 6px; font: 400 .875rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.ed-error { margin-top: 6px; font: 500 .875rem/1.5 var(--font-ui); color: hsl(var(--destructive)); }

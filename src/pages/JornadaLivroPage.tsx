@@ -41,7 +41,7 @@ export default function JornadaLivroPage() {
   const testamentLabel = book.testament === "old-testament" ? t("journey.oldTestament") : t("journey.newTestament");
 
   return <div className="journey-book-page">
-    <main className="journey-book-content">
+    <div className="journey-book-content">
       <Link to="/jornada" className="ed-link journey-back">← {t("journey.title")}</Link>
 
       <header className="journey-opener">
@@ -54,7 +54,7 @@ export default function JornadaLivroPage() {
         <div className="journey-opener-meta">
           <strong>{progress.completed} / {progress.total}</strong>
           <span>{t("journey.chapters")}</span>
-          <div className="journey-rule-bar" role="progressbar" aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.completed}><i style={{ width: `${progress.percentage}%` }} /></div>
+          <div className="journey-rule-bar" role="progressbar" aria-label={t("journey.chapters")} aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.completed}><i style={{ width: `${progress.percentage}%` }} /></div>
         </div>
       </header>
 
@@ -113,6 +113,6 @@ export default function JornadaLivroPage() {
           <strong>{nextBook.overview[language].title}</strong>
         </Link>}
       </nav>
-    </main>
+    </div>
   </div>;
 }

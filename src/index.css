@@ -85,14 +85,14 @@
     --popover-foreground: 216 45% 16%;
 
     /* Dourado escurecido para ter contraste AA como texto sobre o papel */
-    --primary: 40 52% 35%;
+    --primary: 40 58% 28%;
     --primary-foreground: 40 47% 96%;
 
     --secondary: 41 38% 89%;
     --secondary-foreground: 216 40% 20%;
 
     --muted: 41 35% 90%;
-    --muted-foreground: 218 14% 40%;
+    --muted-foreground: 218 14% 36%;
 
     --accent: 41 38% 88%;
     --accent-foreground: 216 45% 16%;
@@ -102,15 +102,15 @@
 
     --border: 41 39% 80%;
     --input: 41 30% 76%;
-    --ring: 40 52% 35%;
+    --ring: 40 58% 28%;
 
     --paper: 40 47% 94%;
     --paper-2: 41 42% 89%;
     --ink: 216 45% 16%;
     --ink-2: 218 17% 35%;
-    --ink-3: 218 13% 42%;
+    --ink-3: 218 14% 38%;
     --gold: 40 48% 47%;
-    --gold-ink: 40 52% 35%;
+    --gold-ink: 40 58% 28%;
     --gold-soft: 40 45% 84%;
     --rule: 41 39% 78%;
     --rule-soft: 41 40% 86%;
@@ -152,6 +152,27 @@
 
   ::selection {
     background: hsl(var(--gold) / .3);
+  }
+
+  /* Foco de teclado visível em tudo, no mesmo desenho: filete dourado afastado */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  [role="slider"]:focus-visible,
+  summary:focus-visible,
+  select:focus-visible {
+    outline: 2px solid hsl(var(--gold-ink));
+    outline-offset: 2px;
+  }
+
+  /* Quem pede menos movimento não vê rolagens animadas nem transições */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   :root:not(.light) body {

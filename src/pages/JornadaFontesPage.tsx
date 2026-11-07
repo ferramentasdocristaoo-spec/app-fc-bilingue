@@ -13,7 +13,7 @@ export default function JornadaFontesPage() {
   const language = normalizeJourneyLanguage(i18n.resolvedLanguage || i18n.language);
   const figures = journeyPublicDomainFigures();
   return <div className="journey-book-page">
-    <main className="journey-book-content journey-sources">
+    <div className="journey-book-content journey-sources">
       <Link to="/jornada" className="ed-link journey-back">← {t("journey.title")}</Link>
       <h1>{t("journey.sources")}</h1>
       <p className="ed-lede">{t("journey.sourcesPage.intro")}</p>
@@ -58,6 +58,6 @@ export default function JornadaFontesPage() {
         <h2>{t("journey.sourcesPage.fonts")}</h2>
         <p>{FONTS.join(" · ")} · <em>SIL Open Font License 1.1</em></p>
       </section>
-    </main>
+    </div>
   </div>;
 }

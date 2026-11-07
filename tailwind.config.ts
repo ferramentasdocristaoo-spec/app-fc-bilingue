@@ -17,7 +17,8 @@ export default {
         // Títulos: serifada de display (antes era Cinzel em tudo)
         display: ["Cormorant Garamond", "Georgia", "serif"],
         // Leitura: serifa de texto
-        serif: ["Source Serif 4 Variable", "Source Serif 4", "Georgia", "serif"],
+        // Entre aspas: sem elas o "4" invalida a declaração e a página cai na Inter.
+        serif: ['"Source Serif 4 Variable"', '"Source Serif 4"', "Georgia", "serif"],
         // Interface
         body: ["Inter Variable", "Inter", "system-ui", "sans-serif"],
         sans: ["Inter Variable", "Inter", "system-ui", "sans-serif"],
@@ -25,8 +26,9 @@ export default {
         brand: ["Cinzel", "Cormorant Garamond", "serif"],
       },
       fontSize: {
-        // Escala mínima: nada de interface abaixo de 12px
+        // Escala mínima: nada de interface abaixo de 13px (eyebrows em caixa alta ficam em 12px)
         "2xs": ["0.75rem", { lineHeight: "1.4" }],
+        xs: ["0.8125rem", { lineHeight: "1.25rem" }],
         read: ["1.125rem", { lineHeight: "1.75" }],
       },
       colors: {
