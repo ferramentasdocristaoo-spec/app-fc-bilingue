@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Home, Mic, LogOut, Library, Map } from "lucide-react";
@@ -14,6 +15,7 @@ import {
   SidebarMenuButton,
   SidebarHeader,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 // Item do menu: sem "pílula"; o ativo ganha um filete dourado à esquerda.
@@ -24,6 +26,9 @@ export function AppSidebar() {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const { signOut, email } = useAuth();
+  const { setOpenMobile } = useSidebar();
+  // No celular o menu cobre a página: fecha ao trocar de tela.
+  useEffect(() => { setOpenMobile(false); }, [location.pathname, setOpenMobile]);
 
   const preparationItems = [
     { icon: BookOpen, title: t("sidebar.oficina.title"), description: t("sidebar.oficina.description"), path: "/oficina" },

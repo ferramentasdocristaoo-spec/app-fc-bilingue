@@ -1,4 +1,5 @@
-import { Outlet } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -11,6 +12,7 @@ import InstallButton from "@/components/InstallButton";
 import { usePageTracking } from "@/hooks/use-tracking";
 
 const MenuButton = () => {
+  const { t } = useTranslation();
   const { toggleSidebar } = useSidebar();
   return (
     <Button
@@ -18,7 +20,7 @@ const MenuButton = () => {
       size="icon"
       onClick={toggleSidebar}
       className="menu-toggle h-10 w-10 hover:bg-transparent"
-      aria-label="Menu"
+      aria-label={t("dashboard.menu")}
     >
       <Menu className="!h-6 !w-6" strokeWidth={1.75} />
     </Button>
@@ -30,6 +32,14 @@ const DashboardLayout = () => {
   const isMobile = useIsMobile();
   const { theme, toggleTheme } = useTheme();
   usePageTracking();
+  const { pathname, hash } = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+  // Sem isto, ir ao capítulo seguinte abre a página nova já rolada até ao fim.
+  useEffect(() => {
+    if (hash) return;
+    mainRef.current?.scrollTo(0, 0);
+    window.scrollTo(0, 0);
+  }, [pathname, hash]);
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>
@@ -56,7 +66,7 @@ const DashboardLayout = () => {
               </Button>
             </div>
           </header>
-          <main className="flex-1 overflow-auto">
+          <main ref={mainRef} className="flex-1 overflow-auto">
             <Outlet />
           </main>
         </div>
