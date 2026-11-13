@@ -652,5 +652,27 @@
     "youGet": "Cosa riceverai",
     "examples": "Esempi",
     "slowHint": "Può richiedere fino a un minuto."
+  },
+  "home": {
+    "stagesLabel": "Tappe della settimana",
+    "supportLabel": "Supporto",
+    "yourWeek": "La tua settimana",
+    "noPassage": "Ancora nessun passo",
+    "forDate": "Per {{date}}",
+    "stageOf": "tappa {{current}} di {{total}}",
+    "status": {
+      "done": "fatto",
+      "now": "ora",
+      "later": "dopo"
+    },
+    "prepText": "Scegli il testo e il tema e prepara lo schema nel Laboratorio.",
+    "prepDone": "Testo scelto. Puoi tornare al Laboratorio quando vuoi.",
+    "choosePassage": "Scegli il passo",
+    "studyText": "Guarda il testo a fondo prima di scrivere.",
+    "lifeText": "Porta il messaggio nella vita di ogni giorno e nella chiesa.",
+    "journeyStart": "Inizia dalla Genesi",
+    "journeyWhere": "Dove ti sei fermato l'ultima volta.",
+    "journeyContinue": "Continua a leggere",
+    "journeyOpen": "Apri il Viaggio"
   }
 }

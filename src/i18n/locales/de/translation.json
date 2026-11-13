@@ -167,7 +167,7 @@
     "deletedMessage": "Predigt erfolgreich entfernt.",
     "copiedMessage": "Die Gliederung wurde in die Zwischenablage kopiert.",
     "emptyTitle": "Noch keine Gliederungen",
-    "emptyHint": "Gliederungen, die Sie in der Werkstatt speichern, erscheinen hier auf diesem Gerät.",
+    "emptyHint": "Gliederungen, die Sie in der Predigtwerkstatt speichern, erscheinen hier auf diesem Gerät.",
     "emptyAction": "Botschaft vorbereiten",
     "statusDraft": "Entwurf",
     "statusFinal": "Abgeschlossen",
@@ -652,5 +652,27 @@
     "youGet": "Was Sie erhalten",
     "examples": "Beispiele",
     "slowHint": "Das kann bis zu einer Minute dauern."
+  },
+  "home": {
+    "stagesLabel": "Schritte der Woche",
+    "supportLabel": "Begleitung",
+    "yourWeek": "Deine Woche",
+    "noPassage": "Noch kein Bibeltext",
+    "forDate": "Für {{date}}",
+    "stageOf": "Schritt {{current}} von {{total}}",
+    "status": {
+      "done": "erledigt",
+      "now": "jetzt",
+      "later": "danach"
+    },
+    "prepText": "Wähle Text und Thema und baue die Gliederung in der Werkstatt.",
+    "prepDone": "Text gewählt. Du kannst jederzeit zur Predigtwerkstatt zurück.",
+    "choosePassage": "Bibeltext wählen",
+    "studyText": "Sieh dir den Text gründlich an, bevor du schreibst.",
+    "lifeText": "Trage die Botschaft in den Alltag und in die Gemeinde.",
+    "journeyStart": "Beginne mit Genesis",
+    "journeyWhere": "Wo du zuletzt aufgehört hast.",
+    "journeyContinue": "Weiterlesen",
+    "journeyOpen": "Reise öffnen"
   }
 }

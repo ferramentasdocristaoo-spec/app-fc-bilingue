@@ -1,24 +1,45 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Check } from "lucide-react";
 import { fetchDailyVerse, type DailyVerse } from "@/lib/daily-verse";
-import { getLastRead } from "@/data/library";
-import "./WorkspaceDesign.css";
+import { journeyProgressRepository } from "@/features/bible-journey/progress";
+import "./HomeTrilha.css";
 
-interface Sermon { titulo?: string; textoBase?: string; tema?: string; status?: string; data?: string; conteudo?: string }
+/* Início no modelo "Trilha" (direção B, aprovada pelo dono para a tela inicial).
+   O menu vira a ordem do estudo: 1 Preparação · 2 Estudo e biblioteca · 3 Vida e comunidade.
+   A etapa atual sai do estado real guardado no aparelho (Oficina e esboços); nada inventado. */
 
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
+interface Sermon { titulo?: string; textoBase?: string; status?: string }
+type StageKey = "prep" | "study" | "life";
+type JourneySpot = { name: string; chapter: number; to: string };
+
+const readJSON = <T,>(key: string, fallback: T): T => {
+  try { return (JSON.parse(localStorage.getItem(key) || "null") as T) ?? fallback; } catch { return fallback; }
+};
+
+/** Próximo domingo (hoje, se já for domingo): a semana do pregador termina no culto. */
+const nextSunday = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + ((7 - d.getDay()) % 7));
+  return d;
+};
 
 const Index = () => {
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage || i18n.language;
   const [verse, setVerse] = useState<DailyVerse | null>(null);
   const [verseFailed, setVerseFailed] = useState(false);
-  const lastRead = getLastRead(language);
-  const sermons = useMemo<Sermon[]>(() => {
-    try { return JSON.parse(localStorage.getItem("fc-sermoes") || "[]"); } catch { return []; }
+  const [spot, setSpot] = useState<JourneySpot | null>(null);
+
+  const { passage, stage } = useMemo(() => {
+    const sermons = readJSON<Sermon[]>("fc-sermoes", []);
+    const last = Array.isArray(sermons) ? sermons.at(-1) : undefined;
+    const draft = readJSON<{ textoBase?: string }>("fc-oficina-atual", {});
+    const text = draft.textoBase?.trim() || last?.textoBase?.trim() || "";
+    const finished = !!text && last?.status === "finalizado" && last.textoBase?.trim() === text;
+    return { passage: text, stage: (!text ? 1 : finished ? 3 : 2) as 1 | 2 | 3 };
   }, []);
-  const current = sermons.at(-1);
 
   useEffect(() => {
     let active = true;
@@ -31,78 +52,132 @@ const Index = () => {
     return () => { active = false; };
   }, [language]);
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? t("dashboard.goodMorning") : hour < 18 ? t("dashboard.goodAfternoon") : t("dashboard.goodEvening");
-  const date = new Date().toLocaleDateString(language, { weekday: "long", day: "numeric", month: "long" });
+  // Onde o leitor parou na Jornada. O catálogo é grande: só carrega quando há progresso.
+  useEffect(() => {
+    const where = journeyProgressRepository.getState().lastLocation;
+    if (!where) { setSpot(null); return; }
+    let active = true;
+    import("@/features/bible-journey/catalog").then(async ({ journeyCatalogRepository }) => {
+      const book = await journeyCatalogRepository.getBook(where.bookSlug);
+      if (!active || !book) return;
+      const names = t("biblia.books", { returnObjects: true }) as string[];
+      setSpot({
+        name: names[book.bibleBookId - 1] ?? book.slug,
+        chapter: where.chapter,
+        to: `/jornada/${book.testament}/${book.slug}/capitulos/${where.chapter}`,
+      });
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [t, language]);
+
+  const sunday = nextSunday().toLocaleDateString(language, { weekday: "long", day: "numeric", month: "long" });
   const bookNames = t("biblia.books", { returnObjects: true }) as string[];
   const verseRef = verse ? `${bookNames[verse.book - 1]} ${verse.chapter}:${verse.verse}` : "";
 
-  // Índice da "mesa de estudo": sem ícones, numeração romana, uma linha por ferramenta.
-  const desk = [
-    { to: "/jornada", title: t("journey.title"), text: t("journey.sidebarDescription") },
-    { to: "/biblia", title: t("sidebar.biblia.title"), text: current?.textoBase ? `${current.textoBase} · ${t("workspace.researchDescription")}` : t("workspace.researchDescription") },
-    { to: "/raio-x", title: t("sidebar.raioX.title"), text: t("sidebar.raioX.description") },
-    { to: "/devocional", title: t("sidebar.devocional.title"), text: t("workspace.todayReflection") },
-    { to: "/livraria", title: lastRead?.volumeTitle || t("sidebar.livraria.title"), text: lastRead ? t("workspace.readingProgress", { progress: Math.round(lastRead.progress) }) : t("workspace.libraryDescription") },
-    { to: "/esbocos", title: t("sidebar.esbocos.title"), text: t("workspace.sermonsPrepared", { count: sermons.length }) },
+  const stages: { key: StageKey; n: 1 | 2 | 3; title: string; text: string; tools: { to: string; title: string }[]; action: { to: string; label: string } }[] = [
+    {
+      key: "prep", n: 1, title: t("workspace.groups.preparation"),
+      text: passage ? t("home.prepDone") : t("home.prepText"),
+      tools: [
+        { to: "/oficina", title: t("sidebar.oficina.title") },
+        { to: "/esbocos", title: t("sidebar.esbocos.title") },
+        { to: "/pulpito", title: t("sidebar.pulpito.title") },
+      ],
+      action: passage ? { to: "/oficina", label: t("workspace.continue") } : { to: "/oficina", label: t("home.choosePassage") },
+    },
+    {
+      key: "study", n: 2, title: t("workspace.groups.study"),
+      text: t("home.studyText"),
+      tools: [
+        { to: "/raio-x", title: t("sidebar.raioX.title") },
+        { to: "/nomes", title: t("sidebar.nomes.title") },
+        { to: "/garimpo", title: t("sidebar.garimpo.title") },
+        { to: "/biblia", title: t("sidebar.biblia.title") },
+        { to: "/jornada", title: t("journey.title") },
+        { to: "/livraria", title: t("sidebar.livraria.title") },
+      ],
+      action: { to: "/raio-x", label: passage ? `${t("sidebar.raioX.title")} · ${passage}` : t("sidebar.raioX.title") },
+    },
+    {
+      key: "life", n: 3, title: t("workspace.groups.life"),
+      text: t("home.lifeText"),
+      tools: [
+        { to: "/devocional", title: t("sidebar.devocional.title") },
+        { to: "/mural", title: t("sidebar.mural.title") },
+        { to: "/voz-de-deus", title: t("sidebar.voz.title") },
+      ],
+      action: { to: "/devocional", label: t("sidebar.devocional.title") },
+    },
   ];
 
-  return <div className="workspace-home">
-    <header className="workspace-welcome">
-      <p className="workspace-date">{date}</p>
-      <h1>{greeting}.</h1>
-      <p className="workspace-lede">{t("workspace.welcome")}</p>
-    </header>
+  const statusOf = (n: number) => (n < stage ? "done" : n === stage ? "now" : "later");
 
-    <div className="workspace-today">
-      <section className="workspace-current" aria-labelledby="workspace-current-title">
-        <span className="ed-eyebrow">{current ? t("workspace.inPreparation") : t("workspace.nextMessage")}</span>
-        <h2 id="workspace-current-title">{current?.titulo || t("workspace.startInspiration")}</h2>
-        {current?.textoBase
-          ? <p className="workspace-ref">{current.textoBase}</p>
-          : <p className="workspace-current-text">{t("workspace.startDescription")}</p>}
-        {current && <p className="workspace-meta">{current.status === "finalizado" ? t("esbocos.statusFinal") : t("esbocos.statusDraft")} · {t("workspace.sermonsPrepared", { count: sermons.length })}</p>}
-        <div className="workspace-actions">
-          {current
-            ? <Link to="/esbocos" className="ed-btn ed-btn-primary">{t("workspace.continue")} <span aria-hidden>→</span></Link>
-            : <Link to="/oficina" className="ed-btn ed-btn-primary">{t("workspace.prepareMessage")} <span aria-hidden>→</span></Link>}
-          {current
-            ? <Link to="/oficina" className="ed-btn ed-btn-ghost">{t("workspace.newMessage")}</Link>
-            : <Link to="/jornada" className="ed-btn ed-btn-ghost">{t("workspace.exploreJourney")}</Link>}
-        </div>
-      </section>
-
-      <aside className="workspace-verse" aria-label={t("dashboard.verseOfDay")}>
-        <span className="ed-eyebrow">{t("dashboard.verseOfDay")}</span>
-        <blockquote>{verse ? `“${verse.text}”` : verseFailed ? t("workspace.verseUnavailable") : t("workspace.loadingWord")}</blockquote>
-        {verse && <cite>{verseRef}</cite>}
-        <Link to={verse ? `/biblia?bookId=${verse.book}&chapter=${verse.chapter}` : "/biblia"} className="ed-link">{t("dashboard.readInBible")}</Link>
-        {lastRead && <Link to="/livraria" className="workspace-continue">
-          <span className="workspace-spine" aria-hidden />
-          <span>
-            <small>{t("dashboard.continueReading")}</small>
-            <strong>{lastRead.volumeTitle}</strong>
-            <em>{t("workspace.readingProgress", { progress: Math.round(lastRead.progress) })}</em>
-          </span>
-        </Link>}
-      </aside>
-    </div>
-
-    <section className="workspace-index" aria-labelledby="workspace-desk-title">
-      <header>
-        <h3 id="workspace-desk-title">{t("workspace.yourDesk")}</h3>
-        <p>{t("workspace.deskDescription")}</p>
-      </header>
+  return <div className="trilha">
+    <nav className="trilha-stages" aria-label={t("home.stagesLabel")}>
       <ol>
-        {desk.map((item, index) => <li key={item.to}>
-          <Link to={item.to}>
-            <span className="ed-num">{ROMAN[index]}</span>
-            <span><strong>{item.title}</strong><small>{item.text}</small></span>
-            <span className="workspace-go" aria-hidden>→</span>
-          </Link>
-        </li>)}
+        {stages.map((s) => {
+          const status = statusOf(s.n);
+          return <li key={s.key}>
+            <a href={`#etapa-${s.n}`} className={`is-${status}`} aria-current={status === "now" ? "step" : undefined}
+              onClick={(e) => { e.preventDefault(); document.getElementById(`etapa-${s.n}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
+              <i aria-hidden>{status === "done" ? <Check strokeWidth={3} /> : s.n}</i>
+              <span>{s.title}</span>
+            </a>
+          </li>;
+        })}
       </ol>
-    </section>
+    </nav>
+
+    <div className="trilha-body">
+      <header className="trilha-week">
+        <p className="trilha-kicker">{t("home.yourWeek")}</p>
+        <h1>{passage || t("home.noPassage")}</h1>
+        <p className="trilha-week-meta">
+          <span className="trilha-date">{t("home.forDate", { date: sunday })}</span>
+          <span aria-hidden> · </span>
+          <span className="trilha-pill">{t("home.stageOf", { current: stage, total: 3 })}</span>
+        </p>
+      </header>
+
+      <div className="trilha-grid">
+        <ol className="trilha-steps">
+          {stages.map((s) => {
+            const status = statusOf(s.n);
+            return <li key={s.key} id={`etapa-${s.n}`} className={`trilha-step is-${status}`}>
+              <span className="trilha-n" aria-hidden>{s.n}</span>
+              <div className="trilha-step-main">
+                <h2>
+                  <span><span className="sr-only">{s.n}. </span>{s.title}</span>
+                  <small className={`trilha-status is-${status}`}>{t(`home.status.${status}`)}</small>
+                </h2>
+                <p>{s.text}</p>
+                <ul className={`trilha-tools${s.tools.length > 3 ? " is-six" : ""}`}>
+                  {s.tools.map((tool) => <li key={tool.to}><Link to={tool.to}>{tool.title}</Link></li>)}
+                </ul>
+                {status === "now" && <Link to={s.action.to} className="trilha-btn">
+                  <span>{s.action.label}</span><span aria-hidden>→</span>
+                </Link>}
+              </div>
+            </li>;
+          })}
+        </ol>
+
+        <aside className="trilha-side" aria-label={t("home.supportLabel")}>
+          <section className="trilha-card">
+            <p className="trilha-kicker">{t("dashboard.verseOfDay")}</p>
+            {verse && <b>{verseRef}</b>}
+            <p className="trilha-verse">{verse ? `“${verse.text}”` : verseFailed ? t("workspace.verseUnavailable") : t("workspace.loadingWord")}</p>
+            <Link className="trilha-card-link" to={verse ? `/biblia?bookId=${verse.book}&chapter=${verse.chapter}` : "/biblia"}>{t("dashboard.readInBible")} <span aria-hidden>→</span></Link>
+          </section>
+          <section className="trilha-card">
+            <p className="trilha-kicker">{t("journey.title")}</p>
+            <b>{spot ? `${spot.name} ${spot.chapter}` : t("home.journeyStart")}</b>
+            <p>{spot ? t("home.journeyWhere") : t("journey.sidebarDescription")}</p>
+            <Link className="trilha-card-link" to={spot?.to ?? "/jornada"}>{spot ? t("home.journeyContinue") : t("home.journeyOpen")} <span aria-hidden>→</span></Link>
+          </section>
+        </aside>
+      </div>
+    </div>
   </div>;
 };
 

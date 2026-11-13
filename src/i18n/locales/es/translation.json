@@ -652,5 +652,27 @@
     "youGet": "Lo que recibirás",
     "examples": "Ejemplos",
     "slowHint": "Puede tardar hasta un minuto."
+  },
+  "home": {
+    "stagesLabel": "Etapas de la semana",
+    "supportLabel": "Apoyo",
+    "yourWeek": "Tu semana",
+    "noPassage": "Aún sin pasaje",
+    "forDate": "Para el {{date}}",
+    "stageOf": "etapa {{current}} de {{total}}",
+    "status": {
+      "done": "hecho",
+      "now": "ahora",
+      "later": "después"
+    },
+    "prepText": "Elige el texto y el tema y arma el bosquejo en el Taller.",
+    "prepDone": "Texto elegido. Puedes volver al Taller cuando quieras.",
+    "choosePassage": "Elegir el pasaje",
+    "studyText": "Mira el texto a fondo antes de escribir.",
+    "lifeText": "Lleva el mensaje a la vida diaria y a la iglesia.",
+    "journeyStart": "Empieza por Génesis",
+    "journeyWhere": "Donde te quedaste la última vez.",
+    "journeyContinue": "Seguir leyendo",
+    "journeyOpen": "Abrir el Recorrido"
   }
 }

@@ -652,5 +652,27 @@
     "youGet": "O que vais receber",
     "examples": "Exemplos",
     "slowHint": "Pode demorar até um minuto."
+  },
+  "home": {
+    "stagesLabel": "Etapas da semana",
+    "supportLabel": "Apoio",
+    "yourWeek": "A tua semana",
+    "noPassage": "Ainda sem passagem",
+    "forDate": "Para {{date}}",
+    "stageOf": "etapa {{current}} de {{total}}",
+    "status": {
+      "done": "feito",
+      "now": "agora",
+      "later": "depois"
+    },
+    "prepText": "Escolhe o texto e o tema e monta o esboço na Oficina.",
+    "prepDone": "Texto escolhido. Podes voltar à Oficina quando quiseres.",
+    "choosePassage": "Escolher a passagem",
+    "studyText": "Olha o texto a fundo antes de escrever.",
+    "lifeText": "Leva a mensagem para o dia a dia e para a igreja.",
+    "journeyStart": "Começa por Génesis",
+    "journeyWhere": "Onde paraste da última vez.",
+    "journeyContinue": "Continuar a leitura",
+    "journeyOpen": "Abrir a Jornada"
   }
 }

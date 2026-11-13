@@ -1,0 +1,304 @@
+/* ============================================================
+   Início · modelo "Trilha" (direção B), versão arredondada.
+   Pedido do dono (13/11/2026): manter a Trilha, mas com cantos
+   arredondados e sombras suaves. Cores e letras = as do app.
+   Regras da casa: corpo 17-18 px, nada abaixo de 14 px,
+   toques >= 48 px, contraste alto no claro e no escuro.
+   ============================================================ */
+.trilha {
+  --t-radius: 18px;
+  --t-radius-sm: 12px;
+  --t-shadow: 0 1px 2px hsl(216 45% 16% / .06), 0 10px 28px -14px hsl(216 45% 16% / .22);
+  --t-shadow-hi: 0 2px 4px hsl(216 45% 16% / .08), 0 18px 40px -18px hsl(216 45% 16% / .35);
+  --t-on: hsl(var(--ink));          /* etapa atual: fundo */
+  --t-on-fg: hsl(var(--paper));     /* etapa atual: texto */
+  --t-on-num: hsl(var(--gold-soft));
+  color: hsl(var(--ink));
+  font-family: var(--font-ui);
+  font-size: 1.0625rem; /* 17 px */
+  line-height: 1.5;
+  padding-bottom: 72px;
+}
+:root:not(.light) .trilha {
+  --t-shadow: 0 1px 2px hsl(216 60% 2% / .4), 0 12px 30px -14px hsl(216 60% 2% / .75);
+  --t-shadow-hi: 0 2px 4px hsl(216 60% 2% / .5), 0 18px 40px -16px hsl(216 60% 2% / .85);
+  --t-on: hsl(var(--gold-ink));
+  --t-on-fg: hsl(216 55% 10%);
+  --t-on-num: hsl(216 55% 10%);
+}
+
+/* ---------- Faixa de etapas (fixa no topo da área rolável) ---------- */
+.trilha-stages {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 10px 12px;
+  background: hsl(var(--background) / .92);
+  backdrop-filter: saturate(1.2) blur(8px);
+  -webkit-backdrop-filter: saturate(1.2) blur(8px);
+}
+.trilha-stages ol {
+  list-style: none;
+  margin: 0 auto;
+  padding: 6px;
+  max-width: 1032px; /* = largura útil do corpo, bordas alinhadas */
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--rule));
+  border-radius: 20px;
+  box-shadow: var(--t-shadow);
+}
+.trilha-stages a {
+  min-height: 72px;
+  height: 100%;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  text-align: center;
+  font-size: 0.9375rem; /* 15 px */
+  font-weight: 600;
+  line-height: 1.15;
+  color: hsl(var(--ink));
+  text-decoration: none;
+  border-radius: 14px;
+  transition: background-color .15s ease, box-shadow .15s ease;
+}
+.trilha-stages a:hover { background: hsl(var(--ink) / .06); }
+.trilha-stages a:focus-visible { outline: 3px solid hsl(var(--gold)); outline-offset: 2px; }
+.trilha-stages i {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 2px solid hsl(var(--gold-ink));
+  color: hsl(var(--gold-ink));
+  font-style: normal;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.trilha-stages i svg { width: 16px; height: 16px; }
+.trilha-stages a.is-done i { background: hsl(var(--gold-ink)); color: hsl(var(--paper)); }
+.trilha-stages a.is-now { background: var(--t-on); color: var(--t-on-fg); box-shadow: var(--t-shadow-hi); }
+.trilha-stages a.is-now i { border-color: var(--t-on-num); color: var(--t-on-num); }
+.trilha-stages a.is-now:hover { background: var(--t-on); }
+@media (min-width: 768px) {
+  .trilha-stages { padding: 14px 24px; }
+  .trilha-stages a { flex-direction: row; gap: 10px; min-height: 60px; font-size: 1rem; }
+}
+
+/* ---------- Corpo ---------- */
+.trilha-body { width: min(1080px, 100%); margin: 0 auto; padding: 8px 16px 0; }
+@media (min-width: 768px) { .trilha-body { padding: 16px 24px 0; } }
+
+.trilha-kicker {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  color: hsl(var(--gold-ink));
+}
+
+/* A tua semana */
+.trilha-week {
+  padding: 22px 20px 20px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--rule));
+  border-radius: 20px;
+  box-shadow: var(--t-shadow);
+}
+.trilha-week h1 {
+  margin: 6px 0 8px;
+  font: 600 clamp(2.125rem, 7vw, 2.75rem)/1.08 var(--font-display);
+  font-variant-numeric: lining-nums;
+  color: hsl(var(--ink));
+  overflow-wrap: anywhere;
+}
+.trilha-week-meta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  font-size: 1.0625rem;
+  color: hsl(var(--ink-2));
+}
+.trilha-date::first-letter { text-transform: uppercase; }
+.trilha-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: hsl(var(--gold-soft));
+  color: hsl(var(--ink));
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+@media (min-width: 768px) { .trilha-week { padding: 28px 30px 26px; } }
+
+.trilha-grid { display: grid; gap: 16px; margin-top: 16px; }
+@media (min-width: 1100px) {
+  .trilha-grid { grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+  .trilha-side { position: sticky; top: 104px; }
+}
+
+/* ---------- Etapas ---------- */
+.trilha-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.trilha-step {
+  scroll-margin-top: 112px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 4px;
+  padding: 16px 16px 18px 12px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--rule));
+  border-radius: var(--t-radius);
+  box-shadow: var(--t-shadow);
+}
+.trilha-step.is-now {
+  border: 2px solid hsl(var(--gold));
+  background:
+    linear-gradient(hsl(var(--gold-soft) / .45), hsl(var(--gold-soft) / 0) 120px),
+    hsl(var(--card));
+  box-shadow: var(--t-shadow-hi);
+}
+.trilha-n {
+  font-size: 2.125rem;
+  line-height: 1;
+  font-weight: 700;
+  text-align: center;
+  color: hsl(var(--gold-ink));
+  padding-top: 2px;
+}
+.trilha-step.is-now .trilha-n { color: hsl(var(--ink)); }
+.trilha-step.is-later .trilha-n { color: hsl(var(--ink-3)); }
+.trilha-step h2 {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font: 700 1.1875rem/1.25 var(--font-ui); /* 19 px */
+  color: hsl(var(--ink));
+}
+.trilha-status {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 1px 11px;
+  border-radius: 999px;
+  font-size: 0.875rem; /* 14 px, mínimo da casa */
+  font-weight: 700;
+  border: 1.5px solid currentColor;
+}
+.trilha-status.is-done { color: hsl(var(--gold-ink)); }
+.trilha-status.is-now { color: var(--t-on-fg); background: var(--t-on); border-color: var(--t-on); }
+.trilha-status.is-later { color: hsl(var(--ink-2)); }
+.trilha-step-main > p { margin: 4px 0 0; font-size: 1.0625rem; line-height: 1.45; color: hsl(var(--ink-2)); }
+
+/* Ferramentas da etapa: grade de botões arredondados */
+.trilha-tools {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.trilha-tools a {
+  min-height: 56px;
+  height: 100%;
+  padding: 8px 6px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: hsl(var(--ink));
+  text-decoration: none;
+  overflow-wrap: anywhere; /* só parte a palavra se ela não couber inteira */
+  background: hsl(var(--paper));
+  border: 1px solid hsl(var(--rule));
+  border-radius: var(--t-radius-sm);
+  transition: background-color .15s ease, border-color .15s ease, transform .15s ease;
+}
+:lang(de) .trilha-tools a, :lang(de) .trilha-stages a { hyphens: auto; -webkit-hyphens: auto; } /* compostos longos */
+.trilha-tools a:hover { border-color: hsl(var(--gold)); background: hsl(var(--gold-soft) / .5); }
+.trilha-tools a:active { transform: scale(.98); }
+.trilha-tools a:focus-visible { outline: 3px solid hsl(var(--gold)); outline-offset: 2px; }
+@media (min-width: 768px) { .trilha-tools a { font-size: 1rem; min-height: 60px; } }
+/* Celular: grade e botão ocupam a largura toda do cartão (palavras inteiras, sem hífen). */
+@media (max-width: 767px) {
+  .trilha-tools, .trilha-btn { margin-left: -48px; }
+}
+
+/* Botão principal da etapa */
+.trilha-btn {
+  margin-top: 14px;
+  min-height: 56px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: var(--t-radius-sm);
+  background: var(--t-on);
+  color: var(--t-on-fg);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+  box-shadow: 0 8px 20px -10px hsl(216 45% 16% / .55);
+  transition: filter .15s ease, transform .15s ease;
+}
+.trilha-btn:hover { filter: brightness(1.08); }
+.trilha-btn:active { transform: translateY(1px); }
+.trilha-btn:focus-visible { outline: 3px solid hsl(var(--gold)); outline-offset: 3px; }
+.trilha-btn span:first-child { overflow-wrap: anywhere; }
+@media (min-width: 768px) { .trilha-btn { display: inline-flex; min-width: 320px; } }
+
+/* ---------- Bloco lateral de apoio (duas colunas) ---------- */
+.trilha-side { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 359px) { .trilha-side { grid-template-columns: 1fr; } }
+@media (min-width: 1100px) { .trilha-side { grid-template-columns: 1fr; } }
+.trilha-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: hsl(var(--paper-2));
+  border: 1px solid hsl(var(--rule));
+  border-radius: var(--t-radius);
+  box-shadow: var(--t-shadow);
+}
+.trilha-card b { font-size: 1.125rem; line-height: 1.25; font-weight: 700; color: hsl(var(--ink)); }
+.trilha-card p:not(.trilha-kicker) { margin: 0; font-size: 1rem; line-height: 1.45; color: hsl(var(--ink-2)); }
+.trilha-card .trilha-verse { font-family: var(--font-text); font-style: italic; color: hsl(var(--ink)); }
+.trilha-card-link {
+  margin-top: auto;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: hsl(var(--gold-ink));
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+}
+.trilha-card-link:focus-visible { outline: 3px solid hsl(var(--gold)); outline-offset: 2px; border-radius: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .trilha * { transition: none !important; }
+}

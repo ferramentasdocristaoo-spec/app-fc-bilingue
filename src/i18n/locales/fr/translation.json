@@ -652,5 +652,27 @@
     "youGet": "Ce que vous recevrez",
     "examples": "Exemples",
     "slowHint": "Cela peut prendre jusqu'à une minute."
+  },
+  "home": {
+    "stagesLabel": "Étapes de la semaine",
+    "supportLabel": "Appui",
+    "yourWeek": "Votre semaine",
+    "noPassage": "Pas encore de passage",
+    "forDate": "Pour {{date}}",
+    "stageOf": "étape {{current}} sur {{total}}",
+    "status": {
+      "done": "fait",
+      "now": "maintenant",
+      "later": "ensuite"
+    },
+    "prepText": "Choisissez le texte et le thème et construisez le plan dans l'Atelier de Sermon.",
+    "prepDone": "Texte choisi. Vous pouvez revenir à l'Atelier quand vous voulez.",
+    "choosePassage": "Choisir le passage",
+    "studyText": "Examinez le texte en profondeur avant d'écrire.",
+    "lifeText": "Portez le message dans la vie quotidienne et dans l'Église.",
+    "journeyStart": "Commencez par la Genèse",
+    "journeyWhere": "Là où vous vous êtes arrêté la dernière fois.",
+    "journeyContinue": "Reprendre la lecture",
+    "journeyOpen": "Ouvrir le Parcours"
   }
 }

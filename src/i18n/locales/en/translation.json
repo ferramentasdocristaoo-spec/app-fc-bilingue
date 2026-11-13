@@ -652,5 +652,27 @@
     "youGet": "What you will get",
     "examples": "Examples",
     "slowHint": "This may take up to a minute."
+  },
+  "home": {
+    "stagesLabel": "This week's stages",
+    "supportLabel": "Support",
+    "yourWeek": "Your week",
+    "noPassage": "No passage yet",
+    "forDate": "For {{date}}",
+    "stageOf": "stage {{current}} of {{total}}",
+    "status": {
+      "done": "done",
+      "now": "now",
+      "later": "later"
+    },
+    "prepText": "Choose the text and theme and build the outline in the Workshop.",
+    "prepDone": "Text chosen. You can return to the Workshop anytime.",
+    "choosePassage": "Choose the passage",
+    "studyText": "Look deeply at the text before you write.",
+    "lifeText": "Take the message into daily life and the church.",
+    "journeyStart": "Start with Genesis",
+    "journeyWhere": "Where you stopped last time.",
+    "journeyContinue": "Continue reading",
+    "journeyOpen": "Open the Journey"
   }
 }
