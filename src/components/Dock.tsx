@@ -23,10 +23,11 @@ import "./Dock.css";
 
 const HOVER_DELAY = 300;
 const LEAVE_DELAY = 220;
+// "A" de amostra: do mínimo da casa (15 px) ao maior.
 const FONT_SIZES: { value: FontSizeOption; px: number }[] = [
-  { value: "small", px: 14 },
-  { value: "medium", px: 17 },
-  { value: "large", px: 20 },
+  { value: "small", px: 15 },
+  { value: "medium", px: 18 },
+  { value: "large", px: 21 },
   { value: "xlarge", px: 24 },
 ];
 
@@ -465,7 +466,8 @@ function SettingsPanel() {
         </button>
       </div>
 
-      <div className="dock-set-install">
+      <div className="dock-set-row dock-set-install">
+        <span>{t("appName")}</span>
         <InstallButton />
       </div>
 
