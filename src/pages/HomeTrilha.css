@@ -96,6 +96,12 @@
 /* ---------- Corpo ---------- */
 .trilha-body { width: min(1080px, 100%); margin: 0 auto; padding: 8px 16px 0; }
 @media (min-width: 768px) { .trilha-body { padding: 16px 24px 0; } }
+/* Desktop sem menu lateral (Dock embaixo): corpo e faixa de etapas mais largos, bordas alinhadas. */
+@media (min-width: 1280px) {
+  .trilha-body { width: min(1240px, 100%); padding: 20px 32px 0; }
+  .trilha-stages ol { max-width: 1176px; }
+  .trilha-grid { grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; }
+}
 
 .trilha-kicker {
   margin: 0;

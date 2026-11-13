@@ -674,5 +674,17 @@
     "journeyWhere": "Where you stopped last time.",
     "journeyContinue": "Continue reading",
     "journeyOpen": "Open the Journey"
+  },
+  "dock": {
+    "label": "Toolbar",
+    "homeDescription": "Your week and the study path",
+    "settings": "Settings",
+    "settingsDescription": "Language, text size, appearance, install and account",
+    "shortcuts": "Shortcuts",
+    "appearance": "Appearance",
+    "language": "Language",
+    "account": "Account",
+    "current": "Current page",
+    "collections": "Collections"
   }
 }

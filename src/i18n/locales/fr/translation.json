@@ -674,5 +674,17 @@
     "journeyWhere": "Là où vous vous êtes arrêté la dernière fois.",
     "journeyContinue": "Reprendre la lecture",
     "journeyOpen": "Ouvrir le Parcours"
+  },
+  "dock": {
+    "label": "Barre d’outils",
+    "homeDescription": "Votre semaine et le parcours d’étude",
+    "settings": "Réglages",
+    "settingsDescription": "Langue, taille du texte, apparence, installation et compte",
+    "shortcuts": "Raccourcis",
+    "appearance": "Apparence",
+    "language": "Langue",
+    "account": "Compte",
+    "current": "Page actuelle",
+    "collections": "Collections"
   }
 }

@@ -8,6 +8,7 @@ import PageShell from "@/components/PageShell";
 import { fetchBibleChapter } from "@/lib/content-api";
 import { cleanBibleText } from "@/lib/bible-text";
 import { useSearchParams } from "react-router-dom";
+import { DEFAULT_VERSION_BY_LANG, VERSIONS_BY_LANG, normalizeBibleLanguage } from "@/data/bible-versions";
 
 const SPEECH_LANG: Record<string, string> = {
   "pt-PT": "pt-PT",
@@ -17,69 +18,6 @@ const SPEECH_LANG: Record<string, string> = {
   it: "it-IT",
   de: "de-DE",
 };
-
-const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = {
-  "pt-PT": [
-    { id: "OL", name: "OL - O Livro (Português Europeu)" },
-    { id: "NVIPT", name: "NVI-PT - Nova Versão Internacional" },
-  ],
-  "en": [
-    { id: "KJV", name: "KJV - King James Version" },
-    { id: "NKJV", name: "NKJV - New King James Version" },
-    { id: "NIV2011", name: "NIV - New International Version" },
-    { id: "ESV", name: "ESV - English Standard Version" },
-    { id: "NLT", name: "NLT - New Living Translation" },
-    { id: "WEB", name: "WEB - World English Bible" },
-    { id: "ASV", name: "ASV - American Standard Version" },
-    { id: "YLT", name: "YLT - Young's Literal Translation" },
-    { id: "MSG", name: "MSG - The Message" },
-  ],
-  "es": [
-    { id: "RV1960", name: "RVR60 - Reina-Valera 1960" },
-    { id: "RV2004", name: "RVG - Reina Valera Gómez 2004" },
-    { id: "NVI", name: "NVI - Nueva Versión Internacional" },
-    { id: "BTX3", name: "BTX3 - Biblia Textual 3ª Edición" },
-    { id: "NTV", name: "NTV - Nueva Traducción Viviente" },
-    { id: "PDT", name: "PDT - Palabra de Dios para Todos" },
-    { id: "LBLA", name: "LBLA - La Biblia de las Américas" },
-  ],
-  "fr": [
-    { id: "FRLSG", name: "LSG - Louis Segond 1910" },
-    { id: "NBS", name: "NBS - Nouvelle Bible Segond" },
-    { id: "FRPDV17", name: "PDV - Parole de Vie 2017" },
-    { id: "BDS", name: "BDS - Bible du Semeur" },
-    { id: "FRDBY", name: "DBY - Bible de Darby" },
-  ],
-  "it": [
-    { id: "NR06", name: "NR06 - Nuova Riveduta 2006" },
-  ],
-  "de": [
-    { id: "LUT", name: "LUT - Luther 1912" },
-    { id: "S00", name: "SCH2000 - Schlachter 2000" },
-    { id: "HFA", name: "HFA - Hoffnung für Alle" },
-    { id: "ELB", name: "ELB - Elberfelder" },
-  ],
-};
-
-const DEFAULT_VERSION_BY_LANG: Record<string, string> = {
-  "pt-PT": "OL",
-  "en": "KJV",
-  "es": "RV1960",
-  "fr": "FRLSG",
-  "it": "NR06",
-  "de": "LUT",
-};
-
-function normalizeBibleLanguage(language: string): keyof typeof VERSIONS_BY_LANG {
-  const normalized = language.toLowerCase();
-
-  if (normalized.startsWith("en")) return "en";
-  if (normalized.startsWith("de")) return "de";
-  if (normalized.startsWith("es")) return "es";
-  if (normalized.startsWith("fr")) return "fr";
-  if (normalized.startsWith("it")) return "it";
-  return "pt-PT";
-}
 
 const BOOKS = [
   { id: 1, name: "Gênesis", chapters: 50 },
@@ -169,7 +107,10 @@ const BibliaPage = () => {
   const [searchParams] = useSearchParams();
   const lang = normalizeBibleLanguage(i18n.resolvedLanguage || i18n.language);
   const versions = VERSIONS_BY_LANG[lang];
-  const [version, setVersion] = useState(() => DEFAULT_VERSION_BY_LANG[lang]);
+  const [version, setVersion] = useState(() => {
+    const requested = searchParams.get("version");
+    return versions.some((v) => v.id === requested) ? requested! : DEFAULT_VERSION_BY_LANG[lang];
+  });
   const [bookId, setBookId] = useState(() => {
     const requested = Number(searchParams.get("bookId"));
     return BOOKS.some((book) => book.id === requested) ? requested : 1;
@@ -193,6 +134,20 @@ const BibliaPage = () => {
     setVersion(DEFAULT_VERSION_BY_LANG[lang]);
     setVerses([]);
   }, [lang]);
+
+  // Atalhos do Dock e do Início (?version=, ?bookId=, ?chapter=) também valem quando a página já está aberta.
+  useEffect(() => {
+    const requestedVersion = searchParams.get("version");
+    if (requestedVersion && versions.some((v) => v.id === requestedVersion)) { setVersion(requestedVersion); setSelectedVerse(null); }
+    const requestedBook = Number(searchParams.get("bookId"));
+    if (BOOKS.some((book) => book.id === requestedBook)) {
+      setBookId(requestedBook);
+      const requestedChapter = Number(searchParams.get("chapter"));
+      setChapter(Number.isInteger(requestedChapter) && requestedChapter > 0 ? requestedChapter : 1);
+      setSelectedVerse(null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const bookNames = t("biblia.books", { returnObjects: true }) as string[];
   const currentBook = BOOKS.find((b) => b.id === bookId)!;

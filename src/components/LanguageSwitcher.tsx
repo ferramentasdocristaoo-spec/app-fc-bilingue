@@ -2,15 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { setLanguageManually } from '@/i18n';
 import type { AppLanguage } from '@/i18n/geo-language';
+import { APP_LANGUAGES } from '@/i18n/app-languages';
 
-const languages = [
-  { code: 'pt-PT', flag: '🇵🇹', name: 'Português' },
-  { code: 'en', flag: '🇺🇸', name: 'English' },
-  { code: 'fr', flag: '🇫🇷', name: 'Français' },
-  { code: 'es', flag: '🇪🇸', name: 'Español' },
-  { code: 'it', flag: '🇮🇹', name: 'Italiano' },
-  { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
-];
+const languages = APP_LANGUAGES;
 
 interface LanguageSwitcherProps {
   className?: string;

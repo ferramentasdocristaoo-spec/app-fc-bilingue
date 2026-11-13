@@ -674,5 +674,17 @@
     "journeyWhere": "Onde paraste da última vez.",
     "journeyContinue": "Continuar a leitura",
     "journeyOpen": "Abrir a Jornada"
+  },
+  "dock": {
+    "label": "Barra de ferramentas",
+    "homeDescription": "A tua semana e a trilha de estudo",
+    "settings": "Ajustes",
+    "settingsDescription": "Idioma, tamanho do texto, aparência, instalação e conta",
+    "shortcuts": "Atalhos",
+    "appearance": "Aparência",
+    "language": "Idioma",
+    "account": "Conta",
+    "current": "Página atual",
+    "collections": "Coleções"
   }
 }

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { BottomNav } from "@/components/BottomNav";
+import { Dock } from "@/components/Dock";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/hooks/use-theme";
@@ -51,24 +52,33 @@ const DashboardLayout = () => {
   return (
     <SidebarProvider defaultOpen={!isMobile}>
       <div className="min-h-screen flex w-full">
-        <nav aria-label={t("dashboard.menu")} className="contents"><AppSidebar /></nav>
+        {/* Celular: menu lateral (abre pela aba "Menu" da barra inferior). Desktop: Dock embaixo, sem lateral. */}
+        {isMobile && <nav aria-label={t("dashboard.menu")} className="contents"><AppSidebar /></nav>}
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-14 flex items-center justify-between gap-1 border-b border-rule-soft bg-background px-1 shrink-0 md:px-6">
-            <div className="flex min-w-0 items-center">
+            <div className="flex min-w-0 items-center md:hidden">
               <MenuButton />
               {/* Celular: o nome inteiro não cabe, então entra o brasão; fora do início, a seta para o nível acima. */}
               {parent ? (
-                <Link to={parent} aria-label={t("common.backTo")} className="flex h-11 w-11 items-center justify-center text-ink-2 hover:text-foreground md:hidden">
+                <Link to={parent} aria-label={t("common.backTo")} className="flex h-11 w-11 items-center justify-center text-ink-2 hover:text-foreground">
                   <ArrowLeft className="h-5 w-5" />
                 </Link>
               ) : (
-                <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="ml-1 h-9 w-9 object-contain md:hidden" />
+                <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt={t("appName")} className="ml-1 h-9 w-9 object-contain" />
               )}
             </div>
+            {/* Desktop: a marca que antes ficava no topo da lateral. */}
+            <Link to="/" className="hidden min-w-0 items-center gap-3 md:flex">
+              <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt="" className="h-9 w-9 object-contain" />
+              <span className="font-brand truncate text-[0.9375rem] font-semibold tracking-[0.06em] text-gold-ink">{t("appName")}</span>
+            </Link>
             <div className="flex shrink-0 items-center md:gap-2">
-              <InstallButton />
-              <FontSizeSelector />
-              <LanguageSwitcher variant="horizontal" compact />
+              {/* Celular: ajustes no topo. Desktop: ficam no ícone Ajustes do Dock. */}
+              <div className="flex items-center md:hidden">
+                <InstallButton />
+                <FontSizeSelector />
+                <LanguageSwitcher variant="horizontal" compact />
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
@@ -85,6 +95,7 @@ const DashboardLayout = () => {
             <div className={`${fontSizeClass} bnav-spacer`}><Outlet /></div>
           </main>
           <BottomNav />
+          {!isMobile && <Dock />}
         </div>
       </div>
     </SidebarProvider>

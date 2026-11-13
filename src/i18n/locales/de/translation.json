@@ -674,5 +674,17 @@
     "journeyWhere": "Wo du zuletzt aufgehört hast.",
     "journeyContinue": "Weiterlesen",
     "journeyOpen": "Reise öffnen"
+  },
+  "dock": {
+    "label": "Werkzeugleiste",
+    "homeDescription": "Ihre Woche und der Studienpfad",
+    "settings": "Einstellungen",
+    "settingsDescription": "Sprache, Textgröße, Darstellung, Installation und Konto",
+    "shortcuts": "Schnellzugriff",
+    "appearance": "Darstellung",
+    "language": "Sprache",
+    "account": "Konto",
+    "current": "Aktuelle Seite",
+    "collections": "Sammlungen"
   }
 }
