@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { BottomNav } from "@/components/BottomNav";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/hooks/use-theme";
@@ -81,8 +82,9 @@ const DashboardLayout = () => {
             </div>
           </header>
           <main ref={mainRef} className="flex-1 overflow-auto">
-            <div className={fontSizeClass}><Outlet /></div>
+            <div className={`${fontSizeClass} bnav-spacer`}><Outlet /></div>
           </main>
+          <BottomNav />
         </div>
       </div>
     </SidebarProvider>
