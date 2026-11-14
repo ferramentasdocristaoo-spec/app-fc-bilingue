@@ -10,7 +10,7 @@ import { useFontSize, type FontSizeOption } from "@/hooks/use-font-size";
 import { setLanguageManually } from "@/i18n";
 import type { AppLanguage } from "@/i18n/geo-language";
 import InstallButton from "@/components/InstallButton";
-import { APP_LANGUAGES } from "@/i18n/app-languages";
+import { APP_LANGUAGES, matchAppLanguage } from "@/i18n/app-languages";
 import { VERSIONS_BY_LANG, normalizeBibleLanguage } from "@/data/bible-versions";
 import { getLastRead, libraryProducts } from "@/data/library";
 import { journeyProgressRepository } from "@/features/bible-journey/progress";
@@ -427,8 +427,7 @@ function SettingsPanel() {
   const { email, signOut } = useAuth();
   const names = t("fontSize.names", { returnObjects: true }) as string[];
   const current = i18n.resolvedLanguage || i18n.language;
-  const matched = APP_LANGUAGES.find((l) => l.code === current)?.code
-    ?? APP_LANGUAGES.find((l) => l.code.split("-")[0] === current.split("-")[0])?.code ?? "pt-PT";
+  const matched = matchAppLanguage(current);
 
   return (
     <div className="dock-settings">

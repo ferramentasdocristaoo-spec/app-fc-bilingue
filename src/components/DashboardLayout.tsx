@@ -5,7 +5,7 @@ import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { BottomNav } from "@/components/BottomNav";
 import { Dock } from "@/components/Dock";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LanguageFlags } from "@/components/LanguageFlags";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/hooks/use-theme";
 import { ArrowLeft, Sun, Moon, Menu } from "lucide-react";
@@ -55,7 +55,9 @@ const DashboardLayout = () => {
         {/* Celular: menu lateral (abre pela aba "Menu" da barra inferior). Desktop: Dock embaixo, sem lateral. */}
         {isMobile && <nav aria-label={t("dashboard.menu")} className="contents"><AppSidebar /></nav>}
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-14 flex items-center justify-between gap-1 border-b border-rule-soft bg-background px-1 shrink-0 md:px-6">
+          {/* Desktop: grelha marca | bandeiras | tema. De 768 a 1023 px as bandeiras centram no espaço que sobra;
+              a partir de 1024 px as três colunas das pontas são iguais e as bandeiras ficam no centro exato do ecrã. */}
+          <header className="h-14 flex items-center justify-between gap-1 border-b border-rule-soft bg-background px-1 shrink-0 md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-3 md:px-6 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
             <div className="flex min-w-0 items-center md:hidden">
               <MenuButton />
               {/* Celular: o nome inteiro não cabe, então entra o brasão; fora do início, a seta para o nível acima. */}
@@ -72,12 +74,15 @@ const DashboardLayout = () => {
               <img src={appLogo(i18n.resolvedLanguage || i18n.language)} alt="" className="h-9 w-9 object-contain" />
               <span className="font-brand truncate text-[0.9375rem] font-semibold tracking-[0.06em] text-gold-ink">{t("appName")}</span>
             </Link>
-            <div className="flex shrink-0 items-center md:gap-2">
+            {/* Desktop: bandeiras dos idiomas no meio, no alto (um toque troca o idioma). */}
+            <LanguageFlags variant="bar" className="hidden md:flex" />
+            <div className="flex shrink-0 items-center md:justify-self-end md:gap-2">
               {/* Celular: ajustes no topo. Desktop: ficam no ícone Ajustes do Dock. */}
               <div className="flex items-center md:hidden">
                 <InstallButton />
                 <FontSizeSelector />
-                <LanguageSwitcher variant="horizontal" compact />
+                {/* Celular: só a bandeira atual, redonda; tocar abre a folha com as 6. */}
+                <LanguageFlags variant="sheet" />
               </div>
               <Button
                 variant="ghost"

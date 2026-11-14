@@ -1,0 +1,120 @@
+/* ============================================================
+   Bandeiras de idioma no topo (pedido do dono, 13/11/2026).
+   Regras da casa: alvo ≥ 44 px, sigla ≥ 14 px, a ativa com anel
+   dourado, as outras levemente apagadas; claro e escuro.
+   Bandeiras em SVG próprio (components/flags/Flag.tsx).
+   ============================================================ */
+.lang-flags-wrap {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  font-family: var(--font-ui);
+}
+.lang-flags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-ui);
+}
+.lang-flag-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 11px 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: hsl(var(--ink-2));
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.lang-flag-btn:hover { background: hsl(var(--accent)); color: hsl(var(--foreground)); }
+.lang-flag-btn:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+
+.lang-flag {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 50%;
+  opacity: 0.6;
+  filter: saturate(0.75);
+  transition: opacity 0.15s, filter 0.15s, box-shadow 0.15s;
+}
+.lang-flag-btn:hover .lang-flag { opacity: 0.92; filter: none; }
+.flag-ring { fill: none; stroke: hsl(var(--ink) / 0.22); stroke-width: 1; }
+
+/* Ativa: anel dourado na bandeira, sigla em dourado, fundo suave. */
+.lang-flag-btn.is-active { color: hsl(var(--gold-ink)); background: hsl(var(--gold-soft) / 0.6); }
+.light .lang-flag-btn.is-active { background: hsl(var(--gold-soft)); }
+.lang-flag-btn.is-active .lang-flag,
+.lang-current-btn .lang-flag {
+  opacity: 1;
+  filter: none;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--gold));
+}
+.lang-flag-btn.is-active:hover { background: hsl(var(--gold-soft)); }
+
+/* Trava futura (idiomasLiberados): apagado, sem clique. */
+.lang-flag-btn.is-locked { opacity: 0.4; cursor: not-allowed; }
+.lang-flag-btn.is-locked:hover { background: transparent; color: hsl(var(--ink-2)); }
+
+/* Desktop estreito (768–1279 px): entre a marca e o tema sobra pouco espaço;
+   a bandeira fica em cima e a sigla embaixo, cada item 44 × 48 px. */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .lang-flags--bar { gap: 2px; }
+  .lang-flags--bar .lang-flag-btn {
+    flex-direction: column;
+    gap: 3px;
+    min-width: 46px;
+    min-height: 48px;
+    padding: 4px 6px 5px;
+    border-radius: 12px;
+  }
+  .lang-flags--bar .lang-flag { width: 22px; height: 22px; }
+}
+
+/* Celular: botão redondo com a bandeira atual no topo… */
+.lang-current-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.lang-current-btn .lang-flag { width: 28px; height: 28px; }
+.lang-current-btn:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+
+/* …que abre a folha com as 6, em 3 × 2, cada uma ≥ 52 px de altura.
+   Largura, cantos, fundo e sombra da folha vão em classes Tailwind no componente
+   (as utilitárias do PopoverContent venceriam uma regra .lang-sheet simples). */
+.lang-flags--sheet {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.lang-flags--sheet .lang-flag-btn {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+  border: 1px solid hsl(var(--rule-soft));
+  background: hsl(var(--background));
+}
+.lang-flags--sheet .lang-flag-btn.is-active { border-color: hsl(var(--gold)); background: hsl(var(--gold-soft) / 0.6); }
+.light .lang-flags--sheet .lang-flag-btn.is-active { background: hsl(var(--gold-soft)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-flag-btn, .lang-flag { transition: none; }
+}

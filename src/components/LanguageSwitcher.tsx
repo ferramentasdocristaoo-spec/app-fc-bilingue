@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { setLanguageManually } from '@/i18n';
 import type { AppLanguage } from '@/i18n/geo-language';
-import { APP_LANGUAGES } from '@/i18n/app-languages';
+import { APP_LANGUAGES, matchAppLanguage } from '@/i18n/app-languages';
 
 const languages = APP_LANGUAGES;
 
@@ -13,20 +13,13 @@ interface LanguageSwitcherProps {
   compact?: boolean;
 }
 
-const matchLanguage = (current: string) => {
-  const exact = languages.find((lang) => lang.code === current);
-  if (exact) return exact.code;
-  const base = current.split('-')[0];
-  return languages.find((lang) => lang.code.split('-')[0] === base)?.code ?? 'pt-PT';
-};
-
 /**
  * "horizontal": um único seletor discreto em texto ("Português ▾"), em vez de 6 bandeiras.
  * "vertical": lista de botões (mantida para quem já usa).
  */
 export const LanguageSwitcher = ({ className = '', variant = 'horizontal', compact = false }: LanguageSwitcherProps) => {
   const { t, i18n } = useTranslation();
-  const current = matchLanguage(i18n.resolvedLanguage || i18n.language || 'pt-PT');
+  const current = matchAppLanguage(i18n.resolvedLanguage || i18n.language || 'pt-PT');
 
   if (variant === 'horizontal') {
     return (
@@ -58,7 +51,7 @@ export const LanguageSwitcher = ({ className = '', variant = 'horizontal', compa
           key={lang.code}
           variant={current === lang.code ? 'default' : 'ghost'}
           size="sm"
-          onClick={() => void setLanguageManually(lang.code as AppLanguage)}
+          onClick={() => void setLanguageManually(lang.code)}
           title={lang.name}
           className="h-8 justify-start gap-2 px-2 text-sm"
         >
