@@ -1,8 +1,9 @@
+import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { BookOpen, Home, Map, Menu } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useSidebar } from "@/components/ui/sidebar";
+import { MenuSheet } from "@/components/MenuSheet";
 import "./BottomNav.css";
 
 // Cruz latina dourada do botão central (Oficina de Sermões).
@@ -27,11 +28,14 @@ const TabLink = ({ to, label, icon: Icon, end }: Tab) => (
   </NavLink>
 );
 
-/** Barra fixa inferior do celular: Início | Bíblia | [Oficina] | Jornada | Menu. */
+/** Barra fixa inferior do celular: Início | Bíblia | [Oficina] | Jornada | Menu.
+ *  "Menu" sobe a folha de cartõezinhos (MenuSheet), no lugar do menu lateral. */
 export function BottomNav() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const { openMobile, setOpenMobile } = useSidebar();
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Trocou de página: a folha fecha.
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
   const oficinaActive = pathname === "/oficina" || pathname.startsWith("/oficina/");
 
   return (
@@ -49,16 +53,18 @@ export function BottomNav() {
 
         <button
           type="button"
-          className={`bnav-tab${openMobile ? " is-active" : ""}`}
-          onClick={() => setOpenMobile(!openMobile)}
-          aria-expanded={openMobile}
+          className={`bnav-tab${menuOpen ? " is-active" : ""}`}
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-expanded={menuOpen}
+          aria-haspopup="dialog"
         >
           <span className="bnav-pill" aria-hidden="true">
-            <Menu className="bnav-icon" strokeWidth={openMobile ? 2.25 : 1.9} />
+            <Menu className="bnav-icon" strokeWidth={menuOpen ? 2.25 : 1.9} />
           </span>
           <span className="bnav-label">{t("dashboard.menu")}</span>
         </button>
       </div>
+      <MenuSheet open={menuOpen} onOpenChange={setMenuOpen} />
     </nav>
   );
 }
