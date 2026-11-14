@@ -15,7 +15,8 @@
     "errorExpired": "Votre abonnement a expiré. Veuillez renouveler votre plan pour continuer.",
     "passwordLabel": "Mot de passe",
     "errorPasswordEmpty": "Veuillez saisir votre mot de passe.",
-    "errorInvalidCredentials": "E-mail ou mot de passe incorrect."
+    "errorInvalidCredentials": "E-mail ou mot de passe incorrect.",
+    "errorUnavailable": "Impossible de vérifier votre accès pour le moment. Vérifiez votre connexion et réessayez."
   },
   "admin": {
     "title": "Panneau d'administration",
@@ -689,5 +690,20 @@
     "account": "Compte",
     "current": "Page actuelle",
     "collections": "Collections"
+  },
+  "access": {
+    "expiredTitle": "Votre abonnement est terminé",
+    "expiredBody": "Merci de cheminer avec nous. Renouvelez votre formule pour continuer à utiliser la Bible, l'Atelier de Sermon et les autres outils.",
+    "blockedTitle": "Accès en pause",
+    "blockedBody": "L'accès de cet e-mail est en pause. Si cela vous semble une erreur, contactez le support ou abonnez-vous à nouveau.",
+    "renew": "Renouveler l'abonnement",
+    "subscribeAgain": "S'abonner à nouveau",
+    "backToLogin": "Se connecter avec un autre e-mail",
+    "signedAs": "Compte : {{email}}"
+  },
+  "languages": {
+    "lockedTitle": "Langues supplémentaires",
+    "lockedBody": "Ajoutez-les à votre abonnement pour utiliser {{language}}.",
+    "lockedAction": "Activer les langues"
   }
 }

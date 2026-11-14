@@ -54,8 +54,9 @@ describe("Bandeiras de idioma no topo", () => {
     expect(screen.getByRole("button", { name: "Sprache wählen · Deutsch" })).toBeInTheDocument();
   });
 
-  it("trava futura: hoje idiomasLiberados() devolve os 7 e nenhuma bandeira fica apagada", () => {
-    expect(idiomasLiberados()).toEqual(APP_LANGUAGES.map((lang) => lang.code));
+  it("sem plano registrado (lista antiga de e-mails), idiomasLiberados() devolve os 7 e nenhuma bandeira fica apagada", () => {
+    // A trava por plano está em planos-idiomas.test.tsx.
+    expect(idiomasLiberados(null)).toEqual(APP_LANGUAGES.map((lang) => lang.code));
     render(<LanguageFlags />);
     expect(document.querySelectorAll(".lang-flag-btn.is-locked")).toHaveLength(0);
     expect(document.querySelectorAll(".lang-flag-btn:disabled")).toHaveLength(0);

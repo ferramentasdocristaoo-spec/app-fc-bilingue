@@ -15,7 +15,8 @@
     "errorExpired": "A tua subscrição expirou. Renova o teu plano para continuar a aceder.",
     "passwordLabel": "Palavra-passe",
     "errorPasswordEmpty": "Insere a tua palavra-passe.",
-    "errorInvalidCredentials": "E-mail ou palavra-passe incorretos."
+    "errorInvalidCredentials": "E-mail ou palavra-passe incorretos.",
+    "errorUnavailable": "Não foi possível confirmar o teu acesso agora. Verifica a ligação à internet e tenta de novo."
   },
   "admin": {
     "title": "Painel de Administração",
@@ -689,5 +690,20 @@
     "account": "Conta",
     "current": "Página atual",
     "collections": "Coleções"
+  },
+  "access": {
+    "expiredTitle": "A tua subscrição expirou",
+    "expiredBody": "Obrigado por caminhares connosco. Renova o plano para continuares a usar a Bíblia, a Oficina de Sermões e as outras ferramentas.",
+    "blockedTitle": "Acesso em pausa",
+    "blockedBody": "Este email está com o acesso em pausa. Se achas que foi um engano, contacta o suporte ou subscreve de novo.",
+    "renew": "Renovar subscrição",
+    "subscribeAgain": "Subscrever de novo",
+    "backToLogin": "Entrar com outro email",
+    "signedAs": "Conta: {{email}}"
+  },
+  "languages": {
+    "lockedTitle": "Idiomas adicionais",
+    "lockedBody": "Ativa na tua subscrição para usares {{language}}.",
+    "lockedAction": "Ativar idiomas"
   }
 }

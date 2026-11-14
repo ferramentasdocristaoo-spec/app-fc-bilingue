@@ -15,7 +15,8 @@
     "errorExpired": "Sua assinatura expirou. Renove o seu plano para continuar acessando.",
     "passwordLabel": "Senha",
     "errorPasswordEmpty": "Digite a sua senha.",
-    "errorInvalidCredentials": "E-mail ou senha incorretos."
+    "errorInvalidCredentials": "E-mail ou senha incorretos.",
+    "errorUnavailable": "Não foi possível conferir o seu acesso agora. Verifique a internet e tente de novo."
   },
   "admin": {
     "title": "Painel de Administração",
@@ -689,5 +690,20 @@
     "account": "Conta",
     "current": "Página atual",
     "collections": "Coleções"
+  },
+  "access": {
+    "expiredTitle": "Sua assinatura venceu",
+    "expiredBody": "Obrigado por caminhar com a gente. Renove o plano para continuar usando a Bíblia, a Oficina de Sermões e as outras ferramentas.",
+    "blockedTitle": "Acesso pausado",
+    "blockedBody": "Este e-mail está com o acesso pausado. Se você acha que foi um engano, fale com o suporte ou assine de novo.",
+    "renew": "Renovar assinatura",
+    "subscribeAgain": "Assinar de novo",
+    "backToLogin": "Entrar com outro e-mail",
+    "signedAs": "Conta: {{email}}"
+  },
+  "languages": {
+    "lockedTitle": "Idiomas adicionais",
+    "lockedBody": "Ative na sua assinatura para usar {{language}}.",
+    "lockedAction": "Ativar idiomas"
   }
 }

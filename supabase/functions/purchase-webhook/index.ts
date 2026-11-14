@@ -1,141 +1,106 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { aplicarPlanos, lerCompra, type EstadoAcesso, type PlanoSku } from "./parse.ts";
+
+// Webhook de compra do FC bilíngue (KawaiPay; formatos antigos continuam aceitos).
+// Regras (14/11/2026): compra_aprovada / assinatura_renovada liberam e estendem a validade;
+// reembolso / chargeback bloqueiam; o resto responde 200 "ignored". Nunca 404: a KawaiPay
+// pausa a fila. SKU desconhecido não libera nada (a mesma loja vende os e-books da Livraria).
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-function extractEmail(body: any): string | undefined {
-  // Direct email field
-  if (body.email) return body.email;
-  // Hotmart format
-  if (body.data?.buyer?.email) return body.data.buyer.email;
-  if (body.data?.purchase?.buyer?.email) return body.data.purchase.buyer.email;
-  // Kiwify format
-  if (body.Customer?.email) return body.Customer.email;
-  if (body.customer?.email) return body.customer.email;
-  // Events array format
-  if (body.events && Array.isArray(body.events)) return body.events[0]?.data?.customer_email;
-  if (body.body?.events && Array.isArray(body.body.events)) return body.body.events[0]?.data?.customer_email;
-  if (Array.isArray(body) && body[0]?.body?.events) return body[0].body.events[0]?.data?.customer_email;
-  return undefined;
-}
-
-function extractSku(body: any): string | undefined {
-  // Direct SKU fields
-  if (body.sku) return body.sku;
-  if (body.product_id) return String(body.product_id);
-  if (body.product_code) return body.product_code;
-  if (body.offer_code) return body.offer_code;
-  // Hotmart format
-  if (body.data?.purchase?.offer?.code) return body.data.purchase.offer.code;
-  if (body.data?.product?.id) return String(body.data.product.id);
-  if (body.data?.purchase?.product?.id) return String(body.data.purchase.product.id);
-  // Kiwify format
-  if (body.Product?.id) return String(body.Product.id);
-  if (body.product?.id) return String(body.product.id);
-  if (body.plan?.id) return String(body.plan.id);
-  // Eduzz / Monetizze
-  if (body.key) return body.key;
-  // Events array
-  if (body.events && Array.isArray(body.events)) return body.events[0]?.data?.product?.id;
-  return undefined;
-}
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const body = await req.json();
-    console.log("Webhook payload:", JSON.stringify(body).slice(0, 1000));
+    let raw: unknown = null;
+    try { raw = await req.json(); } catch { return json({ ignored: true, reason: "payload_invalido" }); }
+    console.log("Webhook payload:", JSON.stringify(raw).slice(0, 1000));
 
-    const email = extractEmail(body);
-    if (!email || typeof email !== "string") {
-      console.error("Email not found in payload");
-      return new Response(JSON.stringify({ error: "Email não encontrado no payload" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const compra = lerCompra(raw);
+    console.log(`Evento: ${compra.evento || "(sem evento)"} | ação: ${compra.acao} | e-mail: ${compra.email ?? "?"} | itens: ${compra.itens.length}`);
 
-    const normalizedEmail = email.trim().toLowerCase();
-    const sku = extractSku(body);
-    console.log(`Email: ${normalizedEmail} | SKU: ${sku ?? "none"}`);
+    if (compra.acao === "ignorar") return json({ ignored: true, event: compra.evento || null });
+    if (!compra.email || !compra.email.includes("@")) return json({ ignored: true, reason: "email_ausente", event: compra.evento || null });
+    const email = compra.email;
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    let planName = "manual";
-    let expiresAt: string | null = null;
-
-    // Look up SKU in sku_plans to determine duration
-    if (sku) {
-      const { data: skuPlan } = await supabase
+    const candidatos = [...new Set(compra.itens.flatMap((i) => i.candidatos))];
+    let planos: PlanoSku[] = [];
+    if (candidatos.length) {
+      const { data, error } = await supabase
         .from("sku_plans")
-        .select("plan_name, months")
-        .eq("sku", sku)
-        .maybeSingle();
-
-      if (skuPlan) {
-        planName = skuPlan.plan_name;
-        const expiry = new Date();
-        expiry.setMonth(expiry.getMonth() + skuPlan.months);
-        expiresAt = expiry.toISOString();
-        console.log(`Plan found: ${planName} (${skuPlan.months} months) → expires ${expiresAt}`);
-      } else {
-        console.warn(`SKU "${sku}" not found in sku_plans — granting access without expiry`);
-      }
+        .select("sku, plan_name, months, unlocks_languages")
+        .in("sku", candidatos);
+      if (error) { console.error("Erro ao ler sku_plans:", error); return json({ error: "Erro ao ler planos" }, 500); }
+      planos = (data ?? []) as PlanoSku[];
     }
 
-    const { error } = await supabase
+    const { data: atualRow, error: atualErr } = await supabase
       .from("approved_emails")
-      .upsert(
-        { email: normalizedEmail, plan: planName, sku: sku ?? null, expires_at: expiresAt },
-        { onConflict: "email" }
-      );
+      .select("id, plan, expires_at, idiomas_liberados, bloqueado")
+      .eq("email", email)
+      .maybeSingle();
+    if (atualErr) { console.error("Erro ao ler approved_emails:", atualErr); return json({ error: "Erro ao ler acesso" }, 500); }
+    const atual: (EstadoAcesso & { id: string; bloqueado: boolean }) | null = atualRow
+      ? { id: atualRow.id, plan: atualRow.plan ?? null, expires_at: atualRow.expires_at ?? null, idiomas_liberados: !!atualRow.idiomas_liberados, bloqueado: !!atualRow.bloqueado }
+      : null;
 
-    if (error) {
-      console.error("Error saving email:", error);
-      return new Response(JSON.stringify({ error: "Erro ao salvar email" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (compra.acao === "bloquear") {
+      if (!atual) return json({ ignored: true, reason: "email_desconhecido", event: compra.evento });
+      if (planos.length === 0) return json({ ignored: true, reason: "sku_desconhecido", event: compra.evento });
+      // Reembolso só do adicional de idiomas: tira os idiomas e mantém o plano.
+      const soAdicional = planos.every((p) => p.months === 0);
+      const patch = soAdicional ? { idiomas_liberados: false } : { bloqueado: true };
+      const { error } = await supabase.from("approved_emails").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", atual.id);
+      if (error) { console.error("Erro ao bloquear:", error); return json({ error: "Erro ao bloquear" }, 500); }
+      console.log(`Acesso ${soAdicional ? "sem idiomas adicionais" : "bloqueado"}: ${email} (${compra.evento})`);
+      return json({ success: true, action: soAdicional ? "languages_revoked" : "blocked", email });
     }
 
-    // A SKU may unlock a library product. Access is tied to the product,
-    // therefore it remains valid in every language and for every localized cover.
-    if (sku) {
-      const { data: libraryProduct } = await supabase
-        .from("library_sku_products")
-        .select("product_slug")
-        .eq("sku", sku)
-        .maybeSingle();
-
-      if (libraryProduct) {
-        const { error: entitlementError } = await supabase
-          .from("library_entitlements")
-          .upsert(
-            { email: normalizedEmail, product_slug: libraryProduct.product_slug, source_sku: sku },
-            { onConflict: "email,product_slug" }
-          );
-        if (entitlementError) console.error("Error granting library access:", entitlementError);
-      }
+    // liberar
+    const novo = aplicarPlanos(atual, planos);
+    if (!novo) {
+      console.warn(`SKU desconhecido para ${email}: ${candidatos.join(", ") || "(nenhum)"} — nada liberado. Cadastre em sku_plans.`);
+      return json({ ignored: true, reason: "sku_desconhecido", skus: candidatos, email });
     }
 
-    console.log(`Access granted: ${normalizedEmail} | plan: ${planName} | expires: ${expiresAt ?? "never"}`);
-    return new Response(JSON.stringify({ success: true, email: normalizedEmail, plan: planName, expires_at: expiresAt }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    // Só o adicional, sem plano com validade e sem cadastro: cria a linha já vencida (o plano
+    // principal, quando chegar, estende a partir de hoje). Assim o bump sozinho não dá acesso.
+    const expiresAt = novo.expires_at ?? (atual ? null : new Date().toISOString());
+    const registro = {
+      email,
+      plan: novo.plan ?? atual?.plan ?? "adicional_idiomas",
+      sku: novo.sku,
+      expires_at: expiresAt,
+      idiomas_liberados: novo.idiomas_liberados,
+      // Compra nova reabilita quem estava bloqueado por reembolso antigo.
+      bloqueado: false,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await supabase.from("approved_emails").upsert(registro, { onConflict: "email" });
+    if (error) { console.error("Erro ao salvar acesso:", error); return json({ error: "Erro ao salvar acesso" }, 500); }
+
+    // Um SKU pode liberar também um produto da Livraria (acesso ao produto, em todos os idiomas).
+    for (const sku of candidatos) {
+      const { data: libraryProduct } = await supabase.from("library_sku_products").select("product_slug").eq("sku", sku).maybeSingle();
+      if (!libraryProduct) continue;
+      const { error: entitlementError } = await supabase
+        .from("library_entitlements")
+        .upsert({ email, product_slug: libraryProduct.product_slug, source_sku: sku }, { onConflict: "email,product_slug" });
+      if (entitlementError) console.error("Error granting library access:", entitlementError);
+    }
+
+    console.log(`Acesso liberado: ${email} | plano: ${registro.plan} | validade: ${registro.expires_at ?? "sem"} | idiomas: ${registro.idiomas_liberados}`);
+    return json({ success: true, email, plan: registro.plan, expires_at: registro.expires_at, idiomas_liberados: registro.idiomas_liberados });
   } catch (err) {
     console.error("Webhook error:", err);
-    return new Response(JSON.stringify({ error: "Erro interno" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return json({ error: "Erro interno" }, 500);
   }
 });

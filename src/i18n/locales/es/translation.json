@@ -15,7 +15,8 @@
     "errorExpired": "Tu suscripción ha expirado. Renueva tu plan para continuar accediendo.",
     "passwordLabel": "Contraseña",
     "errorPasswordEmpty": "Introduce tu contraseña.",
-    "errorInvalidCredentials": "Correo o contraseña incorrectos."
+    "errorInvalidCredentials": "Correo o contraseña incorrectos.",
+    "errorUnavailable": "No pudimos comprobar tu acceso ahora. Revisa tu conexión e inténtalo de nuevo."
   },
   "admin": {
     "title": "Panel de Administración",
@@ -689,5 +690,20 @@
     "account": "Cuenta",
     "current": "Página actual",
     "collections": "Colecciones"
+  },
+  "access": {
+    "expiredTitle": "Tu suscripción ha vencido",
+    "expiredBody": "Gracias por caminar con nosotros. Renueva tu plan para seguir usando la Biblia, el Taller de Sermones y las demás herramientas.",
+    "blockedTitle": "Acceso en pausa",
+    "blockedBody": "El acceso de este correo está en pausa. Si crees que es un error, contacta con soporte o suscríbete de nuevo.",
+    "renew": "Renovar suscripción",
+    "subscribeAgain": "Suscribirse de nuevo",
+    "backToLogin": "Entrar con otro correo",
+    "signedAs": "Cuenta: {{email}}"
+  },
+  "languages": {
+    "lockedTitle": "Idiomas adicionales",
+    "lockedBody": "Actívalos en tu suscripción para usar {{language}}.",
+    "lockedAction": "Activar idiomas"
   }
 }

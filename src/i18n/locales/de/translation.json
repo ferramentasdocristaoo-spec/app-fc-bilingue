@@ -15,7 +15,8 @@
     "errorExpired": "Ihr Abonnement ist abgelaufen. Bitte verlängern Sie Ihren Plan, um weiterhin Zugriff zu haben.",
     "passwordLabel": "Passwort",
     "errorPasswordEmpty": "Bitte gib dein Passwort ein.",
-    "errorInvalidCredentials": "E-Mail oder Passwort ist falsch."
+    "errorInvalidCredentials": "E-Mail oder Passwort ist falsch.",
+    "errorUnavailable": "Dein Zugang konnte gerade nicht geprüft werden. Prüfe deine Verbindung und versuche es noch einmal."
   },
   "admin": {
     "title": "Admin-Bereich",
@@ -689,5 +690,20 @@
     "account": "Konto",
     "current": "Aktuelle Seite",
     "collections": "Sammlungen"
+  },
+  "access": {
+    "expiredTitle": "Dein Abo ist abgelaufen",
+    "expiredBody": "Danke, dass du mit uns unterwegs bist. Verlängere deinen Plan, um die Bibel, die Predigtwerkstatt und die anderen Werkzeuge weiter zu nutzen.",
+    "blockedTitle": "Zugang pausiert",
+    "blockedBody": "Der Zugang für diese E-Mail ist pausiert. Wenn das ein Irrtum ist, wende dich an den Support oder schließe das Abo erneut ab.",
+    "renew": "Abo verlängern",
+    "subscribeAgain": "Erneut abonnieren",
+    "backToLogin": "Mit anderer E-Mail anmelden",
+    "signedAs": "Konto: {{email}}"
+  },
+  "languages": {
+    "lockedTitle": "Zusätzliche Sprachen",
+    "lockedBody": "Schalte sie in deinem Abo frei, um {{language}} zu nutzen.",
+    "lockedAction": "Sprachen freischalten"
   }
 }

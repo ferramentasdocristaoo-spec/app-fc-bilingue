@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { setLanguageManually } from '@/i18n';
 import type { AppLanguage } from '@/i18n/geo-language';
-import { APP_LANGUAGES, matchAppLanguage } from '@/i18n/app-languages';
+import { APP_LANGUAGES, idiomasLiberados, matchAppLanguage, usePlanoAtual } from '@/i18n/app-languages';
 
 const languages = APP_LANGUAGES;
 
@@ -20,6 +20,8 @@ interface LanguageSwitcherProps {
 export const LanguageSwitcher = ({ className = '', variant = 'horizontal', compact = false }: LanguageSwitcherProps) => {
   const { t, i18n } = useTranslation();
   const current = matchAppLanguage(i18n.resolvedLanguage || i18n.language || 'pt-PT');
+  // Trava por plano (app-languages.ts): fora do plano, a opção fica desabilitada.
+  const liberados = idiomasLiberados(usePlanoAtual());
 
   if (variant === 'horizontal') {
     return (
@@ -37,7 +39,9 @@ export const LanguageSwitcher = ({ className = '', variant = 'horizontal', compa
           className="absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
         >
           {languages.map((lang) => (
-            <option key={lang.code} value={lang.code}>{lang.name}</option>
+            <option key={lang.code} value={lang.code} disabled={!liberados.includes(lang.code)}>
+              {liberados.includes(lang.code) ? lang.name : `${lang.name} · ${t('languages.lockedTitle')}`}
+            </option>
           ))}
         </select>
       </label>
@@ -52,6 +56,7 @@ export const LanguageSwitcher = ({ className = '', variant = 'horizontal', compa
           variant={current === lang.code ? 'default' : 'ghost'}
           size="sm"
           onClick={() => void setLanguageManually(lang.code)}
+          disabled={!liberados.includes(lang.code)}
           title={lang.name}
           className="h-8 justify-start gap-2 px-2 text-sm"
         >

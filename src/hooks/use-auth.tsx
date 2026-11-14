@@ -1,11 +1,24 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import i18n from "i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { setLanguageManually } from "@/i18n";
+import { idiomasLiberados, matchAppLanguage, setPlanoAtual, type PlanoAcesso } from "@/i18n/app-languages";
 
-type AccessStatus = "ok" | "notApproved" | "blocked" | "expired";
+type AccessStatus = "ok" | "notApproved" | "blocked" | "expired" | "unavailable";
+/** Motivos que levam à tela de acesso encerrado (AccessDeniedPage). */
+export type DeniedStatus = "blocked" | "expired";
+
+export interface AccessDenied {
+  status: DeniedStatus;
+  email: string;
+}
 
 interface AuthContextType {
   email: string | null;
   loading: boolean;
+  /** Preenchido quando a assinatura venceu ou o e-mail foi bloqueado: o App mostra a tela de renovar. */
+  denied: AccessDenied | null;
+  clearDenied: () => void;
   /** pending = "checkEmail" quando o link mágico foi enviado e falta o usuário clicar. */
   signIn: (email: string, password?: string) => Promise<{ error: string | null; pending?: "checkEmail" }>;
   signOut: () => void;
@@ -34,21 +47,47 @@ const RPC_STATUS: Record<string, AccessStatus> = {
   expired: "expired",
 };
 
-/** Confere a liberação pela RPC app_access_status; sem ela (migração não aplicada), lê a tabela como antes. */
-async function checkAccess(email: string): Promise<AccessStatus> {
-  // RPC nova (migração 20261102010000) ainda fora dos tipos gerados.
-  const rpc = (await supabase.rpc("app_access_status" as never, { _email: email } as never)) as { data: unknown; error: unknown };
-  if (!rpc.error && typeof rpc.data === "string" && RPC_STATUS[rpc.data]) return RPC_STATUS[rpc.data];
+interface AccessInfo {
+  status: AccessStatus;
+  plano: PlanoAcesso | null;
+}
 
-  const { data } = await supabase
+/**
+ * Confere a liberação e o plano: RPC app_access_info (migração 20261114010000) → RPC app_access_status
+ * (20261102010000) → leitura direta da tabela (instalações antigas). Falha de rede = "unavailable":
+ * quem já estava logado continua (o app abre sem internet), quem está entrando vê um aviso.
+ */
+async function checkAccess(email: string): Promise<AccessInfo> {
+  // RPCs novas ainda fora dos tipos gerados.
+  const info = (await supabase.rpc("app_access_info" as never, { _email: email } as never)) as { data: unknown; error: unknown };
+  if (!info.error && info.data && typeof info.data === "object") {
+    const d = info.data as { status?: string; plan?: string | null; idiomas_liberados?: boolean };
+    const status = RPC_STATUS[d.status ?? ""];
+    if (status) return { status, plano: { plan: d.plan ?? null, idiomasLiberados: d.idiomas_liberados === true } };
+  }
+
+  const rpc = (await supabase.rpc("app_access_status" as never, { _email: email } as never)) as { data: unknown; error: unknown };
+  if (!rpc.error && typeof rpc.data === "string" && RPC_STATUS[rpc.data]) return { status: RPC_STATUS[rpc.data], plano: null };
+
+  const { data, error } = await supabase
     .from("approved_emails")
-    .select("id, bloqueado, expires_at")
+    .select("id, bloqueado, expires_at, plan")
     .eq("email", email)
     .maybeSingle();
-  if (!data) return "notApproved";
-  if (data.bloqueado) return "blocked";
-  if (data.expires_at && new Date(data.expires_at) < new Date()) return "expired";
-  return "ok";
+  if (error) return { status: "unavailable", plano: null };
+  if (!data) return { status: "notApproved", plano: null };
+  const plano: PlanoAcesso = { plan: data.plan ?? null, idiomasLiberados: false };
+  if (data.bloqueado) return { status: "blocked", plano };
+  if (data.expires_at && new Date(data.expires_at) < new Date()) return { status: "expired", plano };
+  return { status: "ok", plano };
+}
+
+/** Guarda o plano e, se o idioma em uso ficou fora dele, troca para o primeiro liberado. */
+function aplicarPlano(plano: PlanoAcesso | null) {
+  setPlanoAtual(plano);
+  const liberados = idiomasLiberados(plano);
+  const atual = matchAppLanguage(i18n.resolvedLanguage || i18n.language || "pt-PT");
+  if (!liberados.includes(atual)) void setLanguageManually(liberados[0]);
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -56,32 +95,44 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [email, setEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [denied, setDenied] = useState<AccessDenied | null>(null);
 
   useEffect(() => {
+    let active = true;
+
+    // Resultado da conferência para alguém que já estava dentro (sessão salva ou Supabase Auth).
+    const aplicarStatus = async (normalized: string, info: AccessInfo) => {
+      if (!active) return;
+      if (info.status === "ok") {
+        aplicarPlano(info.plano);
+        localStorage.setItem(AUTH_KEY, normalized);
+        setEmail(normalized);
+        return;
+      }
+      if (info.status === "unavailable") return; // sem rede: mantém como está
+      localStorage.removeItem(AUTH_KEY);
+      setPlanoAtual(null);
+      setEmail(null);
+      if (info.status === "blocked" || info.status === "expired") setDenied({ status: info.status, email: normalized });
+      if (AUTH_MODE !== "email") await supabase.auth.signOut();
+    };
+
     if (AUTH_MODE === "email") {
       const saved = localStorage.getItem(AUTH_KEY);
-      if (saved) setEmail(saved);
+      if (saved) setEmail(saved); // abre já (também sem internet) e confere em seguida
       setLoading(false);
-      return;
+      if (saved) void checkAccess(saved).then((info) => aplicarStatus(saved, info)).catch(() => { /* sem rede */ });
+      return () => { active = false; };
     }
 
-    let active = true;
     const applySession = async (sessionEmail: string | null | undefined) => {
       if (!sessionEmail) {
         if (active) setEmail(null);
         return;
       }
       const normalized = sessionEmail.trim().toLowerCase();
-      const status = await checkAccess(normalized);
-      if (!active) return;
-      if (status === "ok") {
-        localStorage.setItem(AUTH_KEY, normalized);
-        setEmail(normalized);
-      } else {
-        localStorage.removeItem(AUTH_KEY);
-        setEmail(null);
-        await supabase.auth.signOut();
-      }
+      const info = await checkAccess(normalized);
+      await aplicarStatus(normalized, info);
     };
 
     supabase.auth.getSession().then(async ({ data }) => {
@@ -103,14 +154,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (inputEmail: string, password?: string) => {
     const normalizedEmail = inputEmail.trim().toLowerCase();
-    const status = await checkAccess(normalizedEmail);
-    if (status !== "ok") return { error: status };
+    const info = await checkAccess(normalizedEmail);
+    if (info.status === "blocked" || info.status === "expired") {
+      setDenied({ status: info.status, email: normalizedEmail });
+      return { error: info.status };
+    }
+    if (info.status !== "ok") return { error: info.status };
 
     if (AUTH_MODE === "password") {
       if (!password) return { error: "passwordEmpty" };
       const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
       if (error) return { error: "invalidCredentials" };
       // onAuthStateChange(SIGNED_IN) confere de novo a liberação e grava o e-mail.
+      aplicarPlano(info.plano);
       localStorage.setItem(AUTH_KEY, normalizedEmail);
       setEmail(normalizedEmail);
       return { error: null };
@@ -125,6 +181,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { error: null, pending: "checkEmail" as const };
     }
 
+    aplicarPlano(info.plano);
     localStorage.setItem(AUTH_KEY, normalizedEmail);
     setEmail(normalizedEmail);
     return { error: null };
@@ -132,12 +189,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = () => {
     localStorage.removeItem(AUTH_KEY);
+    setPlanoAtual(null);
     setEmail(null);
     if (AUTH_MODE !== "email") void supabase.auth.signOut();
   };
 
+  const clearDenied = () => setDenied(null);
+
   return (
-    <AuthContext.Provider value={{ email, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ email, loading, denied, clearDenied, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

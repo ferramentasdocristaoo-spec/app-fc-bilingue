@@ -10,7 +10,7 @@ import { FONT_SIZE_OPTIONS, useFontSize } from "@/hooks/use-font-size";
 import { setLanguageManually } from "@/i18n";
 import type { AppLanguage } from "@/i18n/geo-language";
 import InstallButton from "@/components/InstallButton";
-import { APP_LANGUAGES, matchAppLanguage } from "@/i18n/app-languages";
+import { APP_LANGUAGES, idiomasLiberados, matchAppLanguage, usePlanoAtual } from "@/i18n/app-languages";
 import { VERSIONS_BY_LANG, normalizeBibleLanguage } from "@/data/bible-versions";
 import { getLastRead, libraryProducts } from "@/data/library";
 import { journeyProgressRepository } from "@/features/bible-journey/progress";
@@ -423,13 +423,18 @@ function SettingsPanel() {
   const names = t("fontSize.names", { returnObjects: true }) as string[];
   const current = i18n.resolvedLanguage || i18n.language;
   const matched = matchAppLanguage(current);
+  // Trava por plano: idioma fora do plano fica desabilitado na lista (ver app-languages.ts).
+  const liberados = idiomasLiberados(usePlanoAtual());
 
   return (
     <div className="dock-settings">
       <label className="dock-set-row">
         <span>{t("dock.language")}</span>
         <select className="dock-select" value={matched} onChange={(e) => void setLanguageManually(e.target.value as AppLanguage)}>
-          {APP_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.name}</option>)}
+          {APP_LANGUAGES.map((l) => {
+            const bloqueado = !liberados.includes(l.code);
+            return <option key={l.code} value={l.code} disabled={bloqueado}>{bloqueado ? `${l.name} · ${t("languages.lockedTitle")}` : l.name}</option>;
+          })}
         </select>
       </label>
 

@@ -15,7 +15,8 @@
     "errorExpired": "Your subscription has expired. Please renew your plan to continue accessing.",
     "passwordLabel": "Password",
     "errorPasswordEmpty": "Please enter your password.",
-    "errorInvalidCredentials": "Incorrect email or password."
+    "errorInvalidCredentials": "Incorrect email or password.",
+    "errorUnavailable": "We couldn't verify your access right now. Check your connection and try again."
   },
   "admin": {
     "title": "Admin Panel",
@@ -689,5 +690,20 @@
     "account": "Account",
     "current": "Current page",
     "collections": "Collections"
+  },
+  "access": {
+    "expiredTitle": "Your subscription has ended",
+    "expiredBody": "Thank you for walking with us. Renew your plan to keep using the Bible, the Sermon Workshop and the other tools.",
+    "blockedTitle": "Access paused",
+    "blockedBody": "Access for this email is paused. If this looks like a mistake, contact support or subscribe again.",
+    "renew": "Renew subscription",
+    "subscribeAgain": "Subscribe again",
+    "backToLogin": "Sign in with another email",
+    "signedAs": "Account: {{email}}"
+  },
+  "languages": {
+    "lockedTitle": "Additional languages",
+    "lockedBody": "Add them to your subscription to use {{language}}.",
+    "lockedAction": "Unlock languages"
   }
 }

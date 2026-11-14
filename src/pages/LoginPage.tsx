@@ -42,6 +42,7 @@ const LoginPage = () => {
         expired: t("login.errorExpired"),
         invalidCredentials: t("login.errorInvalidCredentials"),
         passwordEmpty: t("login.errorPasswordEmpty"),
+        unavailable: t("login.errorUnavailable"),
       };
       setError(msgs[error] ?? error);
     }

@@ -64,9 +64,23 @@
 }
 .lang-flag-btn.is-active:hover { background: hsl(var(--gold-soft)); }
 
-/* Trava futura (idiomasLiberados): apagado, sem clique. */
-.lang-flag-btn.is-locked { opacity: 0.4; cursor: not-allowed; }
-.lang-flag-btn.is-locked:hover { background: transparent; color: hsl(var(--ink-2)); }
+/* Trava por plano (idiomasLiberados): bandeira apagada com cadeado; tocar abre o aviso do adicional. */
+.lang-flag-wrap { position: relative; display: grid; place-items: center; flex: none; }
+.lang-flag-btn.is-locked { opacity: 0.45; }
+.lang-flag-btn.is-locked .lang-flag { filter: grayscale(1); opacity: 0.55; }
+.lang-flag-btn.is-locked:hover { background: hsl(var(--accent)); opacity: 0.7; }
+.lang-flag-lock {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 13px;
+  height: 13px;
+  fill: hsl(var(--ink));
+  color: hsl(var(--ink));
+  background: hsl(var(--background));
+  border-radius: 50%;
+  padding: 1.5px;
+}
 
 /* Desktop estreito (768–1279 px): entre a marca e o tema sobra pouco espaço;
    a bandeira fica em cima e a sigla embaixo, cada item 44 × 48 px. */

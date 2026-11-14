@@ -15,7 +15,8 @@
     "errorExpired": "Il tuo abbonamento è scaduto. Rinnova il tuo piano per continuare ad accedere.",
     "passwordLabel": "Password",
     "errorPasswordEmpty": "Inserisci la tua password.",
-    "errorInvalidCredentials": "Email o password non corretti."
+    "errorInvalidCredentials": "Email o password non corretti.",
+    "errorUnavailable": "Non è stato possibile verificare il tuo accesso ora. Controlla la connessione e riprova."
   },
   "admin": {
     "title": "Pannello di Amministrazione",
@@ -689,5 +690,20 @@
     "account": "Account",
     "current": "Pagina attuale",
     "collections": "Raccolte"
+  },
+  "access": {
+    "expiredTitle": "Il tuo abbonamento è scaduto",
+    "expiredBody": "Grazie per camminare con noi. Rinnova il piano per continuare a usare la Bibbia, il Laboratorio di Sermoni e gli altri strumenti.",
+    "blockedTitle": "Accesso in pausa",
+    "blockedBody": "L'accesso di questa e-mail è in pausa. Se pensi sia un errore, contatta l'assistenza o abbonati di nuovo.",
+    "renew": "Rinnova l'abbonamento",
+    "subscribeAgain": "Abbonati di nuovo",
+    "backToLogin": "Entra con un'altra e-mail",
+    "signedAs": "Account: {{email}}"
+  },
+  "languages": {
+    "lockedTitle": "Lingue aggiuntive",
+    "lockedBody": "Attivale nel tuo abbonamento per usare {{language}}.",
+    "lockedAction": "Attiva le lingue"
   }
 }

@@ -20,6 +20,7 @@ import VozDeDeusPage from "./pages/VozDeDeusPage.tsx";
 import PulpitoPage from "./pages/PulpitoPage.tsx";
 import BibliaPage from "./pages/BibliaPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import AccessDeniedPage from "./pages/AccessDeniedPage.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import LivrariaPage from "./pages/LivrariaPage.tsx";
 import ColecaoPage from "./pages/ColecaoPage.tsx";
@@ -33,7 +34,7 @@ import { Loader2 } from "lucide-react";
 const queryClient = new QueryClient();
 
 const ProtectedRoutes = () => {
-  const { email, loading } = useAuth();
+  const { email, loading, denied, clearDenied } = useAuth();
   const isAdminRoute = typeof window !== "undefined" && window.location.pathname.startsWith("/fc-control-panel");
 
   if (isAdminRoute) {
@@ -50,6 +51,11 @@ const ProtectedRoutes = () => {
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  // Assinatura vencida ou e-mail bloqueado: tela de renovar antes do login.
+  if (denied) {
+    return <AccessDeniedPage denied={denied} onBack={clearDenied} />;
   }
 
   if (!email) {
