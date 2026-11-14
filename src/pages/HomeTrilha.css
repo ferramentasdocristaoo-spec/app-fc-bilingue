@@ -314,12 +314,12 @@
 @media (min-width: 1280px) {
   .trilha { padding-bottom: 0; }
   .trilha-stages { padding: 6px 40px; }
-  .trilha-stages ol { max-width: 1680px; padding: 3px; gap: 4px; }
+  .trilha-stages ol { max-width: none; padding: 3px; gap: 4px; }
   .trilha-stages a { min-height: 46px; border-radius: 12px; }
   .trilha-stages i { width: 26px; height: 26px; font-size: 0.9375rem; }
 
   .trilha-body {
-    width: min(1760px, 100%);
+    width: 100%;
     padding: 14px 40px 0;
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) 336px;
     grid-template-rows: auto 1fr;

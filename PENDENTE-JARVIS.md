@@ -1,5 +1,14 @@
 # Pendente para o Jarvis — App bilíngue (wt-final)
 
+## 2026-11-13 · Web em largura total concluída (branch local `app-novo`)
+Continuação do pedido do dono após a execução do GM parar por limite de quota: todas as ferramentas e funções devem aproveitar a largura útil da tela no computador.
+- Removidos os tetos de largura desktop dos layouts compartilhados, Início, Oficina, Bíblia, Jornada (lista, livro, capítulo e fontes) e painel administrativo.
+- Mantida a medida de leitura dos textos corridos; o leitor de livros não foi esticado.
+- Corrigidas duas regras que se anulavam pela ordem do CSS (altura do mapa da Jornada e tamanho/entrelinha dos versículos).
+- Estante passou a usar colunas automáticas com largura mínima de 140 px e quebra segura para nomes longos.
+- Autoverificação: Chrome em 1280, 1440, 1536 e 2560 px; suíte 144/144; build Vite; ESLint dos arquivos TS/JS alterados; `git diff --check`.
+- O lint completo ainda acusa 24 erros e 16 avisos preexistentes, fora dos arquivos alterados. Sem commit, push ou deploy.
+
 ## 2026-11-13 · Quatro Frentes Concluídas: Oficina, Leitura da Bíblia, Estante 66 Livros e Jornada Trilha (branch local `app-novo`)
 Feito por Aoliabe (Criação/UI). Pedido do dono: executar todas as quatro frentes do aplicativo novo.
 - **Frente 1 · Oficina Trilha arredondada** (`OficinaPage.tsx` + `OficinaTrilha.css`):

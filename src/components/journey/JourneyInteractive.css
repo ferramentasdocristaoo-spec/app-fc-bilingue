@@ -161,6 +161,7 @@
 
 /* Página do capítulo: stepper compacto entre o cabeçalho e a leitura */
 .chapter-journey-steps { max-width: 1000px; margin: 0 auto; padding: 24px 20px 0; display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 1280px) { .chapter-journey-steps { max-width: none; } }
 .chapter-journey-steps .ed-link { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; }
 .chapter-journey-steps .ed-link svg { width: 14px; height: 14px; }
 

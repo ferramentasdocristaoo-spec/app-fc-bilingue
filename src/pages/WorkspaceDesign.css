@@ -179,3 +179,17 @@
 .studio-editor { display: flex; flex-direction: column; gap: 16px; max-width: 46rem; }
 .studio-editor-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .studio-editor textarea { min-height: 60vh; padding: clamp(20px, 4vw, 40px); background: hsl(var(--card)); border: 0; border-radius: 2px; box-shadow: var(--shadow-page); font: 400 1.0625rem/1.75 var(--font-text); resize: vertical; }
+
+@media (min-width: 1280px) {
+  .studio-shell {
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: clamp(40px, 4vw, 72px);
+  }
+  .studio-document {
+    max-width: 100%;
+    padding: 48px clamp(36px, 4vw, 72px);
+  }
+  .studio-editor {
+    max-width: 100%;
+  }
+}

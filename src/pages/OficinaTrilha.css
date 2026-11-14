@@ -18,8 +18,8 @@
 
 @media (min-width: 1280px) {
   .oficina-trilha {
-    width: min(1560px, 100%);
-    padding: 20px 40px 80px;
+    width: 100%;
+    padding: 24px clamp(32px, 3.5vw, 64px) 96px;
   }
 }
 
@@ -137,8 +137,20 @@
 
 @media (min-width: 1280px) {
   .oficina-grid {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    gap: 36px;
+    grid-template-columns: minmax(460px, 1.25fr) minmax(360px, 1fr);
+    gap: clamp(32px, 3.5vw, 56px);
+  }
+
+  .oficina-sidebar {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .oficina-grid {
+    grid-template-columns: minmax(520px, 1.35fr) minmax(420px, 1fr);
+    gap: 48px;
   }
 }
 

@@ -167,11 +167,11 @@
 .ed-result > header p { margin: 8px 0 0; font: italic 400 1.125rem/1.55 var(--font-text); color: hsl(var(--ink-2)); }
 .ed-result-section { padding: 24px 0; border-top: 1px solid hsl(var(--rule)); }
 .ed-result-section > h3 { margin: 0 0 12px; font: 600 1.5rem/1.2 var(--font-display); color: hsl(var(--ink)); }
-.ed-result-section > p, .ed-result-text { margin: 0; font: 400 1.0625rem/1.75 var(--font-text); color: hsl(var(--ink)); white-space: pre-wrap; }
+.ed-result-section > p, .ed-result-text { max-width: 72ch; margin: 0; font: 400 1.0625rem/1.75 var(--font-text); color: hsl(var(--ink)); white-space: pre-wrap; }
 .ed-result-item { padding: 14px 0; border-top: 1px solid hsl(var(--rule-soft)); }
 .ed-result-item:first-of-type { border-top: 0; padding-top: 0; }
 .ed-result-item h4 { margin: 0 0 4px; font: 500 .8125rem/1.4 var(--font-ui); letter-spacing: .04em; color: hsl(var(--gold-ink)); }
-.ed-result-item p { margin: 0; font: 400 1.0625rem/1.65 var(--font-text); color: hsl(var(--ink)); }
+.ed-result-item p { max-width: 72ch; margin: 0; font: 400 1.0625rem/1.65 var(--font-text); color: hsl(var(--ink)); }
 .ed-result-item p + p { margin-top: 6px; }
 .ed-result-item .ed-sub { font: 400 .9375rem/1.55 var(--font-ui); color: hsl(var(--ink-2)); }
 .ed-original { font-size: 1.25rem; }
@@ -250,29 +250,20 @@ a:hover .book-cover { box-shadow: inset 5px 0 0 rgb(0 0 0 / .28), 0 18px 36px -1
 @media (min-width: 640px) { .library-volumes { grid-template-columns: repeat(auto-fill, minmax(170px, 200px)); gap: 36px 32px; } }
 .library-ref { margin: 8px 0 0; font: italic 400 .9375rem/1.4 var(--font-text); color: hsl(var(--gold-ink)); }
 
-/* ============================================================
-   Computador (≥ 1280 px): usar a tela toda. Pedido do dono (13/11/2026):
-   o conteúdo ocupa a largura útil (máx. 1760 px, margem lateral 48 px)
-   em grade de colunas, não numa coluna estreita no meio. O texto corrido
-   continua com linha legível (≈ 46 rem ≈ 70–80 caracteres).
-   A Jornada fica como está (modelo novo ainda por escolher): ".ed-page-read"
-   não muda de largura.
-   ============================================================ */
+/* Computador: as páginas ocupam a largura disponível; blocos de prosa mantêm sua medida de leitura. */
 @media (min-width: 1280px) {
-  .ed-page { padding: 40px 48px 128px; }
-  .ed-page-wide { max-width: 1760px; }
+  .ed-page { width: 100%; max-width: none; padding: 40px clamp(36px, 4vw, 64px) 128px; }
 
-  /* Painel: pedido à esquerda (fixo enquanto a resposta rola), resposta à direita. */
+  /* Painel: pedido à esquerda (fixo enquanto a resposta rola), resposta ampla à direita */
   .ed-page-tool {
-    max-width: 1760px;
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    column-gap: 64px;
+    grid-template-columns: minmax(360px, 4.5fr) minmax(0, 7.5fr);
+    column-gap: clamp(40px, 4vw, 72px);
     align-items: start;
   }
   .ed-page-tool > .ed-page-head { grid-column: 1 / -1; }
   .ed-page-tool > .ed-page-head + * { grid-column: 1; grid-row: 2 / span 12; position: sticky; top: 0; }
-  .ed-page-tool > :not(.ed-page-head):not(.ed-page-head + *) { grid-column: 2; max-width: 46rem; }
+  .ed-page-tool > :not(.ed-page-head):not(.ed-page-head + *) { grid-column: 2; max-width: 100%; }
   .ed-page-tool > .ed-page-head + * .ed-field { max-width: 100%; }
   .ed-page-tool .ed-promise { margin-top: 0; }
   .ed-page-tool .ed-result, .ed-page-tool .ed-wait, .ed-page-tool .ed-alert, .ed-page-tool .mural-list { margin-top: 0; }
@@ -285,11 +276,11 @@ a:hover .book-cover { box-shadow: inset 5px 0 0 rgb(0 0 0 / .28), 0 18px 36px -1
   .sermon-list, .pulpit-list, .library-shelf {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 64px;
+    column-gap: clamp(40px, 4vw, 72px);
     row-gap: 0;
   }
   .sermon-list li, .sermon-list li:last-child { border-top: 0; border-bottom: 1px solid hsl(var(--rule)); }
-  .pulpit-list { gap: 0 64px; }
+  .pulpit-list { gap: 0 clamp(40px, 4vw, 72px); }
   .library-item, .library-item:first-child { padding: 28px 0; }
   .library-item { grid-template-columns: 160px minmax(0, 1fr); }
   .library-item:nth-child(-n + 2) { padding-top: 0; }

@@ -239,3 +239,10 @@
 .chapter-step-navigation a:last-child:not(:first-child) { justify-content: flex-end; text-align: right; }
 .chapter-step-navigation small { display: block; font: 400 .8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); }
 .chapter-step-navigation svg { flex: none; width: 18px; height: 18px; color: hsl(var(--gold-ink)); }
+
+@media (min-width: 1280px) {
+  .journey-home, .journey-book-content, .chapter-journey-page { width: 100%; max-width: none; }
+  .journey-book-content, .chapter-journey-page { padding-left: clamp(36px, 4vw, 64px); padding-right: clamp(36px, 4vw, 64px); }
+  .chapter-layout { grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); }
+  .chapter-reading { max-width: 80ch; }
+}

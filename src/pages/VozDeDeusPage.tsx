@@ -40,7 +40,7 @@ const VozDeDeusPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.voz.title")} lede={t("voz.description")}>
+    <PageShell title={t("sidebar.voz.title")} lede={t("voz.description")} width="wide">
       {!failed && (
         <button type="button" onClick={sortear} disabled={loading} className="ed-btn ed-btn-primary">
           {promessa ? t("voz.again") : t("voz.button")}

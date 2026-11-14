@@ -12,8 +12,8 @@
 
 @media (min-width: 1280px) {
   .jornada-trilha {
-    width: min(1560px, 100%);
-    padding: 16px 36px 96px;
+    width: 100%;
+    padding: 24px clamp(32px, 3.5vw, 64px) 96px;
   }
 }
 
@@ -141,8 +141,20 @@
 
 @media (min-width: 1280px) {
   .jornada-grid {
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: 36px;
+    grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr);
+    gap: clamp(32px, 3.5vw, 56px);
+  }
+
+  .jornada-sidebar {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .jornada-grid {
+    grid-template-columns: minmax(0, 1.55fr) minmax(420px, 1fr);
+    gap: 48px;
   }
 }
 
@@ -162,6 +174,9 @@
     height: 380px;
   }
 }
+
+@media (min-width: 1280px) { .jornada-map-card { height: 440px; } }
+@media (min-width: 1600px) { .jornada-map-card { height: 480px; } }
 
 .jornada-map-svg {
   position: absolute;

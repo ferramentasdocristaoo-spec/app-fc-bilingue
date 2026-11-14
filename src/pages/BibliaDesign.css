@@ -13,8 +13,8 @@
 
 @media (min-width: 1280px) {
   .biblia-container {
-    width: min(1560px, 100%);
-    padding: 16px 36px 96px;
+    width: 100%;
+    padding: 24px clamp(32px, 3.5vw, 64px) 112px;
   }
 }
 
@@ -169,7 +169,7 @@
 
 @media (min-width: 1280px) {
   .estante-prateleira {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 14px;
   }
 }
@@ -212,7 +212,7 @@
   line-height: 1.2;
   hyphens: none;
   word-break: normal;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
 }
 
 .estante-livro-caps {
@@ -295,12 +295,16 @@
    ------------------------------------------------------------ */
 
 .biblia-reading-view {
-  max-width: 820px;
+  max-width: 860px;
   margin: 0 auto;
   position: relative;
 }
 
 @media (min-width: 1280px) {
+  .biblia-reading-view {
+    max-width: none;
+  }
+
   .biblia-desktop-grid {
     display: grid;
     grid-template-columns: 280px minmax(0, 1fr);
@@ -359,6 +363,10 @@
   line-height: 1.65;
   color: hsl(var(--ink));
   padding-bottom: 140px;
+}
+
+@media (min-width: 1280px) {
+  .biblia-verses-container { font-size: 1.25rem; line-height: 1.8; }
 }
 
 .biblia-verse-item {
