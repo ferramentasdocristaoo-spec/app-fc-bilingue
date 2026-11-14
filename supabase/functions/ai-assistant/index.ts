@@ -1,5 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import {
+  CACHE_TTL_MS,
+  brasilCacheKey,
+  localCacheKey,
+  readSharedCache,
+  usesBrasilCache,
+  writeSharedCache,
+  type CacheStore,
+  type CacheTargets,
+} from "./shared-cache.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,6 +29,42 @@ const LANG_NAMES: Record<string, string> = {
 
 function getLangName(lang: string): string {
   return LANG_NAMES[lang] || "European Portuguese (Portugal)";
+}
+
+// Tabela ai_cache (igual nos dois projetos) vista como um "store" do shared-cache.ts.
+function supabaseCacheStore(name: string, client: SupabaseClient): CacheStore {
+  return {
+    name,
+    async read(action, key) {
+      const { data, error } = await client
+        .from("ai_cache")
+        .select("result")
+        .eq("action", action)
+        .eq("cache_key", key)
+        .gte("expires_at", new Date().toISOString())
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return data?.result ?? null;
+    },
+    async write(action, key, result, expiresAt) {
+      const { error } = await client.from("ai_cache").upsert(
+        { action, cache_key: key, result, expires_at: expiresAt, created_at: new Date().toISOString() },
+        { onConflict: "action,cache_key" },
+      );
+      if (error) throw new Error(error.message);
+    },
+  };
+}
+
+/**
+ * Cache do FC Brasil (Supabase FC-BRASIL), só com os dois secrets da função:
+ * FC_BRASIL_URL e FC_BRASIL_SERVICE_KEY (`supabase secrets set`). Sem eles, fica só o cache local.
+ */
+function brasilClient() {
+  const url = Deno.env.get("FC_BRASIL_URL");
+  const key = Deno.env.get("FC_BRASIL_SERVICE_KEY");
+  if (!url || !key) return null;
+  return createClient(url, key, { auth: { persistSession: false } });
 }
 
 // Busca versículos reais na bible-api.com (tradução Almeida, sem API key)
@@ -139,21 +185,26 @@ serve(async (req) => {
     }
     await sb.from("ai_request_log").insert({ request_key: rateLimitKey, action });
 
-    // Build cache key from action + sorted payload values (includes lang)
-    const cacheKey = JSON.stringify(payload, Object.keys(payload).sort());
+    // Chave local: action + payload com as chaves ordenadas (inclui lang).
+    const cacheKey = localCacheKey(payload);
+
+    // pt-BR consulta e grava também no ai_cache do FC Brasil (chave sem lang = mesma fórmula de lá).
+    // Qualquer falha lá cai no cache local e segue. Ver shared-cache.ts.
+    const sbBrasil = usesBrasilCache(action, lang) ? brasilClient() : null;
+    if (usesBrasilCache(action, lang) && !sbBrasil) {
+      console.warn("pt-BR sem FC_BRASIL_URL/FC_BRASIL_SERVICE_KEY: usando só o cache local");
+    }
+    const cacheTargets: CacheTargets = {
+      brasil: sbBrasil ? { store: supabaseCacheStore("fc-brasil", sbBrasil), key: brasilCacheKey(payload) } : null,
+      local: { store: supabaseCacheStore("local", sb), key: cacheKey },
+    };
 
     // Check cache first (respect TTL via expires_at)
-    const { data: cached } = await sb
-      .from("ai_cache")
-      .select("result")
-      .eq("action", action)
-      .eq("cache_key", cacheKey)
-      .gte("expires_at", new Date().toISOString())
-      .maybeSingle();
+    const cached = await readSharedCache(cacheTargets, action, { log: (m) => console.warn(m) });
 
     if (cached) {
-      console.log(`Cache HIT for ${action} [${lang}]: ${cacheKey}`);
-      return new Response(JSON.stringify({ result: cached.result, cacheHit: true }), {
+      console.log(`Cache HIT (${cached.source}) for ${action} [${lang}]: ${cacheKey}`);
+      return new Response(JSON.stringify({ result: cached.result, cacheHit: true, cacheSource: cached.source }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -437,14 +488,11 @@ ${scriptureText}`,
         });
     }
 
-    // Save to cache
-    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    const { error: cacheErr } = await sb.from("ai_cache").upsert(
-      { action, cache_key: cacheKey, result, expires_at: expiresAt, created_at: new Date().toISOString() },
-      { onConflict: "action,cache_key" },
-    );
-    if (cacheErr) console.warn("Cache save error:", cacheErr.message);
-    else console.log(`Cache SAVED for ${action} [${lang}]: ${cacheKey}`);
+    // Save to cache (local e, em pt-BR, também no FC Brasil; falha em um não impede o outro)
+    const expiresAt = new Date(Date.now() + CACHE_TTL_MS).toISOString();
+    const gravados = await writeSharedCache(cacheTargets, action, result, expiresAt, { log: (m) => console.warn(m) });
+    if (gravados.length === 0) console.warn(`Cache save error for ${action} [${lang}]: nenhum cache gravou`);
+    else console.log(`Cache SAVED (${gravados.join("+")}) for ${action} [${lang}]: ${cacheKey}`);
 
     return new Response(JSON.stringify({ result, cacheHit: false }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
