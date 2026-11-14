@@ -1,0 +1,360 @@
+/* ============================================================
+   Oficina de Sermões — modelo Trilha Arredondado
+   Direção B com pontas boleadas e cantos suaves (16–20px)
+   ============================================================ */
+
+.oficina-trilha {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 8px 16px 40px;
+  color: hsl(var(--ink));
+}
+
+@media (min-width: 768px) {
+  .oficina-trilha {
+    padding: 16px 28px 60px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .oficina-trilha {
+    width: min(1560px, 100%);
+    padding: 20px 40px 80px;
+  }
+}
+
+/* Cabeçalho com link voltar */
+.oficina-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.oficina-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 1.375rem; /* ~22px */
+  font-weight: 600;
+  color: hsl(var(--ink));
+  text-decoration: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.oficina-back-link:hover {
+  color: hsl(var(--gold-ink));
+  transform: translateX(-2px);
+}
+
+.oficina-back-link svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Faixa das 3 etapas arredondada */
+.oficina-stages {
+  margin-bottom: 24px;
+}
+
+.oficina-stages ol {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--rule));
+  border-radius: 20px;
+  box-shadow: var(--t-shadow, 0 4px 16px -4px rgba(14, 29, 47, 0.08));
+}
+
+.oficina-stages a {
+  min-height: 56px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: hsl(var(--ink));
+  text-decoration: none;
+  border-radius: 14px;
+  transition: background-color 0.15s ease;
+}
+
+@media (max-width: 640px) {
+  .oficina-stages a {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.8125rem;
+    min-height: 64px;
+    padding: 6px 4px;
+  }
+}
+
+.oficina-stages a:hover {
+  background: hsl(var(--ink) / 0.06);
+}
+
+.oficina-stages i {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 2px solid hsl(var(--gold-ink));
+  color: hsl(var(--gold-ink));
+  font-style: normal;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.oficina-stages a.is-active {
+  background: var(--t-on, hsl(216 45% 16%));
+  color: var(--t-on-fg, #fff);
+  box-shadow: 0 4px 14px -3px rgba(14, 29, 47, 0.35);
+}
+
+.oficina-stages a.is-active i {
+  border-color: var(--t-on-num, #d2b26f);
+  color: var(--t-on-num, #d2b26f);
+}
+
+/* Grade de conteúdo: 1 coluna no mobile, 2 colunas no desktop largo */
+.oficina-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (min-width: 1280px) {
+  .oficina-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 36px;
+  }
+}
+
+/* Bloco "Trazer das outras etapas" */
+.oficina-from-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--rule));
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--t-shadow, 0 4px 16px -4px rgba(14, 29, 47, 0.08));
+  margin-bottom: 20px;
+}
+
+.oficina-from-head {
+  background: hsl(216 45% 16%);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.oficina-from-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.oficina-from-item {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  min-height: 52px;
+  border-top: 1px solid hsl(var(--rule));
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.oficina-from-item:first-of-type {
+  border-top: 0;
+}
+
+.oficina-from-item:hover {
+  background: hsl(var(--ink) / 0.03);
+}
+
+.oficina-checkbox {
+  width: 22px;
+  height: 22px;
+  border: 2px solid hsl(var(--gold-ink));
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: #fff;
+  transition: all 0.15s ease;
+}
+
+.oficina-checkbox.is-checked {
+  background: hsl(216 45% 16%);
+  border-color: hsl(216 45% 16%);
+}
+
+.oficina-from-text {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: hsl(var(--ink));
+  line-height: 1.3;
+}
+
+.oficina-from-tag {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: hsl(var(--gold-ink));
+  letter-spacing: 0.02em;
+}
+
+.oficina-from-empty {
+  padding: 18px 20px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: hsl(var(--ink-2));
+  font-style: italic;
+}
+
+/* Formulário da Oficina */
+.oficina-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.oficina-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.oficina-field-label {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: hsl(var(--gold-ink));
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.oficina-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 18px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--rule));
+  border-radius: 14px;
+  font-family: var(--font-text);
+  font-size: 1.1875rem;
+  line-height: 1.35;
+  color: hsl(var(--ink));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.oficina-input:focus {
+  outline: none;
+  border-color: hsl(var(--gold));
+  box-shadow: 0 0 0 3px hsl(var(--gold) / 0.2);
+}
+
+.oficina-input::placeholder {
+  color: hsl(var(--ink-3));
+  font-size: 1.0625rem;
+}
+
+/* Segmentos em pílula */
+.oficina-segments {
+  display: grid;
+  gap: 8px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--rule));
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.oficina-segments-btn {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: hsl(var(--ink));
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.oficina-segments-btn:hover {
+  background: hsl(var(--ink) / 0.06);
+}
+
+.oficina-segments-btn.is-active {
+  background: hsl(216 45% 16%);
+  color: #fff;
+  box-shadow: 0 2px 8px -2px rgba(14, 29, 47, 0.3);
+}
+
+/* Botão principal de envio */
+.oficina-submit-btn {
+  margin-top: 10px;
+  min-height: 56px;
+  padding: 14px 24px;
+  background: var(--t-on, hsl(216 45% 16%));
+  color: var(--t-on-fg, #fff);
+  border: 0;
+  border-radius: 16px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 8px 22px -6px rgba(14, 29, 47, 0.45);
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.oficina-submit-btn:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.oficina-submit-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.oficina-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Modo escuro suave */
+:root[data-theme="dark"] .oficina-from-head {
+  background: hsl(216 40% 12%);
+}
+
+:root[data-theme="dark"] .oficina-segments-btn.is-active,
+:root[data-theme="dark"] .oficina-checkbox.is-checked {
+  background: hsl(40 60% 48%);
+  color: hsl(216 45% 12%);
+  border-color: hsl(40 60% 48%);
+}
