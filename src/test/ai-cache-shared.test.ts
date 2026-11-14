@@ -155,3 +155,14 @@ describe("gravação nos dois caches", () => {
     expect(await writeSharedCache({ brasil: null, local: { store: local, key: "l" } }, "nomes", {}, "x")).toEqual(["local"]);
   });
 });
+
+describe("gravação: o limite de tempo é só do Brasil", () => {
+  it("Brasil travado estoura o limite, mas o local lento é aguardado e gravado", async () => {
+    const log = vi.fn();
+    const brasil = store("fc-brasil", { write: vi.fn(() => new Promise<void>(() => { /* nunca responde */ })) });
+    const local = store("local", { write: vi.fn(() => new Promise<void>((ok) => setTimeout(ok, 60))) });
+    const gravados = await writeSharedCache({ brasil: { store: brasil, key: "b" }, local: { store: local, key: "l" } }, "nomes", {}, "x", { timeoutMs: 20, log });
+    expect(gravados).toEqual(["local"]);
+    expect(log.mock.calls[0][0]).toMatch(/fc-brasil.*tempo esgotado/);
+  });
+});

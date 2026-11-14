@@ -190,8 +190,9 @@ serve(async (req) => {
 
     // pt-BR consulta e grava também no ai_cache do FC Brasil (chave sem lang = mesma fórmula de lá).
     // Qualquer falha lá cai no cache local e segue. Ver shared-cache.ts.
-    const sbBrasil = usesBrasilCache(action, lang) ? brasilClient() : null;
-    if (usesBrasilCache(action, lang) && !sbBrasil) {
+    const compartilhado = usesBrasilCache(action, lang);
+    const sbBrasil = compartilhado ? brasilClient() : null;
+    if (compartilhado && !sbBrasil) {
       console.warn("pt-BR sem FC_BRASIL_URL/FC_BRASIL_SERVICE_KEY: usando só o cache local");
     }
     const cacheTargets: CacheTargets = {

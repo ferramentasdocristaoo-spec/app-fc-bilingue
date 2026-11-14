@@ -107,7 +107,10 @@ export async function readSharedCache(
   return null;
 }
 
-/** Grava nos dois caches; cada falha é só registrada. Devolve o nome dos que gravaram. */
+/**
+ * Grava nos dois caches; cada falha é só registrada. Devolve o nome dos que gravaram.
+ * O limite de tempo vale só para o Brasil; o local é aguardado como sempre foi.
+ */
 export async function writeSharedCache(
   targets: CacheTargets,
   action: string,
@@ -119,7 +122,10 @@ export async function writeSharedCache(
   const timeoutMs = options.timeoutMs ?? BRASIL_TIMEOUT_MS;
   const alvos = [targets.brasil, targets.local].filter((t): t is CacheTarget => t !== null);
   const settled = await Promise.allSettled(
-    alvos.map((t) => withTimeout(t.store.write(action, t.key, result, expiresAt), timeoutMs, t.store.name)),
+    alvos.map((t) => {
+      const escrita = t.store.write(action, t.key, result, expiresAt);
+      return t === targets.brasil ? withTimeout(escrita, timeoutMs, t.store.name) : escrita;
+    }),
   );
   const gravados: string[] = [];
   settled.forEach((s, i) => {

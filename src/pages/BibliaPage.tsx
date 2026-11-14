@@ -158,6 +158,15 @@ const BibliaPage = () => {
     return DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "ol";
   });
 
+  // Trocou o idioma com a página aberta (Dock ou detecção por país)? Se a versão atual não existe na
+  // lista nova (ex.: OL ao ir de pt-PT para pt-BR), volta para a padrão do idioma (ARA).
+  useEffect(() => {
+    if (!versions.some((item) => item.id === version)) {
+      setVersion(DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "OL");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
   const [verses, setVerses] = useState<Verse[]>([]);
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
