@@ -8,7 +8,7 @@ estudo bíblico e ferramentas de apoio ao ministério. App web (PWA) bilíngue.
 - **Vite** + **React 18** + **TypeScript**
 - **Tailwind CSS** + **shadcn/ui**
 - **Supabase** (banco, auth por e-mail aprovado, Edge Functions)
-- **react-i18next** (5 idiomas: pt-PT, es, en, fr, it)
+- **react-i18next** (7 idiomas: pt-PT, pt-BR, es, en, fr, it, de)
 - **Vitest** + **Playwright** (testes)
 
 ## Desenvolvimento
@@ -52,7 +52,7 @@ src/
 ├── pages/          # páginas (ferramentas + admin + login)
 ├── components/     # componentes (UI + admin)
 ├── hooks/          # auth, tema, tamanho de fonte, etc.
-├── i18n/           # traduções (5 idiomas)
+├── i18n/           # traduções (7 idiomas)
 └── integrations/   # cliente Supabase
 supabase/
 ├── functions/      # Edge Functions

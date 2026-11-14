@@ -28,6 +28,7 @@ import "./BibliaDesign.css";
 
 const SPEECH_LANG: Record<string, string> = {
   "pt-PT": "pt-PT",
+  "pt-BR": "pt-BR",
   en: "en-US",
   es: "es-ES",
   fr: "fr-FR",
@@ -132,6 +133,8 @@ const BibliaPage = () => {
   const stepFontSize = (delta: 1 | -1) => fontCtx?.stepFontSize(delta);
 
   const lang = normalizeBibleLanguage(i18n.resolvedLanguage || i18n.language);
+  // pt-BR lê o texto da versão de pt-PT (sem versão brasileira ainda), mas com voz brasileira.
+  const speechLang = SPEECH_LANG[i18n.resolvedLanguage || i18n.language] || SPEECH_LANG[lang] || "pt-PT";
   const versions = VERSIONS_BY_LANG[lang] || VERSIONS_BY_LANG["pt-PT"];
   const bookNames = (t("biblia.books", { returnObjects: true }) as string[]) || [];
 
@@ -199,7 +202,7 @@ const BibliaPage = () => {
     setLoading(true);
     setFailed(false);
     try {
-      const data = await fetchBibleChapter(bookId, chapter, version);
+      const data = await fetchBibleChapter({ version, bookId, chapter });
       if (Array.isArray(data)) {
         const cleaned = data.map((v: any) => ({
           pk: v.pk ?? v.verse,
@@ -236,7 +239,6 @@ const BibliaPage = () => {
     if (!synth || verses.length === 0) return;
     synth.cancel();
 
-    const speechLang = SPEECH_LANG[lang] || "pt-PT";
     const voices = synth.getVoices();
     const voice = voices.find((v) => v.lang === speechLang);
 
@@ -262,7 +264,7 @@ const BibliaPage = () => {
     });
     setLendo(true);
     setPausado(false);
-  }, [verses, lang, selectedVerse]);
+  }, [verses, speechLang, selectedVerse]);
 
   const alternarLeitura = useCallback(() => {
     const synth = window.speechSynthesis;

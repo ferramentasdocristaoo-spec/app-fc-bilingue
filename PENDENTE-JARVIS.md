@@ -1,5 +1,19 @@
 # Pendente para o Jarvis — App bilíngue (wt-final)
 
+## 2026-11-14 · Português do Brasil (pt-BR) no app (branch local `app-novo`)
+Feito por Tércio (Copy e Conteúdo). Pedido do dono por voz (14/11): "colocar agora o português brasileiro". Quem acessa do Brasil caía no português de Portugal.
+- **Locale novo** `src/i18n/locales/pt-BR/translation.json`: tradução de verdade a partir do pt-PT (513 chaves, mesmas chaves e placeholders): "você", compartilhar, salvar, excluir, tela, aplicativo, aparelho, e-mail, senha, "Gerando…" em vez de "A gerar…", nomes brasileiros dos 66 livros (Gênesis, Deuteronômio, Jó, Oseias, Obadias, Filemom…). Revisão final pelo `copy-master` (Joanna Wiebe + Evaldo Albuquerque): 5 ajustes de tom.
+- **Idioma ligado**: `i18n/index.ts` (resource, `supportedLngs`, `fallbackLng: { 'pt-BR': ['pt-PT','en'] }`), `geo-language.ts` (BR → pt-BR; PT/AO/MZ/CV/GW/ST/TL/MO → pt-PT; `normalize`: pt-BR → pt-BR, pt sem região → pt-PT), `app-languages.ts` (opção `BR · Português (Brasil)`; a de Portugal virou "Português (Portugal)"; `matchAppLanguage('pt')` continua pt-PT; comentário da trava `idiomasLiberados()` atualizado para a decisão de 13/11, ainda sem trava), `Flag.tsx` (bandeira do Brasil em SVG). Seletor do topo, folha do celular (agora 4 colunas: 4 + 3), Dock, Ajustes e menu usam a mesma lista: 7 idiomas.
+- **Conteúdo editorial em reserva (fallback) no pt-PT** — nada fica vazio nem em inglês: Jornada (`normalizeJourneyLanguage`), Bíblia (`normalizeBibleLanguage` → versões de pt-PT), Livraria (`libraryLanguage`), logo (`appLogo`), versículo do dia, textos do i18n. Leitura em voz alta da Bíblia usa voz pt-BR. IA: `supabase/functions/ai-assistant` ganhou `"pt-BR": "Brazilian Portuguese (Brazil)"` no código, **mas a função não foi reimplantada**: até lá a IA responde em português de Portugal para quem usa pt-BR (reserva).
+- **Versão da Bíblia**: pt-BR usa as mesmas de pt-PT (padrão **OL – O Livro, português europeu**; NVI-PT). Versão brasileira (ex.: Almeida 1911 em domínio público, como no Instagram) é pendência do dono.
+- **Bug anterior corrigido (produção!)**: `BibliaPage.tsx` chamava `fetchBibleChapter(bookId, chapter, version)` com argumentos soltos; a função recebe um objeto. Veio no commit 38800f6 (quatro frentes) e está na produção promovida hoje (cfb7810): a leitura da Bíblia dava "Não foi possível carregar o capítulo" em **todos** os idiomas. Corrigido para `fetchBibleChapter({ version, bookId, chapter })`.
+- CSS: `:lang(pt-BR)` com hífen automático nos atalhos da Início ("Púlpito Comparti-lhado") e nas capas da estante ("Deuteronô-mio"), em vez de partir a palavra.
+- Testes: `src/test/pt-br-locale.test.ts` (6: mesmas chaves do pt-PT, placeholders, varredura de lusitanismos, nomes dos livros, fallback pt-PT antes do inglês, normalizadores); testes de geo, bandeiras, Dock e menu atualizados para 7. Suíte **151/151**, build ok, ESLint dos arquivos alterados só com os 2 avisos preexistentes da BibliaPage (`any` e dependência do useMemo), `git diff --check` limpo.
+- Prints em pt-BR (390×844 e 1440×900; Início, seletor aberto, Oficina, Bíblia estante e leitura): `../direcoes-identidade/prints/app-novo-pt-br/`. Prévia local com login em modo e-mail e um proxy local para o Worker de conteúdo (ele só aceita os domínios de produção).
+- **Fora do escopo, anotado:** Oficina Trilha, Estante e Jornada Trilha (commit 38800f6) têm textos fixos em português fora do i18n ("Trazer das outras etapas", "Montar o esboço", "Duração (minutos)", "Estante (66 Livros)", "Procurar na estante…", "Continuar Leitura", "N cap", nomes dos grupos) — aparecem em português para quem usa EN/ES/FR/IT/DE. Precisa de chaves nos 7 idiomas.
+
+**Aguarda o dono:** "confirma" para publicar (push + deploy de produção, que também leva a correção da Bíblia); reimplantar a função `ai-assistant` no Supabase; escolher a versão brasileira da Bíblia; decidir se o pt-BR entra na trava de planos. Sem push nem deploy.
+
 ## 2026-11-13 · Web em largura total concluída (branch local `app-novo`)
 Continuação do pedido do dono após a execução do GM parar por limite de quota: todas as ferramentas e funções devem aproveitar a largura útil da tela no computador.
 - Removidos os tetos de largura desktop dos layouts compartilhados, Início, Oficina, Bíblia, Jornada (lista, livro, capítulo e fontes) e painel administrativo.
@@ -91,3 +105,7 @@ Feito por Aoliabe (Criação/UI). Só a tela de Início (`src/pages/Index.tsx` +
 - Prints: `../direcoes-identidade/prints/app-novo-inicio/` ("exemplo-etapa2-*" usa passagem de exemplo só no navegador de teste).
 
 **Aguarda o dono:** aprovar a Início; depois seguir para a próxima tela. Sem push nem deploy.
+
+## 2026-11-14 · Push e deploy da prévia feitos (Jarvis)
+- `app-novo` (cfb7810) enviado para `origin/app-novo`; build do `wt-final` publicado na prévia `reforma` (deploy 92844db3). Produção e `origin/main` intactos. O build no checkout principal falha por falta de `@fontsource/cormorant-garamond` no node_modules de lá (rodar `npm install` ali se for buildar fora do wt-final).
+- 2026-11-14 · Produção promovida a pedido do dono: deploy fea8380d em `main` do Pages e `origin/main` = cfb7810. Rollback pelo painel para `1663cbbd…` se precisar.

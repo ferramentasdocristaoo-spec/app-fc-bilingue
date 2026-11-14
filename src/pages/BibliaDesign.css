@@ -504,3 +504,6 @@
 .biblia-bottom-text-btn:hover {
   background: hsl(var(--ink) / 0.08);
 }
+
+/* pt-BR: "Deuteronômio" não cabe na capa estreita do celular; hífen em vez de partir a palavra. */
+:lang(pt-BR) .estante-livro-nome { hyphens: auto; -webkit-hyphens: auto; }

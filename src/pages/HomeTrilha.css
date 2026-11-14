@@ -232,7 +232,8 @@
   border-radius: var(--t-radius-sm);
   transition: background-color .15s ease, border-color .15s ease, transform .15s ease;
 }
-:lang(de) .trilha-tools a, :lang(de) .trilha-stages a { hyphens: auto; -webkit-hyphens: auto; } /* compostos longos */
+:lang(de) .trilha-tools a, :lang(de) .trilha-stages a,
+:lang(pt-BR) .trilha-tools a { hyphens: auto; -webkit-hyphens: auto; } /* compostos longos (DE) e "Compartilhado" (BR): hífen em vez de partir a palavra */
 .trilha-tools a:hover { border-color: hsl(var(--gold)); background: hsl(var(--gold-soft) / .5); }
 .trilha-tools a:active { transform: scale(.98); }
 .trilha-tools a:focus-visible { outline: 3px solid hsl(var(--gold)); outline-offset: 2px; }

@@ -14,17 +14,18 @@ if (typeof globalThis.ResizeObserver === "undefined") {
 describe("Bandeiras de idioma no topo", () => {
   beforeEach(async () => { localStorage.clear(); await i18n.changeLanguage("pt-PT"); });
 
-  it("mostra as 6 bandeiras em SVG com o nome do idioma, a sigla e a atual marcada", () => {
+  it("mostra as 7 bandeiras em SVG com o nome do idioma, a sigla e a atual marcada", () => {
     render(<LanguageFlags />);
     const group = screen.getByRole("group", { name: "Selecionar idioma" });
     const buttons = within(group).getAllByRole("button");
-    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual(["Português", "English", "Español", "Français", "Italiano", "Deutsch"]);
-    expect(buttons.map((b) => b.getAttribute("lang"))).toEqual(["pt-PT", "en", "es", "fr", "it", "de"]);
-    expect(screen.getByRole("button", { name: "Português" })).toHaveAttribute("aria-pressed", "true");
+    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual(["Português (Portugal)", "Português (Brasil)", "English", "Español", "Français", "Italiano", "Deutsch"]);
+    expect(buttons.map((b) => b.getAttribute("lang"))).toEqual(["pt-PT", "pt-BR", "en", "es", "fr", "it", "de"]);
+    expect(screen.getByRole("button", { name: "Português (Portugal)" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Português (Brasil)" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "false");
     // SVG próprio (não emoji: o Windows não mostra emoji de bandeira) e sigla legível ao lado.
-    expect(group.querySelectorAll("svg")).toHaveLength(6);
-    expect(group.textContent).toBe("PTENESFRITDE");
+    expect(group.querySelectorAll("svg")).toHaveLength(7);
+    expect(group.textContent).toBe("PTBRENESFRITDE");
   });
 
   it("tocar numa bandeira troca o idioma e guarda a escolha igual ao seletor dos Ajustes", async () => {
@@ -33,19 +34,19 @@ describe("Bandeiras de idioma no topo", () => {
     await waitFor(() => expect(i18n.language).toBe("fr"));
     expect(localStorage.getItem(MANUAL_LANGUAGE_KEY)).toBe("fr");
     expect(screen.getByRole("button", { name: "Français" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "Português" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Português (Portugal)" })).toHaveAttribute("aria-pressed", "false");
     // O rótulo do grupo acompanha o idioma novo.
     expect(screen.getByRole("group", { name: "Sélectionner la langue" })).toBeInTheDocument();
   });
 
-  it("celular: só a bandeira atual no topo; tocar abre a folha com as 6 e escolher uma fecha", async () => {
+  it("celular: só a bandeira atual no topo; tocar abre a folha com as 7 e escolher uma fecha", async () => {
     render(<LanguageFlags variant="sheet" />);
-    const trigger = screen.getByRole("button", { name: "Selecionar idioma · Português" });
+    const trigger = screen.getByRole("button", { name: "Selecionar idioma · Português (Portugal)" });
     expect(trigger.querySelectorAll("svg")).toHaveLength(1);
     expect(screen.queryByRole("button", { name: "Deutsch" })).toBeNull();
     fireEvent.click(trigger);
     const deutsch = await screen.findByRole("button", { name: "Deutsch" });
-    expect(within(screen.getByRole("group", { name: "Selecionar idioma" })).getAllByRole("button")).toHaveLength(6);
+    expect(within(screen.getByRole("group", { name: "Selecionar idioma" })).getAllByRole("button")).toHaveLength(7);
     fireEvent.click(deutsch);
     await waitFor(() => expect(i18n.language).toBe("de"));
     expect(localStorage.getItem(MANUAL_LANGUAGE_KEY)).toBe("de");
@@ -53,7 +54,7 @@ describe("Bandeiras de idioma no topo", () => {
     expect(screen.getByRole("button", { name: "Sprache wählen · Deutsch" })).toBeInTheDocument();
   });
 
-  it("trava futura: hoje idiomasLiberados() devolve os 6 e nenhuma bandeira fica apagada", () => {
+  it("trava futura: hoje idiomasLiberados() devolve os 7 e nenhuma bandeira fica apagada", () => {
     expect(idiomasLiberados()).toEqual(APP_LANGUAGES.map((lang) => lang.code));
     render(<LanguageFlags />);
     expect(document.querySelectorAll(".lang-flag-btn.is-locked")).toHaveLength(0);

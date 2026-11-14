@@ -7,7 +7,7 @@ interface FlagProps {
 }
 
 /**
- * Bandeiras dos 6 idiomas, desenhadas aqui em SVG simplificado e recortadas em círculo.
+ * Bandeiras dos 7 idiomas, desenhadas aqui em SVG simplificado e recortadas em círculo.
  * Sem emoji (o Windows não mostra emoji de bandeira), sem biblioteca nem chamada externa.
  * Decorativas: o nome do idioma vai no aria-label do botão que as envolve.
  * Inglês: EUA (maior público de língua inglesa do app e bandeira já usada no seletor);
@@ -37,6 +37,16 @@ function shapes(code: AppLanguage) {
           <circle cx="9.6" cy="12" r="4.3" fill="none" stroke="#FFE900" strokeWidth="1.5" />
           <rect x="7.75" y="9.5" width="3.7" height="5" rx="1" fill="#DA291C" />
           <rect x="8.45" y="10.2" width="2.3" height="3.6" rx="0.6" fill="#FFFFFF" />
+        </>
+      );
+    case "pt-BR":
+      return (
+        <>
+          <rect width="24" height="24" fill="#009C3B" />
+          {/* Losango amarelo e globo azul; a faixa branca só sugerida (o lema não cabe em 24 px). */}
+          <polygon points="12,3.2 21.2,12 12,20.8 2.8,12" fill="#FFDF00" />
+          <circle cx="12" cy="12" r="4.4" fill="#002776" />
+          <path d="M7.8 11.2 Q12 9.6 16.2 11.6" fill="none" stroke="#FFFFFF" strokeWidth="0.9" />
         </>
       );
     case "en":

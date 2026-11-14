@@ -9,8 +9,8 @@ import "./LanguageFlags.css";
 
 interface LanguageFlagsProps {
   /**
-   * "bar": fileira das 6 bandeiras no cabeçalho (desktop, ≥ 768 px).
-   * "sheet": celular — só a bandeira atual, redonda; tocar abre a folha com as 6.
+   * "bar": fileira das 7 bandeiras no cabeçalho (desktop, ≥ 768 px).
+   * "sheet": celular — só a bandeira atual, redonda; tocar abre a folha com as 7.
    */
   variant?: "bar" | "sheet";
   className?: string;
@@ -22,7 +22,7 @@ interface FlagListProps {
   onPick: (code: AppLanguage) => void;
 }
 
-/** As 6 bandeiras com a sigla. Mesma troca e mesma persistência do seletor dos Ajustes (`setLanguageManually`). */
+/** As 7 bandeiras com a sigla. Mesma troca e mesma persistência do seletor dos Ajustes (`setLanguageManually`). */
 const FlagList = ({ current, layout, onPick }: FlagListProps) => {
   const { t } = useTranslation();
   const liberados = idiomasLiberados();

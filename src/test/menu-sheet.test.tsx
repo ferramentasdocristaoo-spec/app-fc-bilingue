@@ -47,7 +47,7 @@ describe("Menu do celular em cartõezinhos", () => {
     // Topo: nome a partir do e-mail, iniciais, idioma · Aa, Sair.
     expect(dialog).toHaveTextContent("Joao Pereira");
     expect(dialog.querySelector(".msheet-avatar")).toHaveTextContent("JP");
-    expect(dialog.querySelector(".msheet-meta")).toHaveTextContent("Português · Aa");
+    expect(dialog.querySelector(".msheet-meta")).toHaveTextContent("Português (Portugal) · Aa");
     expect(within(dialog).getByRole("button", { name: "Sair" })).toBeInTheDocument();
     // Grupos iguais às etapas da Início.
     for (const name of ["Preparação", "Estudo e biblioteca", "Vida e comunidade"]) {
@@ -70,7 +70,7 @@ describe("Menu do celular em cartõezinhos", () => {
     openMenu();
     const dialog = await screen.findByRole("dialog", { name: "Menu" });
     const settings = within(dialog).getByRole("region", { name: "Ajustes" });
-    expect(within(settings).getByRole("group", { name: "Selecionar idioma" }).querySelectorAll("button")).toHaveLength(6);
+    expect(within(settings).getByRole("group", { name: "Selecionar idioma" }).querySelectorAll("button")).toHaveLength(7);
     expect(within(settings).getByRole("button", { name: "Tamanho do texto" })).toBeInTheDocument();
     expect(within(settings).getByRole("button", { name: /Modo Claro|Modo Escuro/ })).toBeInTheDocument();
     expect(within(settings).getByRole("button", { name: "Instalar" })).toBeInTheDocument();
@@ -107,8 +107,8 @@ describe("Menu do celular em cartõezinhos", () => {
     expect(dialog.querySelectorAll(".msheet-name")).toHaveLength(12);
   });
 
-  it("rótulos nos 6 idiomas (chaves já existentes)", async () => {
-    for (const lng of ["pt-PT", "en", "es", "fr", "it", "de"]) {
+  it("rótulos nos 7 idiomas (chaves já existentes)", async () => {
+    for (const lng of ["pt-PT", "pt-BR", "en", "es", "fr", "it", "de"]) {
       for (const key of ["dashboard.menu", "workspace.groups.preparation", "workspace.groups.study", "workspace.groups.life", "sidebar.logout", "common.close", "dock.settings", "dock.language", "dock.appearance", "dock.current", "fontSize.label", "dashboard.install"]) {
         expect(i18n.exists(key, { lng }), `${lng} ${key}`).toBe(true);
       }

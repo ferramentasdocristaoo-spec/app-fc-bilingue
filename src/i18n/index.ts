@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import ptPtTranslation from './locales/pt-PT/translation.json';
+import ptBrTranslation from './locales/pt-BR/translation.json';
 import enTranslation from './locales/en/translation.json';
 import frTranslation from './locales/fr/translation.json';
 import esTranslation from './locales/es/translation.json';
@@ -19,6 +20,7 @@ import {
 
 const resources = {
   'pt-PT': { translation: ptPtTranslation },
+  'pt-BR': { translation: ptBrTranslation },
   en: { translation: enTranslation },
   fr: { translation: frTranslation },
   es: { translation: esTranslation },
@@ -44,8 +46,9 @@ i18n
   .init({
     resources,
     lng: initial,
-    fallbackLng: 'en',
-    supportedLngs: ['pt-PT', 'en', 'fr', 'es', 'it', 'de'],
+    // pt-BR só tem a interface traduzida; o que faltar cai primeiro no pt-PT (e só depois no inglês).
+    fallbackLng: { 'pt-BR': ['pt-PT', 'en'], default: ['en'] },
+    supportedLngs: ['pt-PT', 'pt-BR', 'en', 'fr', 'es', 'it', 'de'],
     interpolation: {
       escapeValue: false,
     },

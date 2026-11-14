@@ -2,14 +2,16 @@
  * Idioma inicial pelo país do visitante.
  * Prioridade: escolha manual salva > país (Cloudflare) > idiomas do navegador > en.
  */
-export const SUPPORTED_LANGUAGES = ['pt-PT', 'es', 'en', 'fr', 'it', 'de'] as const;
+export const SUPPORTED_LANGUAGES = ['pt-PT', 'pt-BR', 'es', 'en', 'fr', 'it', 'de'] as const;
 export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 export const MANUAL_LANGUAGE_KEY = 'fc-idioma-manual';
 export const COUNTRY_OVERRIDE_KEY = 'fc-pais-teste';
 export const DEFAULT_LANGUAGE: AppLanguage = 'en';
 
-const PT = ['PT', 'BR', 'AO', 'MZ', 'CV', 'GW', 'ST', 'TL', 'MO'];
+// Brasil tem o seu próprio português; os outros países lusófonos ficam com o de Portugal.
+const PT = ['PT', 'AO', 'MZ', 'CV', 'GW', 'ST', 'TL', 'MO'];
+const BR = ['BR'];
 const ES = [
   'ES', 'MX', 'AR', 'CO', 'CL', 'PE', 'BO', 'VE', 'EC', 'UY', 'PY', 'CR', 'PA',
   'GT', 'HN', 'SV', 'NI', 'DO', 'CU', 'PR', 'GQ', 'AD',
@@ -23,7 +25,7 @@ const IT = ['IT', 'SM', 'VA'];
 const DE = ['DE', 'AT', 'CH', 'LI'];
 
 const COUNTRY_MAP: Record<string, AppLanguage> = {};
-for (const [list, lang] of [[PT, 'pt-PT'], [ES, 'es'], [FR, 'fr'], [IT, 'it'], [DE, 'de']] as const) {
+for (const [list, lang] of [[PT, 'pt-PT'], [BR, 'pt-BR'], [ES, 'es'], [FR, 'fr'], [IT, 'it'], [DE, 'de']] as const) {
   for (const c of list) COUNTRY_MAP[c] = lang;
 }
 
@@ -35,12 +37,12 @@ const MULTILINGUAL: Record<string, AppLanguage[]> = {
   CA: ['en', 'fr'],
 };
 
-/** Normaliza um código qualquer (pt-BR, es-419, de_AT…) para um idioma do app. */
+/** Normaliza um código qualquer (pt-BR, es-419, de_AT…) para um idioma do app. `pt-BR` fica pt-BR; `pt` sem região (ou pt-PT, pt-AO…) é pt-PT. */
 export function normalizeLanguage(code?: string | null): AppLanguage | null {
   if (!code) return null;
-  const base = code.trim().replace('_', '-').split('-')[0].toLowerCase();
+  const [base, region = ''] = code.trim().replace('_', '-').toLowerCase().split('-');
   switch (base) {
-    case 'pt': return 'pt-PT';
+    case 'pt': return region === 'br' ? 'pt-BR' : 'pt-PT';
     case 'es': return 'es';
     case 'en': return 'en';
     case 'fr': return 'fr';

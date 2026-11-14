@@ -9,6 +9,7 @@ const corsHeaders = {
 
 const LANG_NAMES: Record<string, string> = {
   "pt-PT": "European Portuguese (Portugal)",
+  "pt-BR": "Brazilian Portuguese (Brazil)",
   "en": "English",
   "fr": "French",
   "es": "Spanish",

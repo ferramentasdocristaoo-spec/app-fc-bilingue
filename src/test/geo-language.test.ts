@@ -14,7 +14,7 @@ import {
 
 describe('mapa país → idioma', () => {
   it.each([
-    ['PT', 'pt-PT'], ['BR', 'pt-PT'], ['AO', 'pt-PT'], ['MZ', 'pt-PT'],
+    ['PT', 'pt-PT'], ['BR', 'pt-BR'], ['AO', 'pt-PT'], ['MZ', 'pt-PT'], ['CV', 'pt-PT'],
     ['ES', 'es'], ['MX', 'es'], ['AR', 'es'], ['CO', 'es'], ['CL', 'es'], ['PE', 'es'],
     ['BO', 'es'], ['VE', 'es'],
     ['FR', 'fr'], ['BE', 'fr'], ['SN', 'fr'],
@@ -26,7 +26,8 @@ describe('mapa país → idioma', () => {
   });
 
   it('aceita minúsculas e espaços', () => {
-    expect(countryToLanguage(' br ')).toBe('pt-PT');
+    expect(countryToLanguage(' br ')).toBe('pt-BR');
+    expect(countryToLanguage(' pt ')).toBe('pt-PT');
   });
 
   it('país inválido ou desconhecido da Cloudflare devolve null', () => {
@@ -47,7 +48,11 @@ describe('mapa país → idioma', () => {
 
 describe('navegador', () => {
   it('normaliza códigos', () => {
-    expect(normalizeLanguage('pt-BR')).toBe('pt-PT');
+    expect(normalizeLanguage('pt-BR')).toBe('pt-BR');
+    expect(normalizeLanguage('pt_BR')).toBe('pt-BR');
+    expect(normalizeLanguage('pt')).toBe('pt-PT');
+    expect(normalizeLanguage('pt-PT')).toBe('pt-PT');
+    expect(normalizeLanguage('pt-AO')).toBe('pt-PT');
     expect(normalizeLanguage('es-419')).toBe('es');
     expect(normalizeLanguage('de_AT')).toBe('de');
     expect(normalizeLanguage('ja')).toBeNull();
@@ -61,12 +66,16 @@ describe('navegador', () => {
 describe('prioridade', () => {
   it('escolha manual vence país e navegador', () => {
     expect(resolveInitialLanguage({ manual: 'fr', country: 'BR', navigatorLanguages: ['de'] })).toBe('fr');
+    expect(resolveInitialLanguage({ manual: 'pt-BR', country: 'PT' })).toBe('pt-BR');
   });
   it('país vence navegador', () => {
     expect(resolveInitialLanguage({ country: 'MX', navigatorLanguages: ['en-US'] })).toBe('es');
+    expect(resolveInitialLanguage({ country: 'BR', navigatorLanguages: ['pt-PT'] })).toBe('pt-BR');
+    expect(resolveInitialLanguage({ country: 'PT', navigatorLanguages: ['pt-BR'] })).toBe('pt-PT');
   });
   it('sem país usa navegador; sem nada usa en', () => {
     expect(resolveInitialLanguage({ country: null, navigatorLanguages: ['it'] })).toBe('it');
+    expect(resolveInitialLanguage({ country: null, navigatorLanguages: ['pt-BR', 'en'] })).toBe('pt-BR');
     expect(resolveInitialLanguage({})).toBe('en');
   });
   it('manual inválido é ignorado', () => {

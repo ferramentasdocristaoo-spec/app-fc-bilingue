@@ -85,8 +85,8 @@ describe("Dock (versão web)", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("as chaves novas do Dock existem nos 6 idiomas", () => {
-    for (const lng of ["pt-PT", "en", "es", "fr", "it", "de"]) {
+  it("as chaves novas do Dock existem nos 7 idiomas", () => {
+    for (const lng of ["pt-PT", "pt-BR", "en", "es", "fr", "it", "de"]) {
       for (const key of ["label", "homeDescription", "settings", "settingsDescription", "shortcuts", "appearance", "language", "account", "current", "collections"]) {
         expect(i18n.exists(`dock.${key}`, { lng }), `${lng} dock.${key}`).toBe(true);
       }

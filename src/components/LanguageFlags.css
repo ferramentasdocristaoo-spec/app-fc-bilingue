@@ -97,12 +97,12 @@
 .lang-current-btn .lang-flag { width: 28px; height: 28px; }
 .lang-current-btn:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
 
-/* …que abre a folha com as 6, em 3 × 2, cada uma ≥ 52 px de altura.
+/* …que abre a folha com as 7, em 4 colunas (4 + 3), cada uma ≥ 52 px de altura.
    Largura, cantos, fundo e sombra da folha vão em classes Tailwind no componente
    (as utilitárias do PopoverContent venceriam uma regra .lang-sheet simples). */
 .lang-flags--sheet {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
 }
 .lang-flags--sheet .lang-flag-btn {
