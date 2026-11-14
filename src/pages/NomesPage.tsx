@@ -43,7 +43,7 @@ const NomesPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.nomes.title")} lede={t("nomes.description")}>
+    <PageShell title={t("sidebar.nomes.title")} lede={t("nomes.description")} width="tool">
       <ToolForm id="nome-busca" label={t("nomes.label")} placeholder={t("nomes.placeholder")} value={nome} onChange={setNome} onSubmit={pesquisar} submitLabel={t("nomes.submit")} loading={loading} examples={t("nomes.examples", { returnObjects: true }) as string[]} />
 
       {!resultado && !loading && !failed && <ToolPromise items={[t("nomes.result"), t("nomes.etymology"), t("nomes.history"), t("nomes.variations")]} />}

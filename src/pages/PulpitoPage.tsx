@@ -24,8 +24,8 @@ const PulpitoPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.pulpito.title")} lede={t("pulpito.description")}>
-      <div className="flex flex-col gap-3">
+    <PageShell title={t("sidebar.pulpito.title")} lede={t("pulpito.description")} width="wide">
+      <div className="pulpit-list flex flex-col gap-3">
         {sermoesPub.length === 0 && (
           <div className="ed-void">
             <p>{t("pulpito.empty")}</p>

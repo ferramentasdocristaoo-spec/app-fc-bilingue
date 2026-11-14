@@ -25,7 +25,7 @@ export function ToolForm({ id, label, placeholder, value, onChange, onSubmit, su
   const inputRef = useRef<HTMLInputElement>(null);
   const canSubmit = !loading && (optional || value.trim().length > 0);
   return (
-    <>
+    <div className="ed-tool">
       <form className="ed-tool-form" onSubmit={(event) => { event.preventDefault(); if (canSubmit) onSubmit(); }}>
         <label className="ed-label" htmlFor={id}>{label}</label>
         <input ref={inputRef} id={id} className="ed-field w-full px-1" placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} enterKeyHint="search" autoComplete="off" />
@@ -39,7 +39,7 @@ export function ToolForm({ id, label, placeholder, value, onChange, onSubmit, su
           ))}
         </p>
       )}
-    </>
+    </div>
   );
 }
 

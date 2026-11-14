@@ -31,7 +31,7 @@ const RaioXPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.raioX.title")} lede={t("raioX.description")}>
+    <PageShell title={t("sidebar.raioX.title")} lede={t("raioX.description")} width="tool">
       <ToolForm id="raio-x-ref" label={t("raioX.label")} placeholder={t("raioX.placeholder")} value={referencia} onChange={setReferencia} onSubmit={buscar} submitLabel={t("raioX.submit")} loading={loading} examples={exemplos} />
 
       {!resultado && !loading && !failed && <ToolPromise items={[t("raioX.comparative"), t("raioX.keywords"), t("raioX.historical"), t("raioX.literary"), t("raioX.theological")]} />}

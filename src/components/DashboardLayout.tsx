@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import InstallButton from "@/components/InstallButton";
 import { usePageTracking } from "@/hooks/use-tracking";
 import FontSizeSelector from "@/components/FontSizeSelector";
+import { FontSizeStepper } from "@/components/FontSizeStepper";
 import { useFontSize } from "@/hooks/use-font-size";
 import { appLogo } from "@/lib/branding";
 import { parentPath } from "@/lib/parent-path";
@@ -51,7 +52,9 @@ const DashboardLayout = () => {
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>
-      <div className="min-h-screen flex w-full">
+      {/* Altura da tela fixa: quem rola é o <main>, não a janela. Assim o cabeçalho (bandeiras, A−/A+, tema) fica sempre
+          à vista no computador e os blocos "sticky" das páginas (faixa de etapas da Início, coluna de pedido) funcionam. */}
+      <div className="h-dvh min-h-0 flex w-full overflow-hidden">
         {/* Celular: menu lateral (abre pela aba "Menu" da barra inferior). Desktop: Dock embaixo, sem lateral. */}
         {isMobile && <nav aria-label={t("dashboard.menu")} className="contents"><AppSidebar /></nav>}
         <div className="flex-1 flex flex-col min-w-0">
@@ -84,6 +87,8 @@ const DashboardLayout = () => {
                 {/* Celular: só a bandeira atual, redonda; tocar abre a folha com as 6. */}
                 <LanguageFlags variant="sheet" />
               </div>
+              {/* Computador e tablet: A−/A+ sempre à vista, ao lado do tema (o dono não quer o tamanho escondido nos Ajustes). */}
+              <FontSizeStepper className="hidden md:inline-flex" />
               <Button
                 variant="ghost"
                 size="icon"
@@ -96,7 +101,9 @@ const DashboardLayout = () => {
               </Button>
             </div>
           </header>
-          <main ref={mainRef} className="flex-1 overflow-auto">
+          {/* "relative": sem isto, os textos só para leitor de tela (sr-only, posição absoluta) tomam a janela como
+              referência e fazem a página inteira rolar atrás do <main>. */}
+          <main ref={mainRef} className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
             <div className={`${fontSizeClass} bnav-spacer`}><Outlet /></div>
           </main>
           <BottomNav />

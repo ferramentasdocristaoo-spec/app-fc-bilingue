@@ -1,13 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { useFontSize, FontSizeOption } from "@/hooks/use-font-size";
+import { FONT_SIZE_OPTIONS, useFontSize } from "@/hooks/use-font-size";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const SIZES: { value: FontSizeOption; px: number }[] = [
-  { value: "small", px: 14 },
-  { value: "medium", px: 17 },
-  { value: "large", px: 20 },
-  { value: "xlarge", px: 24 },
-];
+const SIZES = FONT_SIZE_OPTIONS;
 
 /** "Aa" discreto no topo: o tamanho vale para o app inteiro, não precisa ocupar cada página. */
 const FontSizeSelector = () => {

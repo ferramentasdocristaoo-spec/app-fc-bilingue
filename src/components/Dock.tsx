@@ -6,7 +6,7 @@ import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Za
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { useFontSize, type FontSizeOption } from "@/hooks/use-font-size";
+import { FONT_SIZE_OPTIONS, useFontSize } from "@/hooks/use-font-size";
 import { setLanguageManually } from "@/i18n";
 import type { AppLanguage } from "@/i18n/geo-language";
 import InstallButton from "@/components/InstallButton";
@@ -24,12 +24,7 @@ import "./Dock.css";
 const HOVER_DELAY = 300;
 const LEAVE_DELAY = 220;
 // "A" de amostra: do mínimo da casa (15 px) ao maior.
-const FONT_SIZES: { value: FontSizeOption; px: number }[] = [
-  { value: "small", px: 15 },
-  { value: "medium", px: 18 },
-  { value: "large", px: 21 },
-  { value: "xlarge", px: 24 },
-];
+const FONT_SIZES = FONT_SIZE_OPTIONS;
 
 // Mesma cruz latina dourada da barra do celular.
 const Cross = () => (

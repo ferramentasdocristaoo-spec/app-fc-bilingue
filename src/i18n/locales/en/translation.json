@@ -385,7 +385,10 @@
       "Medium",
       "Large",
       "Extra large"
-    ]
+    ],
+    "decrease": "Make text smaller",
+    "increase": "Make text larger",
+    "current": "Current size: {{name}}"
   },
   "notFound": {
     "title": "Page Not Found",

@@ -2,8 +2,10 @@ interface PageShellProps {
   title: string;
   /** Frase de abertura logo abaixo do título. */
   lede?: string;
-  /** "read": coluna de leitura. "wide": bibliotecas e estúdio. */
-  width?: "read" | "wide";
+  /** "read": coluna de leitura. "wide": bibliotecas e estúdio.
+   *  "tool": no computador (≥ 1280 px) vira painel de duas colunas: o 1.º bloco (pedido, seletores) à esquerda,
+   *  o resto (resposta, lista, texto) à direita. Abaixo disso é igual a "read". */
+  width?: "read" | "wide" | "tool";
   children: React.ReactNode;
 }
 

@@ -32,7 +32,7 @@ const GarimpoPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.garimpo.title")} lede={t("garimpo.description")}>
+    <PageShell title={t("sidebar.garimpo.title")} lede={t("garimpo.description")} width="tool">
       <ToolForm id="garimpo-busca" label={t("garimpo.label")} placeholder={t("garimpo.placeholder")} value={busca} onChange={setBusca} onSubmit={() => pesquisar(busca)} submitLabel={t("garimpo.submit")} loading={loading} examples={!resultado ? categoriasSugeridas : undefined} examplesLabel={t("garimpo.suggestions")} />
 
       {loading && <ToolWait label={t("garimpo.loading", { theme: busca })} />}

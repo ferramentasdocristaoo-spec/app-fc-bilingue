@@ -93,15 +93,9 @@
   .trilha-stages a { flex-direction: row; gap: 10px; min-height: 60px; font-size: 1rem; }
 }
 
-/* ---------- Corpo ---------- */
-.trilha-body { width: min(1080px, 100%); margin: 0 auto; padding: 8px 16px 0; }
+/* ---------- Corpo: semana, etapas e apoio numa grade (1 coluna; 2 a partir de 1100 px; painel a partir de 1280 px) ---------- */
+.trilha-body { width: min(1080px, 100%); margin: 0 auto; padding: 8px 16px 0; display: grid; gap: 16px; }
 @media (min-width: 768px) { .trilha-body { padding: 16px 24px 0; } }
-/* Desktop sem menu lateral (Dock embaixo): corpo e faixa de etapas mais largos, bordas alinhadas. */
-@media (min-width: 1280px) {
-  .trilha-body { width: min(1240px, 100%); padding: 20px 32px 0; }
-  .trilha-stages ol { max-width: 1176px; }
-  .trilha-grid { grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; }
-}
 
 .trilha-kicker {
   margin: 0;
@@ -149,10 +143,10 @@
 }
 @media (min-width: 768px) { .trilha-week { padding: 28px 30px 26px; } }
 
-.trilha-grid { display: grid; gap: 16px; margin-top: 16px; }
-@media (min-width: 1100px) {
-  .trilha-grid { grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
-  .trilha-side { position: sticky; top: 104px; }
+@media (min-width: 1100px) and (max-width: 1279px) {
+  .trilha-body { grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+  .trilha-week { grid-column: 1 / -1; }
+  .trilha-side { position: sticky; top: 116px; } /* abaixo da faixa de etapas (≈ 100 px) */
 }
 
 /* ---------- Etapas ---------- */
@@ -308,3 +302,72 @@
 @media (prefers-reduced-motion: reduce) {
   .trilha * { transition: none !important; }
 }
+
+/* ============================================================
+   Computador (≥ 1280 px): painel que cabe numa tela (1440×900 e 1920×1080),
+   sem rolar. Pedido do dono (13/11/2026). Conta com o cabeçalho (56 px),
+   a faixa de etapas (≈ 64 px) e o Dock (≈ 100 px) embaixo.
+   Coluna larga: "A tua semana" + etapa atual com as ferramentas.
+   Coluna do meio: as outras duas etapas, compactas. Direita: Versículo + Jornada.
+   Legibilidade mantida: corpo ≥ 17 px nos textos, nada < 14 px.
+   ============================================================ */
+@media (min-width: 1280px) {
+  .trilha { padding-bottom: 0; }
+  .trilha-stages { padding: 6px 40px; }
+  .trilha-stages ol { max-width: 1680px; padding: 3px; gap: 4px; }
+  .trilha-stages a { min-height: 46px; border-radius: 12px; }
+  .trilha-stages i { width: 26px; height: 26px; font-size: 0.9375rem; }
+
+  .trilha-body {
+    width: min(1760px, 100%);
+    padding: 14px 40px 0;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) 336px;
+    grid-template-rows: auto 1fr;
+    gap: 16px 24px;
+    align-items: start;
+  }
+  /* "A tua semana" vira a faixa de cabeça do painel, sobre as duas colunas das etapas:
+     passagem à esquerda, data e etapa à direita. */
+  .trilha-week {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    column-gap: 24px;
+    padding: 18px 26px 18px;
+  }
+  .trilha-week .trilha-kicker { grid-column: 1 / -1; }
+  .trilha-week h1 { grid-column: 1; margin: 4px 0 0; font-size: clamp(2rem, 2.4vw, 2.5rem); }
+  .trilha-week-meta { grid-column: 2; justify-content: flex-end; padding-bottom: 6px; }
+
+  /* As três etapas: a atual na coluna larga, as outras duas empilhadas ao lado. */
+  .trilha-steps {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); /* = as duas primeiras colunas do corpo */
+    grid-template-rows: auto auto 1fr;
+    gap: 12px 24px;
+    align-items: start;
+  }
+  .trilha-step.is-now { grid-column: 1; grid-row: 1 / 4; }
+  .trilha-step:not(.is-now) { grid-column: 2; }
+
+  /* Etapa atual: mais ar, ferramentas em 3 colunas. */
+  .trilha-step.is-now { padding: 18px 20px 20px 14px; }
+  .trilha-step.is-now .trilha-tools a { min-height: 58px; }
+  .trilha-step.is-now .trilha-btn { min-width: 360px; }
+
+  /* Etapas 2 e 3 compactas: cartão menor, ferramentas em 2 colunas de 44 px. */
+  .trilha-step:not(.is-now) { grid-template-columns: 36px minmax(0, 1fr); padding: 14px 16px 14px 10px; }
+  .trilha-step:not(.is-now) .trilha-n { font-size: 1.625rem; padding-top: 4px; }
+  .trilha-step:not(.is-now) h2 { font-size: 1.0625rem; }
+  .trilha-step:not(.is-now) .trilha-step-main > p { font-size: 1rem; line-height: 1.4; }
+  .trilha-step:not(.is-now) .trilha-tools { margin-top: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .trilha-step:not(.is-now) .trilha-tools a { min-height: 44px; padding: 4px 6px; font-size: 0.9375rem; }
+
+  /* Apoio: coluna da direita, ao lado da semana e das etapas. Não precisa ser fixa: cabe na tela. */
+  .trilha-side { grid-column: 3; grid-row: 1 / 3; position: static; grid-template-columns: 1fr; align-content: start; gap: 16px; }
+  .trilha-card { padding: 16px 18px; }
+}
+/* Telas largas mas baixas (ex.: 1440×900 com letra maior) ainda rolam: a faixa de etapas continua fixa no topo. */

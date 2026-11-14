@@ -385,7 +385,10 @@
       "Medio",
       "Grande",
       "Molto grande"
-    ]
+    ],
+    "decrease": "Rimpicciolisci il testo",
+    "increase": "Ingrandisci il testo",
+    "current": "Dimensione attuale: {{name}}"
   },
   "notFound": {
     "title": "Pagina non trovata",

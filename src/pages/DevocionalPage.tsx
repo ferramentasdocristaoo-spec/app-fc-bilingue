@@ -27,7 +27,7 @@ const DevocionalPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.devocional.title")} lede={t("devocional.description")}>
+    <PageShell title={t("sidebar.devocional.title")} lede={t("devocional.description")} width="tool">
       <ToolForm id="devocional-tema" label={t("devocional.label")} placeholder={t("devocional.placeholder")} value={tema} onChange={setTema} onSubmit={gerar} submitLabel={t("devocional.submit")} loading={loading} optional
         examples={[t("garimpo.suggestionGratitude"), t("garimpo.suggestionPeace"), t("garimpo.suggestionForgiveness")]} />
 

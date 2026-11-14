@@ -131,7 +131,7 @@ const MuralPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.mural.title")} lede={t("mural.description")}>
+    <PageShell title={t("sidebar.mural.title")} lede={t("mural.description")} width="tool">
       {!formAberto ? (
         <button type="button" className="ed-btn ed-btn-primary" onClick={() => setFormAberto(true)}>{t("mural.writeButton")}</button>
       ) : (

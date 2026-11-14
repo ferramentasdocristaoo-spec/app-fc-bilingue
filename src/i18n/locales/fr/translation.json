@@ -385,7 +385,10 @@
       "Moyen",
       "Grand",
       "Très grand"
-    ]
+    ],
+    "decrease": "Réduire le texte",
+    "increase": "Agrandir le texte",
+    "current": "Taille actuelle : {{name}}"
   },
   "notFound": {
     "title": "Page non trouvée",

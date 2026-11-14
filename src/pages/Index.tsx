@@ -139,44 +139,43 @@ const Index = () => {
         </p>
       </header>
 
-      <div className="trilha-grid">
-        <ol className="trilha-steps">
-          {stages.map((s) => {
-            const status = statusOf(s.n);
-            return <li key={s.key} id={`etapa-${s.n}`} className={`trilha-step is-${status}`}>
-              <span className="trilha-n" aria-hidden>{s.n}</span>
-              <div className="trilha-step-main">
-                <h2>
-                  <span><span className="sr-only">{s.n}. </span>{s.title}</span>
-                  <small className={`trilha-status is-${status}`}>{t(`home.status.${status}`)}</small>
-                </h2>
-                <p>{s.text}</p>
-                <ul className={`trilha-tools${s.tools.length > 3 ? " is-six" : ""}`}>
-                  {s.tools.map((tool) => <li key={tool.to}><Link to={tool.to}>{tool.title}</Link></li>)}
-                </ul>
-                {status === "now" && <Link to={s.action.to} className="trilha-btn">
-                  <span>{s.action.label}</span><span aria-hidden>→</span>
-                </Link>}
-              </div>
-            </li>;
-          })}
-        </ol>
+      {/* Sem embrulho entre os blocos: no computador o corpo é a grade (semana + etapa atual | etapas 2 e 3 | apoio). */}
+      <ol className="trilha-steps">
+        {stages.map((s) => {
+          const status = statusOf(s.n);
+          return <li key={s.key} id={`etapa-${s.n}`} className={`trilha-step is-${status}`}>
+            <span className="trilha-n" aria-hidden>{s.n}</span>
+            <div className="trilha-step-main">
+              <h2>
+                <span><span className="sr-only">{s.n}. </span>{s.title}</span>
+                <small className={`trilha-status is-${status}`}>{t(`home.status.${status}`)}</small>
+              </h2>
+              <p>{s.text}</p>
+              <ul className={`trilha-tools${s.tools.length > 3 ? " is-six" : ""}`}>
+                {s.tools.map((tool) => <li key={tool.to}><Link to={tool.to}>{tool.title}</Link></li>)}
+              </ul>
+              {status === "now" && <Link to={s.action.to} className="trilha-btn">
+                <span>{s.action.label}</span><span aria-hidden>→</span>
+              </Link>}
+            </div>
+          </li>;
+        })}
+      </ol>
 
-        <aside className="trilha-side" aria-label={t("home.supportLabel")}>
-          <section className="trilha-card">
-            <p className="trilha-kicker">{t("dashboard.verseOfDay")}</p>
-            {verse && <b>{verseRef}</b>}
-            <p className="trilha-verse">{verse ? `“${verse.text}”` : verseFailed ? t("workspace.verseUnavailable") : t("workspace.loadingWord")}</p>
-            <Link className="trilha-card-link" to={verse ? `/biblia?bookId=${verse.book}&chapter=${verse.chapter}` : "/biblia"}>{t("dashboard.readInBible")} <span aria-hidden>→</span></Link>
-          </section>
-          <section className="trilha-card">
-            <p className="trilha-kicker">{t("journey.title")}</p>
-            <b>{spot ? `${spot.name} ${spot.chapter}` : t("home.journeyStart")}</b>
-            <p>{spot ? t("home.journeyWhere") : t("journey.sidebarDescription")}</p>
-            <Link className="trilha-card-link" to={spot?.to ?? "/jornada"}>{spot ? t("home.journeyContinue") : t("home.journeyOpen")} <span aria-hidden>→</span></Link>
-          </section>
-        </aside>
-      </div>
+      <aside className="trilha-side" aria-label={t("home.supportLabel")}>
+        <section className="trilha-card">
+          <p className="trilha-kicker">{t("dashboard.verseOfDay")}</p>
+          {verse && <b>{verseRef}</b>}
+          <p className="trilha-verse">{verse ? `“${verse.text}”` : verseFailed ? t("workspace.verseUnavailable") : t("workspace.loadingWord")}</p>
+          <Link className="trilha-card-link" to={verse ? `/biblia?bookId=${verse.book}&chapter=${verse.chapter}` : "/biblia"}>{t("dashboard.readInBible")} <span aria-hidden>→</span></Link>
+        </section>
+        <section className="trilha-card">
+          <p className="trilha-kicker">{t("journey.title")}</p>
+          <b>{spot ? `${spot.name} ${spot.chapter}` : t("home.journeyStart")}</b>
+          <p>{spot ? t("home.journeyWhere") : t("journey.sidebarDescription")}</p>
+          <Link className="trilha-card-link" to={spot?.to ?? "/jornada"}>{spot ? t("home.journeyContinue") : t("home.journeyOpen")} <span aria-hidden>→</span></Link>
+        </section>
+      </aside>
     </div>
   </div>;
 };

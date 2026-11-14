@@ -72,7 +72,7 @@ const EsbocosPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.esbocos.title")} lede={sermoes.length > 0 ? t("esbocos.description") : undefined}>
+    <PageShell title={t("sidebar.esbocos.title")} lede={sermoes.length > 0 ? t("esbocos.description") : undefined} width="wide">
       {sermoes.length === 0 ? (
         <div className="ed-void">
           <h2>{t("esbocos.emptyTitle")}</h2>

@@ -385,7 +385,10 @@
       "Mediano",
       "Grande",
       "Muy grande"
-    ]
+    ],
+    "decrease": "Reducir el texto",
+    "increase": "Aumentar el texto",
+    "current": "Tamaño actual: {{name}}"
   },
   "notFound": {
     "title": "¡Oops! Página no encontrada",

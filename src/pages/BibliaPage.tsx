@@ -260,7 +260,7 @@ const BibliaPage = () => {
   };
 
   return (
-    <PageShell title={t("sidebar.biblia.title")}>
+    <PageShell title={t("sidebar.biblia.title")} width="tool">
       <div className="bible-controls">
         <div className="bible-book">
           <label className="ed-label" id="biblia-livro">{t("biblia.bookLabel")}</label>
