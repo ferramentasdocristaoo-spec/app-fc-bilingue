@@ -70,11 +70,13 @@ describe("locale pt-BR", () => {
     await i18n.changeLanguage("pt-PT");
   });
 
-  it("conteúdo editorial, Bíblia, livraria e logo de pt-BR caem no pt-PT", () => {
+  it("conteúdo editorial, livraria e logo de pt-BR caem no pt-PT; a Bíblia tem lista própria", () => {
     expect(matchAppLanguage("pt-BR")).toBe("pt-BR");
     expect(matchAppLanguage("pt")).toBe("pt-PT");
     expect(normalizeJourneyLanguage("pt-BR")).toBe("pt-PT");
-    expect(normalizeBibleLanguage("pt-BR")).toBe("pt-PT");
+    // 14/11/2026: decisão do dono — as versões brasileiras do FC Brasil voltaram ao bilíngue.
+    // Antes pt-BR caía em pt-PT (OL); agora tem lista própria (padrão ARA). Detalhe em bible-versions-pt-br.test.ts.
+    expect(normalizeBibleLanguage("pt-BR")).toBe("pt-BR");
     expect(libraryLanguage("pt-BR")).toBe("pt-PT");
     expect(appLogo("pt-BR")).toBe(appLogo("pt-PT"));
   });

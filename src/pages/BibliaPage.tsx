@@ -133,7 +133,7 @@ const BibliaPage = () => {
   const stepFontSize = (delta: 1 | -1) => fontCtx?.stepFontSize(delta);
 
   const lang = normalizeBibleLanguage(i18n.resolvedLanguage || i18n.language);
-  // pt-BR lê o texto da versão de pt-PT (sem versão brasileira ainda), mas com voz brasileira.
+  // pt-BR tem as versões brasileiras (padrão ARA) e voz brasileira; "pt" sem região continua em pt-PT.
   const speechLang = SPEECH_LANG[i18n.resolvedLanguage || i18n.language] || SPEECH_LANG[lang] || "pt-PT";
   const versions = VERSIONS_BY_LANG[lang] || VERSIONS_BY_LANG["pt-PT"];
   const bookNames = (t("biblia.books", { returnObjects: true }) as string[]) || [];
