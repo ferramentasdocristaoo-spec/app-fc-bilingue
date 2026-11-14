@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, MemoryRouter } from "react-router-dom";
 import "@/i18n";
 import i18n from "i18next";
 import { FontSizeProvider } from "@/hooks/use-font-size";
@@ -16,7 +16,25 @@ vi.spyOn(contentApi, "fetchBibleChapter").mockResolvedValue([
 describe("Bíblia: Estante (66 Livros) e Leitura Direção A", () => {
   beforeEach(async () => {
     localStorage.clear();
+    vi.clearAllMocks();
     await i18n.changeLanguage("pt-PT");
+  });
+
+  it("abre diretamente o livro e capítulo recebidos por bookId", async () => {
+    render(
+      <MemoryRouter initialEntries={["/biblia?bookId=43&chapter=3"]}>
+        <FontSizeProvider>
+          <BibliaPage />
+        </FontSizeProvider>
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText(/no princípio criou deus/i)).toBeInTheDocument();
+    expect(contentApi.fetchBibleChapter).toHaveBeenCalledWith({
+      version: "OL",
+      bookId: 43,
+      chapter: 3,
+    });
   });
 
   it("renderiza a estante com os grupos bíblicos e o cartão de continuar", () => {

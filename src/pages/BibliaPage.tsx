@@ -137,15 +137,14 @@ const BibliaPage = () => {
   const speechLang = SPEECH_LANG[i18n.resolvedLanguage || i18n.language] || SPEECH_LANG[lang] || "pt-PT";
   const versions = VERSIONS_BY_LANG[lang] || VERSIONS_BY_LANG["pt-PT"];
   const bookNames = (t("biblia.books", { returnObjects: true }) as string[]) || [];
+  const requestedBookId = Number(searchParams.get("bookId") ?? searchParams.get("book"));
+  const hasRequestedBook = requestedBookId >= 1 && requestedBookId <= 66;
 
   // Modo: Estante (66 livros) vs Leitura
-  const modoInicial = searchParams.get("view") || (searchParams.get("book") ? "leitor" : "estante");
+  const modoInicial = searchParams.get("view") || (hasRequestedBook ? "leitor" : "estante");
   const [modo, setModo] = useState<"estante" | "leitor">(modoInicial as "estante" | "leitor");
 
-  const [bookId, setBookId] = useState<number>(() => {
-    const b = Number(searchParams.get("book"));
-    return b >= 1 && b <= 66 ? b : 1;
-  });
+  const [bookId, setBookId] = useState<number>(() => hasRequestedBook ? requestedBookId : 1);
 
   const [chapter, setChapter] = useState<number>(() => {
     const c = Number(searchParams.get("chapter"));

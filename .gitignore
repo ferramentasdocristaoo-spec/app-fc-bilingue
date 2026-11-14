@@ -29,3 +29,6 @@ supabase/.temp/
 .dev.vars
 .wrangler/
 .export/
+
+# Sessões do Playwright CLI
+.playwright-cli/
