@@ -25,7 +25,7 @@ const FONT_SIZE_CLASSES: Record<FontSizeOption, string> = {
   xlarge: "font-scale-xlarge",
 };
 
-const FontSizeContext = createContext<FontSizeContextType | undefined>(undefined);
+export const FontSizeContext = createContext<FontSizeContextType | undefined>(undefined);
 
 export function FontSizeProvider({ children }: { children: ReactNode }) {
   const [fontSize, setFontSizeState] = useState<FontSizeOption>(() => {

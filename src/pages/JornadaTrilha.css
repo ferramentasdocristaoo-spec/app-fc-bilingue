@@ -1,0 +1,295 @@
+/* ============================================================
+   Jornada pela Bíblia — Modelo Trilha Arredondado
+   Direção B com pontas boleadas (16–20px) e mapa interativo
+   ============================================================ */
+
+.jornada-trilha {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 8px 16px 80px;
+  color: hsl(var(--ink));
+}
+
+@media (min-width: 1280px) {
+  .jornada-trilha {
+    width: min(1560px, 100%);
+    padding: 16px 36px 96px;
+  }
+}
+
+/* Cabeçalho */
+.jornada-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.jornada-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: hsl(var(--ink));
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.jornada-back-link:hover {
+  color: hsl(var(--gold-ink));
+}
+
+.jornada-view-toggle {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--rule));
+  background: hsl(var(--card));
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: hsl(var(--ink));
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.jornada-view-toggle:hover {
+  background: hsl(var(--ink) / 0.06);
+}
+
+/* Faixa das 3 etapas arredondada (Etapa 2 Estudo e Biblioteca ativa) */
+.jornada-stages {
+  margin-bottom: 24px;
+}
+
+.jornada-stages ol {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--rule));
+  border-radius: 20px;
+  box-shadow: var(--t-shadow, 0 4px 16px -4px rgba(14, 29, 47, 0.08));
+}
+
+.jornada-stages a {
+  min-height: 56px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: hsl(var(--ink));
+  text-decoration: none;
+  border-radius: 14px;
+  transition: background-color 0.15s ease;
+}
+
+@media (max-width: 640px) {
+  .jornada-stages a {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.8125rem;
+    min-height: 64px;
+    padding: 6px 4px;
+  }
+}
+
+.jornada-stages a:hover {
+  background: hsl(var(--ink) / 0.06);
+}
+
+.jornada-stages i {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 2px solid hsl(var(--gold-ink));
+  color: hsl(var(--gold-ink));
+  font-style: normal;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.jornada-stages a.is-active {
+  background: var(--t-on, hsl(216 45% 16%));
+  color: var(--t-on-fg, #fff);
+  box-shadow: 0 4px 14px -3px rgba(14, 29, 47, 0.35);
+}
+
+.jornada-stages a.is-active i {
+  border-color: var(--t-on-num, #d2b26f);
+  color: var(--t-on-num, #d2b26f);
+}
+
+/* Grade principal da Jornada */
+.jornada-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (min-width: 1280px) {
+  .jornada-grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 36px;
+  }
+}
+
+/* Mapa da Jornada (.b-mapbox arredondado) */
+.jornada-map-card {
+  position: relative;
+  height: 320px;
+  background: #ede3cc;
+  border: 1px solid hsl(var(--rule));
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px -6px rgba(14, 29, 47, 0.15);
+}
+
+@media (min-width: 768px) {
+  .jornada-map-card {
+    height: 380px;
+  }
+}
+
+.jornada-map-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.jornada-map-label {
+  position: absolute;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #16243b;
+  background: rgba(251, 248, 241, 0.95);
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Abas roláveis dos grupos de livros */
+.jornada-group-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px 0 10px;
+  margin-top: 14px;
+}
+
+.jornada-group-pill {
+  flex: none;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--rule));
+  background: hsl(var(--card));
+  color: hsl(var(--ink));
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.jornada-group-pill:hover {
+  background: hsl(var(--ink) / 0.06);
+}
+
+.jornada-group-pill.is-active {
+  background: hsl(216 45% 16%);
+  color: #fff;
+  border-color: hsl(216 45% 16%);
+  box-shadow: 0 2px 8px -2px rgba(14, 29, 47, 0.35);
+}
+
+/* Cartão do Livro Atual */
+.jornada-book-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--rule));
+  border-radius: 18px;
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 16px;
+  align-items: center;
+  box-shadow: var(--t-shadow, 0 4px 16px -4px rgba(14, 29, 47, 0.08));
+}
+
+.jornada-book-cover {
+  width: 100px;
+  height: 130px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid hsl(var(--rule));
+  box-shadow: 0 4px 12px -3px rgba(0, 0, 0, 0.2);
+}
+
+.jornada-book-kicker {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: hsl(var(--gold-ink));
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.jornada-book-title {
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 4px;
+}
+
+.jornada-book-desc {
+  font-size: 0.9375rem;
+  color: hsl(var(--ink-2));
+  line-height: 1.4;
+  margin: 0 0 6px;
+}
+
+.jornada-book-stats {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: hsl(var(--ink));
+}
+
+/* Botão Continuar */
+.jornada-continue-btn {
+  margin-top: 14px;
+  min-height: 54px;
+  padding: 12px 22px;
+  border-radius: 16px;
+  background: var(--t-on, hsl(216 45% 16%));
+  color: var(--t-on-fg, #fff);
+  text-decoration: none;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 8px 22px -6px rgba(14, 29, 47, 0.45);
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.jornada-continue-btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}

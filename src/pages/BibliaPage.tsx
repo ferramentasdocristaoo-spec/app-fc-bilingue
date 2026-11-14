@@ -1,14 +1,30 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, useContext } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  Search,
+  Volume2,
+  Pause,
+  Play,
+  Square,
+  Sparkles,
+  Bookmark,
+  Share2,
+  Cross,
+  BookOpen,
+  Library,
+} from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, Pause, Play, Square, Volume2 } from "lucide-react";
 import { ToolError } from "@/components/ToolKit";
 import { toast } from "@/hooks/use-toast";
-import PageShell from "@/components/PageShell";
 import { fetchBibleChapter } from "@/lib/content-api";
 import { cleanBibleText } from "@/lib/bible-text";
-import { useSearchParams } from "react-router-dom";
 import { DEFAULT_VERSION_BY_LANG, VERSIONS_BY_LANG, normalizeBibleLanguage } from "@/data/bible-versions";
+import { FontSizeContext } from "@/hooks/use-font-size";
+import "./BibliaDesign.css";
 
 const SPEECH_LANG: Record<string, string> = {
   "pt-PT": "pt-PT",
@@ -88,97 +104,126 @@ const BOOKS = [
   { id: 66, name: "Apocalipse", chapters: 22 },
 ];
 
+const GRUPOS_ESTANTE = [
+  { nome: "Pentateuco", testamento: "antigo", range: [1, 5] },
+  { nome: "Históricos", testamento: "antigo", range: [6, 17] },
+  { nome: "Poéticos", testamento: "antigo", range: [18, 22] },
+  { nome: "Profetas Maiores", testamento: "antigo", range: [23, 27] },
+  { nome: "Profetas Menores", testamento: "antigo", range: [28, 39] },
+  { nome: "Evangelhos e Atos", testamento: "novo", range: [40, 44] },
+  { nome: "Cartas de Paulo", testamento: "novo", range: [45, 57] },
+  { nome: "Cartas Gerais", testamento: "novo", range: [58, 65] },
+  { nome: "Apocalipse", testamento: "novo", range: [66, 66] },
+];
+
+const CORES_VOLUMES = ["vol-navy", "vol-leather", "vol-blue", "vol-gold", "vol-bordeaux"];
+
 interface Verse {
   pk: number;
   verse: number;
   text: string;
 }
 
-function isVerse(value: unknown): value is Verse {
-  if (!value || typeof value !== "object") return false;
-  const verse = value as Partial<Verse>;
-  return typeof verse.pk === "number"
-    && typeof verse.verse === "number"
-    && typeof verse.text === "string";
-}
-
 const BibliaPage = () => {
   const { t, i18n } = useTranslation();
-  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const fontCtx = useContext(FontSizeContext);
+  const stepFontSize = (delta: 1 | -1) => fontCtx?.stepFontSize(delta);
+
   const lang = normalizeBibleLanguage(i18n.resolvedLanguage || i18n.language);
-  const versions = VERSIONS_BY_LANG[lang];
-  const [version, setVersion] = useState(() => {
-    const requested = searchParams.get("version");
-    return versions.some((v) => v.id === requested) ? requested! : DEFAULT_VERSION_BY_LANG[lang];
+  const versions = VERSIONS_BY_LANG[lang] || VERSIONS_BY_LANG["pt-PT"];
+  const bookNames = (t("biblia.books", { returnObjects: true }) as string[]) || [];
+
+  // Modo: Estante (66 livros) vs Leitura
+  const modoInicial = searchParams.get("view") || (searchParams.get("book") ? "leitor" : "estante");
+  const [modo, setModo] = useState<"estante" | "leitor">(modoInicial as "estante" | "leitor");
+
+  const [bookId, setBookId] = useState<number>(() => {
+    const b = Number(searchParams.get("book"));
+    return b >= 1 && b <= 66 ? b : 1;
   });
-  const [bookId, setBookId] = useState(() => {
-    const requested = Number(searchParams.get("bookId"));
-    return BOOKS.some((book) => book.id === requested) ? requested : 1;
+
+  const [chapter, setChapter] = useState<number>(() => {
+    const c = Number(searchParams.get("chapter"));
+    return c >= 1 ? c : 1;
   });
-  const [chapter, setChapter] = useState(() => {
-    const requested = Number(searchParams.get("chapter"));
-    return Number.isInteger(requested) && requested > 0 ? requested : 1;
+
+  const [version, setVersion] = useState<string>(() => {
+    const v = searchParams.get("version");
+    if (v && versions.some((item) => item.id === v)) return v;
+    return DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "ol";
   });
+
   const [verses, setVerses] = useState<Verse[]>([]);
+  const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
+
+  // Busca e modal de capítulos na estante
+  const [buscaEstante, setBuscaEstante] = useState("");
+  const [livroModal, setLivroModal] = useState<typeof BOOKS[0] | null>(null);
+
+  // Leitura por voz (TTS)
   const [lendo, setLendo] = useState(false);
   const [pausado, setPausado] = useState(false);
   const [versoAtual, setVersoAtual] = useState<number | null>(null);
-  const verseRefs = useRef<Record<number, HTMLParagraphElement | null>>({});
-  const requestIdRef = useRef(0);
+  const verseRefs = useRef<Record<number, HTMLElement | null>>({});
 
-  // Reset version to language default when language changes
+  const currentBook = BOOKS.find((b) => b.id === bookId) || BOOKS[0];
+  const nomeLivro = (id: number) => bookNames[id - 1] || BOOKS.find((b) => b.id === id)?.name || "";
+
+  // Guardar último lido
   useEffect(() => {
-    setVersion(DEFAULT_VERSION_BY_LANG[lang]);
-    setVerses([]);
-  }, [lang]);
+    try {
+      localStorage.setItem("fc-biblia-ultimo", JSON.stringify({ bookId, chapter }));
+    } catch { /* vazio */ }
+  }, [bookId, chapter]);
 
-  // Atalhos do Dock e do Início (?version=, ?bookId=, ?chapter=) também valem quando a página já está aberta.
-  useEffect(() => {
-    const requestedVersion = searchParams.get("version");
-    if (requestedVersion && versions.some((v) => v.id === requestedVersion)) { setVersion(requestedVersion); setSelectedVerse(null); }
-    const requestedBook = Number(searchParams.get("bookId"));
-    if (BOOKS.some((book) => book.id === requestedBook)) {
-      setBookId(requestedBook);
-      const requestedChapter = Number(searchParams.get("chapter"));
-      setChapter(Number.isInteger(requestedChapter) && requestedChapter > 0 ? requestedChapter : 1);
-      setSelectedVerse(null);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  const ultimoLido = useMemo(() => {
+    try {
+      const data = JSON.parse(localStorage.getItem("fc-biblia-ultimo") || "null");
+      if (data?.bookId && data?.chapter) {
+        return {
+          bookId: Number(data.bookId),
+          chapter: Number(data.chapter),
+          nome: `${nomeLivro(Number(data.bookId))} ${data.chapter}`,
+        };
+      }
+    } catch { /* vazio */ }
+    return { bookId: 1, chapter: 1, nome: `${nomeLivro(1)} 1` };
+  }, [bookNames]);
 
-  const bookNames = t("biblia.books", { returnObjects: true }) as string[];
-  const currentBook = BOOKS.find((b) => b.id === bookId)!;
-
+  // Carregar versículos
   const fetchChapter = useCallback(async () => {
-    const requestId = ++requestIdRef.current;
     setLoading(true);
     setFailed(false);
     try {
-      const data = await fetchBibleChapter({ version, bookId, chapter });
-
-      const validVerses = data
-        .filter(isVerse)
-        .map((verse) => ({ ...verse, text: cleanBibleText(verse.text) }));
-
-      if (validVerses.length === 0) throw new Error("Capítulo vazio");
-      if (requestId === requestIdRef.current) setVerses(validVerses);
-    } catch {
-      if (requestId === requestIdRef.current) {
+      const data = await fetchBibleChapter(bookId, chapter, version);
+      if (Array.isArray(data)) {
+        const cleaned = data.map((v: any) => ({
+          pk: v.pk ?? v.verse,
+          verse: v.verse,
+          text: cleanBibleText(v.text),
+        }));
+        setVerses(cleaned);
+      } else {
         setFailed(true);
-        setVerses([]);
       }
+    } catch {
+      setFailed(true);
     } finally {
-      if (requestId === requestIdRef.current) setLoading(false);
+      setLoading(false);
     }
-  }, [version, bookId, chapter]);
+  }, [bookId, chapter, version]);
 
   useEffect(() => {
-    fetchChapter();
-  }, [fetchChapter]);
+    if (modo === "leitor") {
+      fetchChapter();
+    }
+  }, [modo, fetchChapter]);
 
+  // Controle de áudio por voz
   const pararLeitura = useCallback(() => {
     window.speechSynthesis?.cancel();
     setLendo(false);
@@ -188,15 +233,13 @@ const BibliaPage = () => {
 
   const iniciarLeitura = useCallback(() => {
     const synth = window.speechSynthesis;
-    if (verses.length === 0) return;
-    if (!synth) {
-      toast({ title: t("common.error"), description: t("livraria.reader.noSpeech"), variant: "destructive" });
-      return;
-    }
+    if (!synth || verses.length === 0) return;
     synth.cancel();
-    const speechLang = SPEECH_LANG[lang] ?? "pt-PT";
-    const voices = synth.getVoices().filter((v) => v.lang.replace("_", "-").toLowerCase().startsWith(speechLang.slice(0, 2)));
-    const voice = voices.find((v) => v.lang.replace("_", "-").toLowerCase() === speechLang.toLowerCase()) ?? voices[0];
+
+    const speechLang = SPEECH_LANG[lang] || "pt-PT";
+    const voices = synth.getVoices();
+    const voice = voices.find((v) => v.lang === speechLang);
+
     const inicio = selectedVerse ? verses.findIndex((v) => v.verse === selectedVerse) : 0;
     const fila = verses.slice(Math.max(0, inicio));
     fila.forEach((verso, idx) => {
@@ -208,35 +251,47 @@ const BibliaPage = () => {
         setVersoAtual(verso.verse);
         verseRefs.current[verso.verse]?.scrollIntoView({ behavior: "smooth", block: "center" });
       };
-      if (idx === fila.length - 1) fala.onend = () => { setLendo(false); setPausado(false); setVersoAtual(null); };
+      if (idx === fila.length - 1) {
+        fala.onend = () => {
+          setLendo(false);
+          setPausado(false);
+          setVersoAtual(null);
+        };
+      }
       synth.speak(fala);
     });
     setLendo(true);
     setPausado(false);
-  }, [verses, lang, selectedVerse, t]);
+  }, [verses, lang, selectedVerse]);
 
   const alternarLeitura = useCallback(() => {
     const synth = window.speechSynthesis;
     if (!synth) return;
     if (!lendo) return iniciarLeitura();
-    if (pausado) { synth.resume(); setPausado(false); }
-    else { synth.pause(); setPausado(true); }
+    if (pausado) {
+      synth.resume();
+      setPausado(false);
+    } else {
+      synth.pause();
+      setPausado(true);
+    }
   }, [lendo, pausado, iniciarLeitura]);
 
-  useEffect(() => { pararLeitura(); }, [version, bookId, chapter, pararLeitura]);
-  useEffect(() => () => { window.speechSynthesis?.cancel(); }, []);
+  useEffect(() => {
+    pararLeitura();
+  }, [version, bookId, chapter, pararLeitura]);
 
-  const irTopo = () => { document.querySelector("main")?.scrollTo(0, 0); window.scrollTo(0, 0); };
-  const nomeLivro = (id: number) => bookNames[id - 1] || BOOKS.find((b) => b.id === id)?.name || "";
-  const prevLabel = chapter > 1 ? `${nomeLivro(bookId)} ${chapter - 1}` : bookId > 1 ? `${nomeLivro(bookId - 1)} ${BOOKS[bookId - 2].chapters}` : "";
-  const nextLabel = chapter < currentBook.chapters ? `${nomeLivro(bookId)} ${chapter + 1}` : bookId < 66 ? `${nomeLivro(bookId + 1)} 1` : "";
+  const irTopo = () => {
+    document.querySelector("main")?.scrollTo(0, 0);
+    window.scrollTo(0, 0);
+  };
 
   const goToPrevChapter = () => {
     irTopo();
     setSelectedVerse(null);
     if (chapter > 1) {
       setChapter((c) => c - 1);
-    } else {
+    } else if (bookId > 1) {
       const prevBook = BOOKS.find((b) => b.id === bookId - 1);
       if (prevBook) {
         setBookId(prevBook.id);
@@ -250,7 +305,7 @@ const BibliaPage = () => {
     setSelectedVerse(null);
     if (chapter < currentBook.chapters) {
       setChapter((c) => c + 1);
-    } else {
+    } else if (bookId < 66) {
       const nextBook = BOOKS.find((b) => b.id === bookId + 1);
       if (nextBook) {
         setBookId(nextBook.id);
@@ -259,90 +314,366 @@ const BibliaPage = () => {
     }
   };
 
+  // Ações do versículo tocado
+  const versoSelecionadoObj = useMemo(
+    () => verses.find((v) => v.verse === selectedVerse),
+    [verses, selectedVerse]
+  );
+  const refVersiculo = `${nomeLivro(bookId)} ${chapter}:${selectedVerse || 1}`;
+
+  const handleAcaoRaioX = () => {
+    navigate(`/raio-x?ref=${encodeURIComponent(refVersiculo)}`);
+  };
+
+  const handleAcaoPregar = () => {
+    try {
+      localStorage.setItem(
+        "fc-oficina-atual",
+        JSON.stringify({
+          textoBase: refVersiculo,
+          titulo: "",
+        })
+      );
+    } catch { /* vazio */ }
+    toast({
+      title: "Versículo enviado para a Oficina",
+      description: refVersiculo,
+    });
+    navigate("/oficina");
+  };
+
+  const handleAcaoGuardar = () => {
+    try {
+      const guardados = JSON.parse(localStorage.getItem("fc-versiculos-guardados") || "[]");
+      guardados.push({
+        ref: refVersiculo,
+        texto: versoSelecionadoObj?.text || "",
+        data: new Date().toISOString(),
+      });
+      localStorage.setItem("fc-versiculos-guardados", JSON.stringify(guardados));
+      toast({
+        title: "Versículo guardado nos favoritos!",
+        description: refVersiculo,
+      });
+    } catch {
+      toast({ title: "Guardado!", description: refVersiculo });
+    }
+    setSelectedVerse(null);
+  };
+
+  const handleAcaoPartilhar = async () => {
+    const shareText = `“${versoSelecionadoObj?.text || ""}” — ${refVersiculo}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: refVersiculo, text: shareText });
+        return;
+      } catch { /* fallback */ }
+    }
+    try {
+      await navigator.clipboard.writeText(shareText);
+      toast({
+        title: "Copiado para a área de transferência",
+        description: refVersiculo,
+      });
+    } catch {
+      toast({ title: "Erro ao copiar", variant: "destructive" });
+    }
+    setSelectedVerse(null);
+  };
+
+  // Abrir livro a partir da estante
+  const handleSelecionarLivro = (livro: typeof BOOKS[0]) => {
+    if (livro.chapters === 1) {
+      setBookId(livro.id);
+      setChapter(1);
+      setSelectedVerse(null);
+      setModo("leitor");
+    } else {
+      setLivroModal(livro);
+    }
+  };
+
   return (
-    <PageShell title={t("sidebar.biblia.title")} width="tool">
-      <div className="bible-controls">
-        <div className="bible-book">
-          <label className="ed-label" id="biblia-livro">{t("biblia.bookLabel")}</label>
-          <Select value={String(bookId)} onValueChange={(v) => { setBookId(Number(v)); setChapter(1); setSelectedVerse(null); }}>
-            <SelectTrigger aria-labelledby="biblia-livro"><SelectValue placeholder={t("biblia.bookLabel")} /></SelectTrigger>
-            <SelectContent className="max-h-72">
-              {BOOKS.map((b) => <SelectItem key={b.id} value={String(b.id)}>{bookNames[b.id - 1] || b.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="ed-label" id="biblia-capitulo">{t("biblia.chapterName")}</label>
-          <Select value={String(chapter)} onValueChange={(v) => { setChapter(Number(v)); setSelectedVerse(null); }}>
-            <SelectTrigger aria-labelledby="biblia-capitulo"><SelectValue placeholder={t("biblia.chapterName")} /></SelectTrigger>
-            <SelectContent className="max-h-72">
-              {Array.from({ length: currentBook.chapters }, (_, i) => <SelectItem key={i + 1} value={String(i + 1)}>{i + 1}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="ed-label" id="biblia-verso">{t("biblia.verseName")}</label>
-          <Select value={selectedVerse ? String(selectedVerse) : ""} disabled={verses.length === 0} onValueChange={(v) => {
-            const num = Number(v);
-            setSelectedVerse(num);
-            verseRefs.current[num]?.scrollIntoView({ behavior: "smooth", block: "center" });
-          }}>
-            <SelectTrigger aria-labelledby="biblia-verso"><SelectValue placeholder="—" /></SelectTrigger>
-            <SelectContent className="max-h-72">
-              {verses.map((v) => <SelectItem key={v.verse} value={String(v.verse)}>{v.verse}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="bible-version">
-          <label className="ed-label" id="biblia-versao">{t("biblia.versionLabel")}</label>
-          <Select value={version} onValueChange={(value) => { setVersion(value); setSelectedVerse(null); }}>
-            <SelectTrigger aria-labelledby="biblia-versao"><SelectValue placeholder={t("biblia.versionLabel")} /></SelectTrigger>
-            <SelectContent className="max-h-72">
-              {versions.map((v) => <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+    <div className="biblia-container">
+      {/* ----------------- MODO ESTANTE (66 LIVROS) ----------------- */}
+      {modo === "estante" && (
+        <div className="biblia-estante-view">
+          <div className="estante-topo">
+            <div className="estante-tabs">
+              <button
+                type="button"
+                className={`estante-tab-btn ${modo === "estante" ? "is-active" : ""}`}
+                onClick={() => setModo("estante")}
+              >
+                <Library size={16} className="inline mr-1" /> Estante (66 Livros)
+              </button>
+              <button
+                type="button"
+                className={`estante-tab-btn ${modo === "leitor" ? "is-active" : ""}`}
+                onClick={() => setModo("leitor")}
+              >
+                <BookOpen size={16} className="inline mr-1" /> Leitura
+              </button>
+            </div>
 
-      <div className="bible-title">
-        <h2>{bookNames[bookId - 1] || currentBook.name} {chapter}</h2>
-        {verses.length > 0 && (
-          <div className="bible-listen" role="group" aria-label={t("biblia.listenChapter")}>
-            <button type="button" onClick={alternarLeitura}>
-              {!lendo ? <Volume2 aria-hidden /> : pausado ? <Play aria-hidden /> : <Pause aria-hidden />}
-              {!lendo ? t("biblia.listenChapter") : pausado ? t("livraria.reader.resume") : t("livraria.reader.pause")}
-            </button>
-            {lendo && <button type="button" onClick={pararLeitura}><Square aria-hidden />{t("livraria.reader.stop")}</button>}
+            <div className="estante-busca">
+              <Search size={18} className="text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Procurar na estante..."
+                value={buscaEstante}
+                onChange={(e) => setBuscaEstante(e.target.value)}
+              />
+            </div>
           </div>
-        )}
-      </div>
 
-      {loading ? (
-        <div className="ed-wait-lines" role="status" aria-label={t("common.loading")}>{Array.from({ length: 10 }).map((_, i) => <i key={i} />)}</div>
-      ) : verses.length > 0 ? (
-        <div className="bible-text" lang={lang}>
-          {verses.map((v) => (
-            <p
-              key={v.pk}
-              ref={(el) => { verseRefs.current[v.verse] = el; }}
-              className={versoAtual === v.verse ? "is-reading" : selectedVerse === v.verse ? "is-selected" : ""}
+          {/* Cartão de Continuar Leitura */}
+          {!buscaEstante && (
+            <div
+              className="estante-continuar-card"
+              onClick={() => {
+                setBookId(ultimoLido.bookId);
+                setChapter(ultimoLido.chapter);
+                setSelectedVerse(null);
+                setModo("leitor");
+              }}
             >
-              <sup>{v.verse}</sup>
-              <span className="whitespace-pre-line">{v.text}</span>
-            </p>
-          ))}
+              <div>
+                <span className="estante-continuar-kicker">Continuar Leitura</span>
+                <div className="estante-continuar-titulo">{ultimoLido.nome}</div>
+              </div>
+              <ChevronRight size={26} />
+            </div>
+          )}
+
+          {/* Prateleiras agrupadas */}
+          {GRUPOS_ESTANTE.map((grupo) => {
+            const livrosDoGrupo = BOOKS.filter(
+              (b) => b.id >= grupo.range[0] && b.id <= grupo.range[1]
+            ).filter((b) => {
+              if (!buscaEstante.trim()) return true;
+              const nome = nomeLivro(b.id).toLowerCase();
+              return nome.includes(buscaEstante.toLowerCase());
+            });
+
+            if (livrosDoGrupo.length === 0) return null;
+
+            return (
+              <section key={grupo.nome} className="estante-grupo">
+                <div className="estante-grupo-header">
+                  <span>{grupo.nome}</span>
+                  <span className="estante-grupo-count">
+                    {livrosDoGrupo.length} {livrosDoGrupo.length === 1 ? "volume" : "volumes"}
+                  </span>
+                </div>
+
+                <div className="estante-prateleira">
+                  {livrosDoGrupo.map((b, idx) => {
+                    const cor = CORES_VOLUMES[(b.id + idx) % CORES_VOLUMES.length];
+                    return (
+                      <div
+                        key={b.id}
+                        className={`estante-livro ${cor}`}
+                        onClick={() => handleSelecionarLivro(b)}
+                        title={`${nomeLivro(b.id)} (${b.chapters} capítulos)`}
+                      >
+                        <span className="estante-livro-nome">{nomeLivro(b.id)}</span>
+                        <span className="estante-livro-caps">{b.chapters} cap</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
+
+          {/* Modal de escolha de capítulo */}
+          {livroModal && (
+            <div className="capitulos-modal" onClick={() => setLivroModal(null)}>
+              <div className="capitulos-card" onClick={(e) => e.stopPropagation()}>
+                <div className="capitulos-header">
+                  <h3>{nomeLivro(livroModal.id)}</h3>
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-muted-foreground"
+                    onClick={() => setLivroModal(null)}
+                  >
+                    Fechar
+                  </button>
+                </div>
+                <div className="capitulos-grid">
+                  {Array.from({ length: livroModal.chapters }, (_, i) => i + 1).map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      className="capitulo-btn"
+                      onClick={() => {
+                        setBookId(livroModal.id);
+                        setChapter(c);
+                        setSelectedVerse(null);
+                        setLivroModal(null);
+                        setModo("leitor");
+                      }}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      ) : failed ? (
-        <ToolError onRetry={fetchChapter}>{t("biblia.errorMessage")}</ToolError>
-      ) : (
-        <p className="ed-empty">{t("biblia.emptyState")}</p>
       )}
 
-      <nav className="bible-nav" aria-label={t("biblia.choose")}>
-        {prevLabel ? <button type="button" onClick={goToPrevChapter}><ArrowLeft aria-hidden /><span><small>{t("biblia.previousButton")}</small>{prevLabel}</span></button> : <span />}
-        {nextLabel ? <button type="button" className="is-next" onClick={goToNextChapter}><span><small>{t("biblia.nextButton")}</small>{nextLabel}</span><ArrowRight aria-hidden /></button> : <span />}
-      </nav>
-    </PageShell>
+      {/* ----------------- MODO LEITURA (DIREÇÃO A) ----------------- */}
+      {modo === "leitor" && (
+        <div className="biblia-reading-view">
+          {/* Pílulas arredondadas no topo */}
+          <div className="biblia-top-pills">
+            <button
+              type="button"
+              className="biblia-pill-btn"
+              onClick={() => setModo("estante")}
+            >
+              <Library size={18} />
+              <span>{nomeLivro(bookId)} {chapter}</span>
+              <ChevronDown size={16} />
+            </button>
+
+            <Select
+              value={version}
+              onValueChange={(v) => {
+                setVersion(v);
+                setSelectedVerse(null);
+              }}
+            >
+              <SelectTrigger className="biblia-pill-btn w-auto border-[1.5px] border-[#b9a77f] rounded-full px-4 h-[46px]">
+                <SelectValue placeholder="Versão" />
+              </SelectTrigger>
+              <SelectContent>
+                {versions.map((v) => (
+                  <SelectItem key={v.id} value={v.id}>
+                    {v.name} ({v.id.toUpperCase()})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Título grande serifado */}
+          <h2 className="biblia-chapter-title">
+            {nomeLivro(bookId)} {chapter}
+          </h2>
+
+          {/* Versículos */}
+          {loading ? (
+            <div className="ed-wait-lines" role="status" aria-label={t("common.loading")}>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <i key={i} />
+              ))}
+            </div>
+          ) : verses.length > 0 ? (
+            <div className="biblia-verses-container" lang={lang}>
+              {verses.map((v) => {
+                const isSelected = selectedVerse === v.verse;
+                const isReading = versoAtual === v.verse;
+                return (
+                  <p
+                    key={v.pk}
+                    ref={(el) => {
+                      verseRefs.current[v.verse] = el;
+                    }}
+                    className={`biblia-verse-item ${isSelected ? "is-selected" : ""} ${isReading ? "is-reading" : ""}`}
+                    onClick={() => setSelectedVerse(isSelected ? null : v.verse)}
+                  >
+                    <span className="biblia-verse-num">{v.verse}</span>
+                    <span>{v.text}</span>
+                  </p>
+                );
+              })}
+            </div>
+          ) : failed ? (
+            <ToolError onRetry={fetchChapter}>{t("biblia.errorMessage")}</ToolError>
+          ) : (
+            <p className="ed-empty">{t("biblia.emptyState")}</p>
+          )}
+
+          {/* Barra flutuante escura arredondada quando o versículo é tocado (.a-pop) */}
+          {selectedVerse && (
+            <aside className="biblia-action-bar" role="dialog" aria-label="Ações do versículo">
+              <button
+                type="button"
+                className="biblia-action-btn"
+                onClick={handleAcaoRaioX}
+              >
+                <Sparkles />
+                <span>Raio-X</span>
+              </button>
+              <button
+                type="button"
+                className="biblia-action-btn"
+                onClick={handleAcaoPregar}
+              >
+                <Cross />
+                <span>Pregar</span>
+              </button>
+              <button
+                type="button"
+                className="biblia-action-btn"
+                onClick={handleAcaoGuardar}
+              >
+                <Bookmark />
+                <span>Guardar</span>
+              </button>
+              <button
+                type="button"
+                className="biblia-action-btn"
+                onClick={handleAcaoPartilhar}
+              >
+                <Share2 />
+                <span>Partilhar</span>
+              </button>
+            </aside>
+          )}
+
+          {/* Pílula flutuante embaixo: ‹ Ouvir Aa › (.a-float) */}
+          <nav className="biblia-bottom-pill" aria-label="Navegação e Leitura">
+            <button
+              type="button"
+              className="biblia-bottom-nav-btn"
+              onClick={goToPrevChapter}
+              title="Capítulo anterior"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <button
+              type="button"
+              className="biblia-bottom-text-btn"
+              onClick={alternarLeitura}
+            >
+              {!lendo ? <Volume2 size={18} /> : pausado ? <Play size={18} /> : <Pause size={18} />}
+              <span>{!lendo ? "Ouvir" : pausado ? "Continuar" : "Pausar"}</span>
+            </button>
+            <button
+              type="button"
+              className="biblia-bottom-text-btn"
+              onClick={() => stepFontSize(1)}
+              title="Tamanho do texto"
+            >
+              <span>Aa</span>
+            </button>
+            <button
+              type="button"
+              className="biblia-bottom-nav-btn"
+              onClick={goToNextChapter}
+              title="Próximo capítulo"
+            >
+              <ChevronRight size={22} />
+            </button>
+          </nav>
+        </div>
+      )}
+    </div>
   );
 };
 

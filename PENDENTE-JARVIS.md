@@ -1,6 +1,21 @@
 # Pendente para o Jarvis — App bilíngue (wt-final)
 
-## 2026-11-13 · Oficina de Sermões no modelo Trilha arredondado (branch local `app-novo`)
+## 2026-11-13 · Quatro Frentes Concluídas: Oficina, Leitura da Bíblia, Estante 66 Livros e Jornada Trilha (branch local `app-novo`)
+Feito por Aoliabe (Criação/UI). Pedido do dono: executar todas as quatro frentes do aplicativo novo.
+- **Frente 1 · Oficina Trilha arredondada** (`OficinaPage.tsx` + `OficinaTrilha.css`):
+  - Faixa das 3 etapas arredondada (Preparação ativa), bloco "Trazer das outras etapas" com dados reais, segmentos pílula de duração (15/30/45/60 min) e tipo de esboço, botão "Montar o esboço →".
+- **Frente 2 · Leitura da Bíblia (Direção A)** (`BibliaPage.tsx` + `BibliaDesign.css`):
+  - Título centralizado serifado, versículos com números dourados, toque no versículo abre barra flutuante arredondada (`.biblia-action-bar`) com Raio-X, Pregar (leva para Oficina), Guardar e Partilhar.
+  - Pílula flutuante inferior (`‹ Ouvir Aa ›`).
+- **Frente 3 · Estante dos 66 Livros (Direção C)** (`BibliaPage.tsx` + `BibliaDesign.css`):
+  - Prateleiras por grupos (Pentateuco, Históricos, Poéticos, Profetas, Evangelhos, Cartas...), volumes de capa alternada com busca rápida e cartão "Continuar Leitura".
+- **Frente 4 · Jornada pela Bíblia Trilha Arredondada** (`JornadaPage.tsx` + `JornadaTrilha.css`):
+  - Faixa das etapas (Estudo e biblioteca ativa), mapa tracejado (Egito → Mar Vermelho → Sinai → Cades → Nebo), abas de categorias em pílula, cartão do livro e botão "Continuar", alternador para lista completa.
+- **Testes & Qualidade**:
+  - Novos testes: `src/test/oficina-trilha.test.tsx`, `src/test/biblia-estante-leitor.test.tsx`, `src/test/jornada-trilha.test.tsx`.
+  - Suíte completa 144/144 passando, build de produção Vite 100% aprovado. Sem push nem deploy.
+
+## 2026-11-13 · Oficina de Sermões no modelo Trilha arredondado (branch local `app-novo`, commit 2693c28)
 Feito por Aoliabe (Criação/UI). Pedido do dono: Oficina de Sermões no modelo Trilha com pontas arredondadas.
 - `src/pages/OficinaPage.tsx` + `OficinaTrilha.css`:
   - Cabeçalho com link voltar `‹ Oficina de Sermões`.
