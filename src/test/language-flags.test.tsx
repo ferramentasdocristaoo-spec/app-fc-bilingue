@@ -18,14 +18,14 @@ describe("Bandeiras de idioma no topo", () => {
     render(<LanguageFlags />);
     const group = screen.getByRole("group", { name: "Selecionar idioma" });
     const buttons = within(group).getAllByRole("button");
-    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual(["Português (Portugal)", "Português (Brasil)", "English", "Español", "Français", "Italiano", "Deutsch"]);
-    expect(buttons.map((b) => b.getAttribute("lang"))).toEqual(["pt-PT", "pt-BR", "en", "es", "fr", "it", "de"]);
+    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual(["Português (Brasil)", "Português (Portugal)", "English", "Español", "Français", "Italiano", "Deutsch"]);
+    expect(buttons.map((b) => b.getAttribute("lang"))).toEqual(["pt-BR", "pt-PT", "en", "es", "fr", "it", "de"]);
     expect(screen.getByRole("button", { name: "Português (Portugal)" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: "Português (Brasil)" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "false");
     // SVG próprio (não emoji: o Windows não mostra emoji de bandeira) e sigla legível ao lado.
     expect(group.querySelectorAll("svg")).toHaveLength(7);
-    expect(group.textContent).toBe("PTBRENESFRITDE");
+    expect(group.textContent).toBe("BRPTENESFRITDE");
   });
 
   it("tocar numa bandeira troca o idioma e guarda a escolha igual ao seletor dos Ajustes", async () => {

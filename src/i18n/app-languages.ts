@@ -12,8 +12,8 @@ export interface AppLanguageOption {
 
 /** Idiomas do app, na ordem do seletor; o topo (bandeiras), o Dock e os Ajustes usam a mesma lista. */
 export const APP_LANGUAGES: readonly AppLanguageOption[] = [
-  { code: 'pt-PT', short: 'PT', flag: '🇵🇹', name: 'Português (Portugal)' },
   { code: 'pt-BR', short: 'BR', flag: '🇧🇷', name: 'Português (Brasil)' },
+  { code: 'pt-PT', short: 'PT', flag: '🇵🇹', name: 'Português (Portugal)' },
   { code: 'en', short: 'EN', flag: '🇺🇸', name: 'English' },
   { code: 'es', short: 'ES', flag: '🇪🇸', name: 'Español' },
   { code: 'fr', short: 'FR', flag: '🇫🇷', name: 'Français' },
@@ -26,7 +26,8 @@ export function matchAppLanguage(current: string): AppLanguage {
   const exact = APP_LANGUAGES.find((lang) => lang.code === current);
   if (exact) return exact.code;
   const base = current.split('-')[0];
-  // Com dois portugueses na lista, o primeiro com a mesma base é o de Portugal (ordem da lista).
+  // "pt" sem região continua Portugal, mesmo com o Brasil em primeiro na lista (pedido do dono, 14/11).
+  if (base === 'pt') return 'pt-PT';
   return APP_LANGUAGES.find((lang) => lang.code.split('-')[0] === base)?.code ?? 'pt-PT';
 }
 
