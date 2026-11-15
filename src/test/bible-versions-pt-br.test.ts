@@ -9,10 +9,10 @@ import { fetchBibleChapter } from "@/lib/content-api";
 import { dailyVerseVersion, fetchVerse } from "@/lib/daily-verse";
 
 /** Lista do FC Brasil (fc-sermon/src/pages/BibliaPage.tsx), na mesma ordem. */
-const LISTA_FC_BRASIL = ["ACF11", "ARA", "ARC09", "ALM21", "KJA", "NAA", "NBV07", "NTLH", "NVIPT", "NVT", "TB10", "VFL"];
+const LISTA_FC_BRASIL = ["ACF11", "ARA", "ARC09", "ALM21", "KJA", "NAA", "NBV07", "NTLH", "NVIPT", "NVT", "TB10", "VFL", "MENS", "CNBB", "OL", "NTJud"];
 
 describe("versões brasileiras da Bíblia (pt-BR)", () => {
-  it("pt-BR tem as 12 versões do FC Brasil, na mesma ordem, com nome e sigla", () => {
+  it("pt-BR tem as 16 versões do FC Brasil, na mesma ordem, com nome e sigla", () => {
     const ids = VERSIONS_BY_LANG["pt-BR"].map((v) => v.id);
     expect(ids).toEqual(LISTA_FC_BRASIL);
     for (const v of VERSIONS_BY_LANG["pt-BR"]) {

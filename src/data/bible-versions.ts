@@ -15,6 +15,10 @@ export const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = 
     { id: "NVT", name: "NVT - Nova Versão Transformadora" },
     { id: "TB10", name: "TB - Tradução Brasileira" },
     { id: "VFL", name: "VFL - Versão Fácil de Ler" },
+    { id: "MENS", name: "MENS - A Mensagem" },
+    { id: "CNBB", name: "CNBB - Bíblia CNBB" },
+    { id: "OL", name: "OL - O Livro" },
+    { id: "NTJud", name: "NTJ - Novo Testamento Judaico" },
   ],
   "pt-PT": [
     { id: "OL", name: "OL - O Livro (Português Europeu)" },

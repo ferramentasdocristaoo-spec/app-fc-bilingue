@@ -407,7 +407,8 @@
   position: fixed;
   left: 20px;
   right: 20px;
-  bottom: 84px;
+  /* Acima da pílula Ouvir, da barra inferior do celular (74 px + cruz da Oficina) e do Dock. */
+  bottom: calc(190px + env(safe-area-inset-bottom, 0px));
   max-width: 580px;
   margin: 0 auto;
   background: hsl(216 45% 14%);
@@ -458,7 +459,8 @@
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 24px;
+  /* Acima da barra inferior do celular; antes ficava escondida atrás dela (z-index menor). */
+  bottom: calc(118px + env(safe-area-inset-bottom, 0px));
   display: flex;
   align-items: center;
   gap: 4px;
@@ -509,3 +511,9 @@
 
 /* pt-BR: "Deuteronômio" não cabe na capa estreita do celular; hífen em vez de partir a palavra. */
 :lang(pt-BR) .estante-livro-nome { hyphens: auto; -webkit-hyphens: auto; }
+
+/* Computador: o Dock (12 px + ~80 px) ocupa o rodapé; pílula e barra de ações ficam acima dele. */
+@media (min-width: 768px) {
+  .biblia-bottom-pill { bottom: 110px; }
+  .biblia-action-bar { bottom: 182px; }
+}
