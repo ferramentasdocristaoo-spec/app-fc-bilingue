@@ -276,7 +276,7 @@ const OficinaPage = () => {
   const blocoTrazer = (
     <div className="oficina-from-card">
       <div className="oficina-from-head">
-        <span>Trazer das outras etapas</span>
+        <span>{t("oficina.fromOtherStages")}</span>
       </div>
       {dadosTrazidos.length > 0 ? (
         <div className="oficina-from-list">
@@ -360,7 +360,7 @@ const OficinaPage = () => {
             {/* Campo: Tema */}
             <div className="oficina-field">
               <label className="oficina-field-label" htmlFor="oficina-tema">
-                <span>Tema</span>
+                <span>{t("oficina.themeShort")}</span>
                 {faltaTema && (
                   <span className="text-red-500 font-normal text-xs">
                     {t("oficina.themeRequired")}
@@ -398,7 +398,7 @@ const OficinaPage = () => {
 
             {/* Duração em segmentos arredondados */}
             <div className="oficina-field">
-              <span className="oficina-field-label">Duração (minutos)</span>
+              <span className="oficina-field-label">{t("oficina.durationMinutes")}</span>
               <div
                 className="oficina-segments"
                 style={{ gridTemplateColumns: `repeat(${duracoesPadrao.length}, 1fr)` }}
@@ -469,7 +469,7 @@ const OficinaPage = () => {
             {failed && <ToolError />}
 
             <button type="submit" className="oficina-submit-btn">
-              <span>{failed ? t("common.retry") : "Montar o esboço"}</span>
+              <span>{failed ? t("common.retry") : t("oficina.buildOutline")}</span>
               <ArrowRight size={20} />
             </button>
           </form>
