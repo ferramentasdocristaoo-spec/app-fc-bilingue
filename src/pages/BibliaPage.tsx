@@ -134,7 +134,7 @@ const BibliaPage = () => {
   const stepFontSize = (delta: 1 | -1) => fontCtx?.stepFontSize(delta);
 
   const lang = normalizeBibleLanguage(i18n.resolvedLanguage || i18n.language);
-  // pt-BR lê o texto da versão de pt-PT (sem versão brasileira ainda), mas com voz brasileira.
+  // pt-BR tem as versões brasileiras (padrão ARA) e voz brasileira; "pt" sem região continua em pt-PT.
   const speechLang = SPEECH_LANG[i18n.resolvedLanguage || i18n.language] || SPEECH_LANG[lang] || "pt-PT";
   const versions = VERSIONS_BY_LANG[lang] || VERSIONS_BY_LANG["pt-PT"];
   const bookNames = (t("biblia.books", { returnObjects: true }) as string[]) || [];
@@ -157,6 +157,15 @@ const BibliaPage = () => {
     if (v && versions.some((item) => item.id === v)) return v;
     return DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "ol";
   });
+
+  // Trocou o idioma com a página aberta (Dock ou detecção por país)? Se a versão atual não existe na
+  // lista nova (ex.: OL ao ir de pt-PT para pt-BR), volta para a padrão do idioma (ARA).
+  useEffect(() => {
+    if (!versions.some((item) => item.id === version)) {
+      setVersion(DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "OL");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   const [verses, setVerses] = useState<Verse[]>([]);
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);

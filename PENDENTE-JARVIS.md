@@ -1,4 +1,43 @@
-# Pendente para o Jarvis — App bilíngue (wt-final)
+# Pendente para o Jarvis — App bilíngue (wt-brasil, branch `brasil-cache`)
+
+## 2026-11-14 · Versões brasileiras da Bíblia e cache de IA compartilhado com o FC Brasil (branch local `brasil-cache`, commits 80c10b5 e cccf855)
+Feito por Noé (Tecnologia). Decisão do dono por voz (14/11): um app só; o brasileiro volta ao bilíngue. Worktree `wt-brasil` criado a partir do `app-novo` (7272166); o `wt-final` do Jafé não foi tocado. **Merge no `app-novo` fica com o Jarvis.** Sem push, sem deploy, sem `supabase db push`, nenhum segredo em arquivo.
+
+**1 · Bíblia em pt-BR (80c10b5)**
+- `src/data/bible-versions.ts`: chave `pt-BR` com as 12 versões do FC Brasil (`fc-sermon/src/pages/BibliaPage.tsx`): ACF11, ARA, ARC09, ALM21, KJA, NAA, NBV07, NTLH, NVIPT, NVT, TB10, VFL. Padrão pt-BR = **ARA**. Mesma fonte bolls.life pelo Worker `fc-bilingue-content` (`/v1/bible`), sem mudança no Worker. As 12 conferidas na bolls.life (Gn 1 → 31 versículos cada). O pedido citava 8; copiei a lista completa de lá (as outras 4 também respondem) — se o dono quiser só as 8, é cortar 4 linhas.
+- `normalizeBibleLanguage`: `pt-BR`/`pt-br`/`pt_BR` → `pt-BR`; `pt` sem região e os outros lusófonos continuam em `pt-PT` (OL). Página da Bíblia, Dock e versículo do dia usam esse normalizador.
+- `src/lib/daily-verse.ts`: `dailyVerseVersion()` = `DEFAULT_VERSION_BY_LANG[normalizeBibleLanguage(lang)]` (pt-BR → ARA, pt-PT → OL, en → KJV…), fonte única com a página da Bíblia.
+- Conferido e **não alterado**: `src/features/bible-journey/editorial-queue.ts` (`BIBLE_SOURCE_BY_LANGUAGE` é por `JourneyLanguage`, que não tem pt-BR — a Jornada em pt-BR continua em reserva no pt-PT, como decidido em 14/11 no pt-BR do Tércio); `library.ts` e `branding.ts` idem.
+- Testes: `pt-br-locale.test.ts` (expectativa pt-BR → pt-PT na Bíblia virou pt-BR → pt-BR, com comentário) e novo `bible-versions-pt-br.test.ts` (7).
+
+**2 · Cache de IA compartilhado (cccf855)**
+- **Chave de cache (documentada no cabeçalho de `supabase/functions/ai-assistant/shared-cache.ts`):** os dois projetos têm a mesma tabela `ai_cache(action, cache_key, result, expires_at, created_at)`, UNIQUE (action, cache_key), TTL 30 dias (migrations 20260323220810 + 20260409153627, iguais nos dois). FC Brasil: `cache_key = JSON.stringify(payload, Object.keys(payload).sort())`, payload **sem idioma** (ex.: `{"referencia":"João 3:16"}`). Bilíngue: o hook `use-ai.ts` acrescenta `lang`, logo a chave local é `{"lang":"pt-BR","referencia":"João 3:16"}`. **Unificação (só do lado do bilíngue):** em pt-BR, a chave do Brasil = payload **sem `lang`**, idêntica à de lá. Payloads das 5 ações conferidos campo a campo nos dois apps (iguais, inclusive `tempo: "N minutos"` e `tipo` ∈ Expositivo/Temático/Textual em pt-BR).
+- Fluxo em pt-BR (ações `gerar-esboco`, `raio-x`, `devocional`, `garimpo`, `nomes`): lê primeiro o `ai_cache` do FC-BRASIL (limite 4 s), depois o local; gera; grava **nos dois** (upsert). Erro/demora no Brasil só vai para o log e cai no local — nunca derruba a resposta. `jornada-capitulo` (só do bilíngue) e os outros 6 idiomas: cache local, como antes. Resposta ganhou `cacheSource` ("fc-brasil" | "local"); o front ignora.
+- Conexão: `createClient(FC_BRASIL_URL, FC_BRASIL_SERVICE_KEY)` lidos de `Deno.env` — **secrets da função**, nada no código. Sem os dois secrets a função avisa no log e segue só com o cache local.
+- Testes: `ai-cache-shared.test.ts` (17: chave igual à fórmula do FC Brasil para os 5 payloads, ordem das chaves, pt-BR em 3 grafias, reserva em erro/timeout/ausência, gravação parcial). `deno check` da função ok.
+
+**Qualidade:** suíte **175/175** (151 + 7 + 17), `npm run build` ok, ESLint dos arquivos alterados limpo (restam só os preexistentes: 2 na `BibliaPage.tsx` e 4 `any` na `index.ts` da função), `git diff --check` limpo.
+
+**Comandos que o dono roda (depois do merge no `app-novo`, na pasta do projeto, com o token do Supabase do Keychain `supabase-fc-bilingue` no padrão de `Kawai-Jarvis/memoria/deploy-cloudflare.md`):**
+```sh
+# 1) secrets da função — a service_role do FC-BRASIL está em Supabase → projeto FC-BRASIL → Project Settings → API (colar no terminal, nunca em arquivo)
+supabase secrets set --project-ref rwyyggtsjbwnwzsnlkgy \
+  FC_BRASIL_URL="https://vnqhgogqoexvfvecnoav.supabase.co" \
+  FC_BRASIL_SERVICE_KEY="<COLE_AQUI_A_SERVICE_ROLE_DO_FC_BRASIL>"
+# 2) deploy da função (leva junto o pt-BR na IA, pendente desde o pt-BR do Tércio; verify_jwt=false já está no config.toml)
+supabase functions deploy ai-assistant --project-ref rwyyggtsjbwnwzsnlkgy
+```
+Conferência depois do deploy: um Raio-X em pt-BR de uma referência já pesquisada no FC Brasil deve voltar com `cacheHit: true, cacheSource: "fc-brasil"` (nos logs da função: "Cache HIT (fc-brasil)").
+
+**Decisões pendentes do dono**
+1. **TTL de 30 dias:** as duas funções só servem linhas com `expires_at` no futuro; das ~27 mil respostas do Brasil, só as geradas nos últimos 30 dias (ou regeneradas) saem do cache. Para a ideia "rodar só do cache sem custo de IA", escolher: (a) tirar o filtro de `expires_at` na leitura do Brasil (1 linha em `index.ts`, `supabaseCacheStore.read`) ou (b) SQL no FC-BRASIL estendendo `expires_at` (ex.: `UPDATE public.ai_cache SET expires_at = now() + interval '10 years';`) — rodado pelo dono no SQL Editor, nunca `db push`.
+2. **Chave usada:** `service_role` do FC-BRASIL dentro da função do bilíngue = acesso total ao banco do Brasil a partir do bilíngue. A `anon` não serve sem uma policy de UPDATE em `ai_cache` (o upsert precisa). Mantido como pedido; alternativa é criar um papel só para `ai_cache`.
+3. Lista de versões: 12 (completa do FC Brasil) ou só as 8 citadas.
+4. **Aviso de merge:** o `wt-final` do Jafé tem `src/pages/BibliaPage.tsx` e `src/test/biblia-estante-leitor.test.tsx` modificados sem commit; minha mudança na `BibliaPage.tsx` é 1 comentário (l. 136) e um `useEffect` de 7 linhas (versão volta ao padrão do idioma se a atual não existir na lista nova, achado da revisão). A `index.ts` da função não foi tocada pelo Jafé (ele mexeu em `purchase-webhook`).
+
+**Ideia futura registrada (não implementar agora):** ligação de bancos mais ampla entre bilíngue e FC Brasil; o FC Brasil continua rodando para os clientes vitalícios e, com o cache grande, pode rodar só do cache sem custo de IA.
+
+---
 
 ## 2026-11-14 · Acesso por plano: validade, webhook KawaiPay e trava de idiomas (branch local `app-novo`)
 Feito por Jafé (Tecnologia, chefe Noé). Pedido do dono: deixar o FC pronto para vender amanhã pelo checkout KawaiPay. **Sem push, sem deploy, sem SQL aplicado**: tudo em commit local + comandos abaixo para o dono rodar.

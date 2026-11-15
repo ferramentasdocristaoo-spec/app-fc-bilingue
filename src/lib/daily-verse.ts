@@ -1,5 +1,6 @@
 import { cleanBibleText } from "@/lib/bible-text";
 import { fetchBibleChapter } from "@/lib/content-api";
+import { DEFAULT_VERSION_BY_LANG, normalizeBibleLanguage } from "@/data/bible-versions";
 
 // Versículos clássicos que rodam por dia do ano (numeração de livros da bolls.life).
 const VERSES: { book: number; chapter: number; verse: number }[] = [
@@ -30,14 +31,10 @@ const VERSES: { book: number; chapter: number; verse: number }[] = [
   { book: 25, chapter: 3, verse: 22 },   // Lamentações 3:22
 ];
 
-const VERSION_BY_LANG: Record<string, string> = {
-  pt: "OL",
-  en: "KJV",
-  es: "RV1960",
-  fr: "FRLSG",
-  it: "NR06",
-  de: "LUT",
-};
+/** Versão do versículo do dia: a padrão da Bíblia do idioma (pt-BR → ARA, pt-PT → OL, en → KJV…). */
+export function dailyVerseVersion(language: string): string {
+  return DEFAULT_VERSION_BY_LANG[normalizeBibleLanguage(language)] ?? "OL";
+}
 
 export interface DailyVerse {
   text: string;
@@ -48,8 +45,7 @@ export interface DailyVerse {
 
 /** Versículo avulso na versão do idioma; null se a Bíblia não responder. */
 export async function fetchVerse(language: string, ref: { book: number; chapter: number; verse: number }): Promise<DailyVerse | null> {
-  const lang = language.toLowerCase().split("-")[0];
-  const version = VERSION_BY_LANG[lang] ?? "OL";
+  const version = dailyVerseVersion(language);
   try {
     const verses = (await fetchBibleChapter({ version, bookId: ref.book, chapter: ref.chapter })) as Array<{ verse?: number; text?: string }>;
     const found = verses.find((v) => v?.verse === ref.verse);
@@ -60,8 +56,7 @@ export async function fetchVerse(language: string, ref: { book: number; chapter:
 }
 
 export async function fetchDailyVerse(language: string): Promise<DailyVerse | null> {
-  const lang = language.toLowerCase().split("-")[0];
-  const version = VERSION_BY_LANG[lang] ?? "OL";
+  const version = dailyVerseVersion(language);
   const today = new Date();
   const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
   const ref = VERSES[dayOfYear % VERSES.length];

@@ -1,5 +1,21 @@
 /* Versões da Bíblia por idioma (a página da Bíblia e o Dock usam a mesma lista). */
 export const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = {
+  // Versões brasileiras: a mesma lista do FC Brasil (fc-sermon/src/pages/BibliaPage.tsx), fonte bolls.life.
+  // Decisão do dono (14/11/2026): um app só; o brasileiro volta ao bilíngue. Padrão pt-BR = ARA.
+  "pt-BR": [
+    { id: "ACF11", name: "ACF - Almeida Corrigida Fiel" },
+    { id: "ARA", name: "ARA - Almeida Revista e Atualizada" },
+    { id: "ARC09", name: "ARC - Almeida Revista e Corrigida" },
+    { id: "ALM21", name: "AS21 - Almeida Século 21" },
+    { id: "KJA", name: "KJA - King James Atualizada" },
+    { id: "NAA", name: "NAA - Nova Almeida Atualizada" },
+    { id: "NBV07", name: "NBV - Nova Bíblia Viva" },
+    { id: "NTLH", name: "NTLH - Nova Tradução Ling. de Hoje" },
+    { id: "NVIPT", name: "NVI - Nova Versão Internacional" },
+    { id: "NVT", name: "NVT - Nova Versão Transformadora" },
+    { id: "TB10", name: "TB - Tradução Brasileira" },
+    { id: "VFL", name: "VFL - Versão Fácil de Ler" },
+  ],
   "pt-PT": [
     { id: "OL", name: "OL - O Livro (Português Europeu)" },
     { id: "NVIPT", name: "NVI-PT - Nova Versão Internacional" },
@@ -43,6 +59,7 @@ export const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = 
 };
 
 export const DEFAULT_VERSION_BY_LANG: Record<string, string> = {
+  "pt-BR": "ARA",
   "pt-PT": "OL",
   "en": "KJV",
   "es": "RV1960",
@@ -51,9 +68,14 @@ export const DEFAULT_VERSION_BY_LANG: Record<string, string> = {
   "de": "LUT",
 };
 
+/**
+ * Idioma da interface → idioma da lista de versões.
+ * pt-BR (ou pt_BR) tem lista própria; "pt" sem região e os outros lusófonos continuam em pt-PT.
+ */
 export function normalizeBibleLanguage(language: string): keyof typeof VERSIONS_BY_LANG {
-  const normalized = language.toLowerCase();
+  const normalized = language.toLowerCase().replace("_", "-");
 
+  if (normalized === "pt-br" || normalized.startsWith("pt-br-")) return "pt-BR";
   if (normalized.startsWith("en")) return "en";
   if (normalized.startsWith("de")) return "de";
   if (normalized.startsWith("es")) return "es";
