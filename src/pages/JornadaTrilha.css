@@ -216,6 +216,14 @@
   margin-top: 14px;
 }
 
+/* Computador: as pílulas quebram linha (a fileira rolável escondia metade delas sem barra visível). */
+@media (min-width: 1024px) {
+  .jornada-group-tabs {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}
+
 .jornada-group-pill {
   flex: none;
   min-height: 44px;
