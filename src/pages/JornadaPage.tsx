@@ -6,6 +6,8 @@ import { journeyCatalogRepository, normalizeJourneyLanguage } from "@/features/b
 import { journeyProgressForBook, journeyProgressRepository } from "@/features/bible-journey/progress";
 import type { JourneyBook, TestamentSlug } from "@/features/bible-journey/types";
 import { journeyCategoryLabel } from "@/features/bible-journey/category-labels";
+import { useJourneyBookTitle } from "@/components/journey/use-book-title";
+import { sectionProgress } from "@/components/journey/journey-utils";
 import "./JourneyDesign.css";
 import "./JornadaTrilha.css";
 
@@ -27,21 +29,30 @@ const groupByCategory = (books: JourneyBook[], testament: TestamentSlug): Catego
   return groups;
 };
 
+// Mesmas chaves do catálogo e de `journeyCategoryLabel` (antes havia chaves soltas, que apareciam cruas: "poetry-wisdom").
 const CATEGORIAS_TRILHA = [
   "pentateuch",
   "historical",
-  "poetry-wisdom",
-  "major-prophets",
-  "minor-prophets",
-  "gospels-acts",
-  "pauline-epistles",
-  "general-epistles",
+  "wisdom",
+  "major_prophet",
+  "minor_prophet",
+  "gospel",
+  "history",
+  "pauline",
+  "general",
   "apocalyptic",
 ];
+
+// Capa do cartão do livro em destaque (antes era sempre o tabernáculo do Êxodo, mesmo para Gênesis).
+const CAPAS: Record<string, string> = {
+  genesis: "/jornada/genesis/dore-001-criacao-da-luz.webp",
+  exodo: "/jornada/exodo/tabernaculo-cima-v2.webp",
+};
 
 export default function JornadaPage() {
   const { t, i18n } = useTranslation();
   const language = normalizeJourneyLanguage(i18n.resolvedLanguage || i18n.language);
+  const bookTitle = useJourneyBookTitle(language);
   const [books, setBooks] = useState<JourneyBook[]>([]);
   const [viewMode, setViewMode] = useState<"trilha" | "lista">("trilha");
   const [categoriaAtiva, setCategoriaAtiva] = useState<string>("pentateuch");
@@ -79,22 +90,31 @@ export default function JornadaPage() {
     if (books.length > 0) return books[0];
     return {
       slug: "exodo",
+      bibleBookId: 2,
       position: 2,
       chapterCount: 40,
       testament: "old-testament" as const,
       category: "pentateuch",
       overview: {
         [language]: {
-          title: "Êxodo",
-          description: "Da escravidão à presença de Deus no meio do povo.",
+          title: t("journey.exodusFallbackTitle"),
+          description: t("journey.exodusFallbackDescription"),
         },
       },
     } as unknown as JourneyBook;
-  }, [books, language]);
+  }, [books, language, t]);
 
   const progressoLivro = livroDestaque
     ? journeyProgressForBook(progressState, livroDestaque.slug, livroDestaque.chapterCount)
     : { completed: 0, total: 40 };
+  // Movimento atual = primeiro com capítulos por concluir (antes o texto era fixo: "movimento 3", "25 paragens").
+  const secoes = livroDestaque?.sections ?? [];
+  const idxMovimento = secoes.findIndex((secao) => {
+    const p = sectionProgress(progressState, livroDestaque!.slug, secao);
+    return p.done < p.total;
+  });
+  const movimentoAtual = idxMovimento === -1 ? Math.max(secoes.length, 1) : idxMovimento + 1;
+  const capaLivro = livroDestaque ? CAPAS[livroDestaque.coverKey ?? livroDestaque.slug] : undefined;
 
   return (
     <div className="jornada-trilha">
@@ -112,11 +132,11 @@ export default function JornadaPage() {
         >
           {viewMode === "trilha" ? (
             <>
-              <List size={16} className="inline mr-1" /> Lista
+              <List size={16} className="inline mr-1" /> {t("journey.listView")}
             </>
           ) : (
             <>
-              <Map size={16} className="inline mr-1" /> Trilha
+              <Map size={16} className="inline mr-1" /> {t("journey.trailView")}
             </>
           )}
         </button>
@@ -187,19 +207,19 @@ export default function JornadaPage() {
               </svg>
 
               <span className="jornada-map-label" style={{ left: "22px", top: "118px" }}>
-                Egito
+                {t("journey.mapEgypt")}
               </span>
               <span className="jornada-map-label" style={{ left: "120px", top: "146px" }}>
-                Mar Vermelho
+                {t("journey.mapRedSea")}
               </span>
               <span className="jornada-map-label" style={{ left: "200px", top: "226px" }}>
-                Sinai
+                {t("journey.mapSinai")}
               </span>
               <span className="jornada-map-label" style={{ left: "196px", top: "76px" }}>
-                Cades
+                {t("journey.mapKadesh")}
               </span>
               <span className="jornada-map-label" style={{ left: "270px", top: "24px" }}>
-                Nebo
+                {t("journey.mapNebo")}
               </span>
             </div>
 
@@ -221,22 +241,28 @@ export default function JornadaPage() {
 
               {/* Cartão do Livro Atual */}
               <div className="jornada-book-card">
-                <img
-                  src="/jornada/exodo/tabernaculo-cima-v2.webp"
-                  alt={livroDestaque.overview[language].title}
-                  className="jornada-book-cover"
-                  onError={(e) => {
-                    // Fallback suave
-                    (e.target as HTMLElement).style.display = "none";
-                  }}
-                />
+                {capaLivro && (
+                  <img
+                    src={capaLivro}
+                    alt={bookTitle(livroDestaque)}
+                    className="jornada-book-cover"
+                    onError={(e) => {
+                      // Fallback suave
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
+                  />
+                )}
                 <div>
                   <div className="jornada-book-kicker">
-                    {journeyCategoryLabel(livroDestaque.category, language)} · livro {livroDestaque.position}
+                    {journeyCategoryLabel(livroDestaque.category, language)} · {t("journey.bookNumber", { number: livroDestaque.position })}
                   </div>
-                  <h3 className="jornada-book-title">{livroDestaque.overview[language].title}</h3>
+                  <h3 className="jornada-book-title">{bookTitle(livroDestaque)}</h3>
                   <p className="jornada-book-desc">{livroDestaque.overview[language].description}</p>
-                  <p className="jornada-book-stats">5 movimentos · 25 paragens</p>
+                  {secoes.length > 0 && (
+                    <p className="jornada-book-stats">
+                      {t("journey.bookStats", { movements: secoes.length, chapters: livroDestaque.chapterCount })}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -247,8 +273,8 @@ export default function JornadaPage() {
               >
                 <span>
                   {progressoLivro.completed > 0
-                    ? `Continuar: movimento ${Math.min(progressoLivro.completed + 1, 5)}`
-                    : "Continuar: movimento 3"}
+                    ? t("journey.continueMovement", { number: movimentoAtual })
+                    : t("journey.startJourney")}
                 </span>
                 <ArrowRight size={20} />
               </Link>
@@ -322,7 +348,7 @@ export default function JornadaPage() {
                             >
                               <span className="ed-num">{String(book.position).padStart(2, "0")}</span>
                               <span className="journey-toc-copy">
-                                <strong>{overview.title}</strong>
+                                <strong>{bookTitle(book)}</strong>
                                 <span>{overview.description}</span>
                               </span>
                               <span className="journey-toc-status">{status}</span>

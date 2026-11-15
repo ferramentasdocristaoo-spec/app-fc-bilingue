@@ -6,6 +6,7 @@ import { journeyProgressForBook, journeyProgressRepository } from "@/features/bi
 import type { JourneyBook } from "@/features/bible-journey/types";
 import { journeyCategoryLabel } from "@/features/bible-journey/category-labels";
 import { JourneyStepper } from "@/components/journey/JourneyStepper";
+import { useJourneyBookTitle } from "@/components/journey/use-book-title";
 import { JourneyMovement } from "@/components/journey/JourneyMovement";
 import { defaultSectionSlug } from "@/components/journey/journey-utils";
 import "./JourneyDesign.css";
@@ -13,6 +14,7 @@ import "./JourneyDesign.css";
 export default function JornadaLivroPage() {
   const { bookSlug, testament } = useParams(); const { t, i18n } = useTranslation();
   const language = normalizeJourneyLanguage(i18n.resolvedLanguage || i18n.language);
+  const bookTitle = useJourneyBookTitle(language);
   const [book, setBook] = useState<JourneyBook | null>();
   const [allBooks, setAllBooks] = useState<JourneyBook[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -48,7 +50,7 @@ export default function JornadaLivroPage() {
         <div className="journey-bignum" aria-hidden>{String(book.position).padStart(2, "0")}</div>
         <div className="journey-opener-title">
           <span className="ed-eyebrow">{testamentLabel} · {journeyCategoryLabel(book.category, language)}</span>
-          <h1>{overview.title}</h1>
+          <h1>{bookTitle(book)}</h1>
           <p className="ed-lede">{overview.description}</p>
         </div>
         <div className="journey-opener-meta">
@@ -106,11 +108,11 @@ export default function JornadaLivroPage() {
       <nav className="journey-book-nav" aria-label={t("journey.title")}>
         {previousBook ? <Link to={`/jornada/${previousBook.testament}/${previousBook.slug}`}>
           <small>← {String(previousBook.position).padStart(2, "0")}</small>
-          <strong>{previousBook.overview[language].title}</strong>
+          <strong>{bookTitle(previousBook)}</strong>
         </Link> : <span />}
         {nextBook && <Link to={`/jornada/${nextBook.testament}/${nextBook.slug}`} className="is-next">
           <small>{String(nextBook.position).padStart(2, "0")} →</small>
-          <strong>{nextBook.overview[language].title}</strong>
+          <strong>{bookTitle(nextBook)}</strong>
         </Link>}
       </nav>
     </div>

@@ -28,6 +28,7 @@
 .jornada-back-link {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 8px;
   font-family: var(--font-display);
   font-size: 1.375rem;
@@ -42,7 +43,8 @@
 }
 
 .jornada-view-toggle {
-  padding: 6px 14px;
+  min-height: 44px;
+  padding: 8px 16px;
   border-radius: 999px;
   border: 1px solid hsl(var(--rule));
   background: hsl(var(--card));
@@ -132,9 +134,10 @@
 }
 
 /* Grade principal da Jornada */
+/* minmax(0, 1fr): a fileira rolável de pílulas não pode ditar a largura da coluna (o mapa estourava a 1400 px no celular). */
 .jornada-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -199,9 +202,14 @@
 }
 
 /* Abas roláveis dos grupos de livros */
+.jornada-sidebar {
+  min-width: 0;
+}
+
 .jornada-group-tabs {
   display: flex;
   gap: 8px;
+  min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
   padding: 4px 0 10px;

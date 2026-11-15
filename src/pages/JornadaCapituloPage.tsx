@@ -9,6 +9,7 @@ import type { JourneyBook } from "@/features/bible-journey/types";
 import type { EditorialGenerationResult } from "@/features/bible-journey/editorial-generator";
 import { getPublishedJourneyEditorial } from "@/features/bible-journey/published-editorial";
 import { JourneyStepper } from "@/components/journey/JourneyStepper";
+import { useJourneyBookTitle } from "@/components/journey/use-book-title";
 import { getJourneyInteractive } from "@/features/bible-journey/interactive";
 import "@/components/journey/JourneyInteractive.css";
 import "./JourneyDesign.css";
@@ -17,6 +18,7 @@ import "./JourneyTimeline.css";
 export default function JornadaCapituloPage() {
   const { bookSlug, chapter: rawChapter, testament } = useParams(); const chapterNumber = Number(rawChapter);
   const { t, i18n } = useTranslation(); const language = normalizeJourneyLanguage(i18n.resolvedLanguage || i18n.language);
+  const bookTitle = useJourneyBookTitle(language);
   const [book, setBook] = useState<JourneyBook | null>(); const [allBooks, setAllBooks] = useState<JourneyBook[]>([]); const [note, setNote] = useState(""); const [completed, setCompleted] = useState(false); const [published, setPublished] = useState<EditorialGenerationResult | null>(null);
   useEffect(() => { journeyCatalogRepository.getBook(bookSlug || "").then(setBook); journeyCatalogRepository.listBooks().then(setAllBooks); }, [bookSlug]);
   useEffect(() => { if (!bookSlug || !chapterNumber) return; journeyProgressRepository.openChapter(bookSlug, chapterNumber); const state = journeyProgressRepository.getState().chapters[`${bookSlug}:${chapterNumber}`]; setNote(state?.note || ""); setCompleted(Boolean(state?.completed)); }, [bookSlug, chapterNumber]);
@@ -38,7 +40,7 @@ export default function JornadaCapituloPage() {
   const nomesLista = (items: string[]) => items.join(" · ");
   return <div className="chapter-journey-page">
     <header className="chapter-head">
-      <Link className="ed-link chapter-back" to={`/jornada/${testament}/${book.slug}`}>← {book.overview[language].title}</Link>
+      <Link className="ed-link chapter-back" to={`/jornada/${testament}/${book.slug}`}>← {bookTitle(book)}</Link>
       <p className="chapter-crumb"><span className="ed-num" aria-hidden>{chapterNumber}</span>{t("journey.chapterProgress", { current: chapterNumber, total: book.chapterCount })}{section ? ` · ${section.content[language].title}` : ""}</p>
       <h1>{displayTitle}</h1>
       <div className="journey-rule-bar" role="progressbar" aria-label={t("journey.chapters")} aria-valuemin={0} aria-valuemax={book.chapterCount} aria-valuenow={chapterNumber}><i style={{ width: `${chapterProgress}%` }} /></div>
@@ -68,7 +70,7 @@ export default function JornadaCapituloPage() {
         </section>}
         <Link className="ed-btn ed-btn-primary" to={`/biblia?bookId=${book.bibleBookId}&chapter=${chapterNumber}`}>{t("journey.readBible")} <span aria-hidden>→</span></Link>
         <blockquote><small>{t("journey.reflect")}</small>{reflectionPrompt}</blockquote>
-        <nav className="chapter-step-navigation" aria-label={t("journey.chapters")}>{previousChapter ? <Link to={`/jornada/${testament}/${book.slug}/capitulos/${previousChapter.number}`}><ArrowLeft aria-hidden /><span><small>{previousChapter.number}</small>{previousChapter.content[language].title}</span></Link> : previousBook ? <Link to={`/jornada/${previousBook.testament}/${previousBook.slug}/capitulos/${previousBook.chapterCount}`}><ArrowLeft aria-hidden /><span><small>{previousBook.overview[language].title}</small>{previousBook.chapters[previousBook.chapterCount - 1].content[language].title}</span></Link> : <span />}{nextChapter ? <Link to={`/jornada/${testament}/${book.slug}/capitulos/${nextChapter.number}`}><span><small>{nextChapter.number}</small>{nextChapter.content[language].title}</span><ArrowRight aria-hidden /></Link> : nextBook ? <Link className="next-book-step" to={`/jornada/${nextBook.testament}/${nextBook.slug}/capitulos/1`}><span><small>{nextBook.overview[language].title}</small>{nextBook.chapters[0].content[language].title}</span><ArrowRight aria-hidden /></Link> : null}</nav>
+        <nav className="chapter-step-navigation" aria-label={t("journey.chapters")}>{previousChapter ? <Link to={`/jornada/${testament}/${book.slug}/capitulos/${previousChapter.number}`}><ArrowLeft aria-hidden /><span><small>{previousChapter.number}</small>{previousChapter.content[language].title}</span></Link> : previousBook ? <Link to={`/jornada/${previousBook.testament}/${previousBook.slug}/capitulos/${previousBook.chapterCount}`}><ArrowLeft aria-hidden /><span><small>{bookTitle(previousBook)}</small>{previousBook.chapters[previousBook.chapterCount - 1].content[language].title}</span></Link> : <span />}{nextChapter ? <Link to={`/jornada/${testament}/${book.slug}/capitulos/${nextChapter.number}`}><span><small>{nextChapter.number}</small>{nextChapter.content[language].title}</span><ArrowRight aria-hidden /></Link> : nextBook ? <Link className="next-book-step" to={`/jornada/${nextBook.testament}/${nextBook.slug}/capitulos/1`}><span><small>{bookTitle(nextBook)}</small>{nextBook.chapters[0].content[language].title}</span><ArrowRight aria-hidden /></Link> : null}</nav>
       </article>
       <aside className="chapter-notes">
         <label htmlFor="chapter-note">{t("journey.myNotes")}</label>
