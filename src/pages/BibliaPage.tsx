@@ -105,16 +105,17 @@ const BOOKS = [
   { id: 66, name: "Apocalipse", chapters: 22 },
 ];
 
+// Nomes em `biblia.groups.<chave>` nos 7 idiomas.
 const GRUPOS_ESTANTE = [
-  { nome: "Pentateuco", testamento: "antigo", range: [1, 5] },
-  { nome: "Históricos", testamento: "antigo", range: [6, 17] },
-  { nome: "Poéticos", testamento: "antigo", range: [18, 22] },
-  { nome: "Profetas Maiores", testamento: "antigo", range: [23, 27] },
-  { nome: "Profetas Menores", testamento: "antigo", range: [28, 39] },
-  { nome: "Evangelhos e Atos", testamento: "novo", range: [40, 44] },
-  { nome: "Cartas de Paulo", testamento: "novo", range: [45, 57] },
-  { nome: "Cartas Gerais", testamento: "novo", range: [58, 65] },
-  { nome: "Apocalipse", testamento: "novo", range: [66, 66] },
+  { chave: "pentateuch", testamento: "antigo", range: [1, 5] },
+  { chave: "historical", testamento: "antigo", range: [6, 17] },
+  { chave: "poetic", testamento: "antigo", range: [18, 22] },
+  { chave: "majorProphets", testamento: "antigo", range: [23, 27] },
+  { chave: "minorProphets", testamento: "antigo", range: [28, 39] },
+  { chave: "gospelsActs", testamento: "novo", range: [40, 44] },
+  { chave: "pauline", testamento: "novo", range: [45, 57] },
+  { chave: "general", testamento: "novo", range: [58, 65] },
+  { chave: "apocalypse", testamento: "novo", range: [66, 66] },
 ];
 
 const CORES_VOLUMES = ["vol-navy", "vol-leather", "vol-blue", "vol-gold", "vol-bordeaux"];
@@ -337,7 +338,7 @@ const BibliaPage = () => {
       );
     } catch { /* vazio */ }
     toast({
-      title: "Versículo enviado para a Oficina",
+      title: t("biblia.sentToWorkshop"),
       description: refVersiculo,
     });
     navigate("/oficina");
@@ -353,11 +354,11 @@ const BibliaPage = () => {
       });
       localStorage.setItem("fc-versiculos-guardados", JSON.stringify(guardados));
       toast({
-        title: "Versículo guardado nos favoritos!",
+        title: t("biblia.savedFavorite"),
         description: refVersiculo,
       });
     } catch {
-      toast({ title: "Guardado!", description: refVersiculo });
+      toast({ title: t("biblia.saved"), description: refVersiculo });
     }
     setSelectedVerse(null);
   };
@@ -373,11 +374,11 @@ const BibliaPage = () => {
     try {
       await navigator.clipboard.writeText(shareText);
       toast({
-        title: "Copiado para a área de transferência",
+        title: t("biblia.copied"),
         description: refVersiculo,
       });
     } catch {
-      toast({ title: "Erro ao copiar", variant: "destructive" });
+      toast({ title: t("biblia.copyError"), variant: "destructive" });
     }
     setSelectedVerse(null);
   };
@@ -406,14 +407,14 @@ const BibliaPage = () => {
                 className={`estante-tab-btn ${modo === "estante" ? "is-active" : ""}`}
                 onClick={() => setModo("estante")}
               >
-                <Library size={16} className="inline mr-1" /> Estante (66 Livros)
+                <Library size={16} className="inline mr-1" /> {t("biblia.shelfTab")}
               </button>
               <button
                 type="button"
                 className={`estante-tab-btn ${modo === "leitor" ? "is-active" : ""}`}
                 onClick={() => setModo("leitor")}
               >
-                <BookOpen size={16} className="inline mr-1" /> Leitura
+                <BookOpen size={16} className="inline mr-1" /> {t("biblia.readingTab")}
               </button>
             </div>
 
@@ -421,7 +422,8 @@ const BibliaPage = () => {
               <Search size={18} className="text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Procurar na estante..."
+                placeholder={t("biblia.searchShelf")}
+                aria-label={t("biblia.searchShelf")}
                 value={buscaEstante}
                 onChange={(e) => setBuscaEstante(e.target.value)}
               />
@@ -440,7 +442,7 @@ const BibliaPage = () => {
               }}
             >
               <div>
-                <span className="estante-continuar-kicker">Continuar Leitura</span>
+                <span className="estante-continuar-kicker">{t("biblia.continueReading")}</span>
                 <div className="estante-continuar-titulo">{ultimoLido.nome}</div>
               </div>
               <ChevronRight size={26} />
@@ -460,11 +462,11 @@ const BibliaPage = () => {
             if (livrosDoGrupo.length === 0) return null;
 
             return (
-              <section key={grupo.nome} className="estante-grupo">
+              <section key={grupo.chave} className="estante-grupo">
                 <div className="estante-grupo-header">
-                  <span>{grupo.nome}</span>
+                  <span>{t(`biblia.groups.${grupo.chave}`)}</span>
                   <span className="estante-grupo-count">
-                    {livrosDoGrupo.length} {livrosDoGrupo.length === 1 ? "volume" : "volumes"}
+                    {livrosDoGrupo.length === 1 ? t("biblia.volumeOne") : t("biblia.volumesMany", { count: livrosDoGrupo.length })}
                   </span>
                 </div>
 
@@ -476,10 +478,10 @@ const BibliaPage = () => {
                         key={b.id}
                         className={`estante-livro ${cor}`}
                         onClick={() => handleSelecionarLivro(b)}
-                        title={`${nomeLivro(b.id)} (${b.chapters} capítulos)`}
+                        title={t("biblia.bookChapters", { book: nomeLivro(b.id), count: b.chapters })}
                       >
                         <span className="estante-livro-nome">{nomeLivro(b.id)}</span>
-                        <span className="estante-livro-caps">{b.chapters} cap</span>
+                        <span className="estante-livro-caps">{t("biblia.chaptersShort", { count: b.chapters })}</span>
                       </div>
                     );
                   })}
@@ -499,7 +501,7 @@ const BibliaPage = () => {
                     className="text-sm font-semibold text-muted-foreground"
                     onClick={() => setLivroModal(null)}
                   >
-                    Fechar
+                    {t("common.close")}
                   </button>
                 </div>
                 <div className="capitulos-grid">
@@ -549,7 +551,7 @@ const BibliaPage = () => {
               }}
             >
               <SelectTrigger className="biblia-pill-btn w-auto border-[1.5px] border-[#b9a77f] rounded-full px-4 h-[46px]">
-                <SelectValue placeholder="Versão" />
+                <SelectValue placeholder={t("biblia.versionLabel")} />
               </SelectTrigger>
               <SelectContent>
                 {versions.map((v) => (
@@ -601,14 +603,14 @@ const BibliaPage = () => {
 
           {/* Barra flutuante escura arredondada quando o versículo é tocado (.a-pop) */}
           {selectedVerse && (
-            <aside className="biblia-action-bar" role="dialog" aria-label="Ações do versículo">
+            <aside className="biblia-action-bar" role="dialog" aria-label={t("biblia.verseActions")}>
               <button
                 type="button"
                 className="biblia-action-btn"
                 onClick={handleAcaoRaioX}
               >
                 <Sparkles />
-                <span>Raio-X</span>
+                <span>{t("biblia.actionXray")}</span>
               </button>
               <button
                 type="button"
@@ -616,7 +618,7 @@ const BibliaPage = () => {
                 onClick={handleAcaoPregar}
               >
                 <Cross />
-                <span>Pregar</span>
+                <span>{t("biblia.actionPreach")}</span>
               </button>
               <button
                 type="button"
@@ -624,7 +626,7 @@ const BibliaPage = () => {
                 onClick={handleAcaoGuardar}
               >
                 <Bookmark />
-                <span>Guardar</span>
+                <span>{t("biblia.actionSave")}</span>
               </button>
               <button
                 type="button"
@@ -632,18 +634,19 @@ const BibliaPage = () => {
                 onClick={handleAcaoPartilhar}
               >
                 <Share2 />
-                <span>Partilhar</span>
+                <span>{t("biblia.actionShare")}</span>
               </button>
             </aside>
           )}
 
           {/* Pílula flutuante embaixo: ‹ Ouvir Aa › (.a-float) */}
-          <nav className="biblia-bottom-pill" aria-label="Navegação e Leitura">
+          <nav className="biblia-bottom-pill" aria-label={t("biblia.readingNav")}>
             <button
               type="button"
               className="biblia-bottom-nav-btn"
               onClick={goToPrevChapter}
-              title="Capítulo anterior"
+              title={t("biblia.prevChapter")}
+              aria-label={t("biblia.prevChapter")}
             >
               <ChevronLeft size={22} />
             </button>
@@ -653,13 +656,14 @@ const BibliaPage = () => {
               onClick={alternarLeitura}
             >
               {!lendo ? <Volume2 size={18} /> : pausado ? <Play size={18} /> : <Pause size={18} />}
-              <span>{!lendo ? "Ouvir" : pausado ? "Continuar" : "Pausar"}</span>
+              <span>{!lendo ? t("biblia.listen") : pausado ? t("biblia.resume") : t("biblia.pause")}</span>
             </button>
             <button
               type="button"
               className="biblia-bottom-text-btn"
               onClick={() => stepFontSize(1)}
-              title="Tamanho do texto"
+              title={t("biblia.textSize")}
+              aria-label={t("biblia.textSize")}
             >
               <span>Aa</span>
             </button>
@@ -667,7 +671,8 @@ const BibliaPage = () => {
               type="button"
               className="biblia-bottom-nav-btn"
               onClick={goToNextChapter}
-              title="Próximo capítulo"
+              title={t("biblia.nextChapter")}
+              aria-label={t("biblia.nextChapter")}
             >
               <ChevronRight size={22} />
             </button>
