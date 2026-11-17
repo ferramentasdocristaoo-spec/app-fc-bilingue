@@ -88,13 +88,39 @@ async function fetchBibleVerse(referencia: string): Promise<string | null> {
   }
 }
 
-async function callAiStructured(apiKey: string, system: string, user: string, toolDef: any) {
+// Provedor principal: Anthropic. Reserva: OpenAI (entra sozinha se a Anthropic falhar ou os créditos acabarem).
+async function callAnthropic(system: string, user: string, toolDef: any) {
+  const key = Deno.env.get("ANTHROPIC_API_KEY");
+  if (!key) throw { status: 401, message: "ANTHROPIC_API_KEY ausente." };
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: Deno.env.get("ANTHROPIC_MODEL") || "claude-haiku-5-5",
+      max_tokens: 4096,
+      system,
+      messages: [{ role: "user", content: user }],
+      tools: [{ name: toolDef.name, description: toolDef.description ?? toolDef.name, input_schema: toolDef.parameters }],
+      tool_choice: { type: "tool", name: toolDef.name },
+    }),
+  });
+  if (!response.ok) {
+    const t = await response.text();
+    console.error("Anthropic error:", response.status, t);
+    throw { status: response.status, message: `Erro na IA (Anthropic): ${response.status}` };
+  }
+  const data = await response.json();
+  const block = (data.content ?? []).find((c: any) => c.type === "tool_use");
+  if (block?.input) return block.input;
+  throw { status: 500, message: "Falha ao processar resposta da IA (Anthropic)." };
+}
+
+async function callOpenAI(system: string, user: string, toolDef: any) {
+  const apiKey = Deno.env.get("OPENAI_API_KEY");
+  if (!apiKey) throw { status: 401, message: "OPENAI_API_KEY ausente." };
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "gpt-4o-mini",
       messages: [
@@ -122,14 +148,29 @@ async function callAiStructured(apiKey: string, system: string, user: string, to
   throw { status: 500, message: "Falha ao processar resposta da IA." };
 }
 
+// O primeiro argumento (_legacyKey) é mantido só para não mexer nas chamadas; as chaves vêm dos secrets.
+async function callAiStructured(_legacyKey: string, system: string, user: string, toolDef: any) {
+  const hasAnthropic = !!Deno.env.get("ANTHROPIC_API_KEY");
+  const hasOpenAI = !!Deno.env.get("OPENAI_API_KEY");
+  if (hasAnthropic) {
+    try {
+      return await callAnthropic(system, user, toolDef);
+    } catch (e) {
+      if (!hasOpenAI) throw e;
+      console.warn("Anthropic falhou; usando OpenAI de reserva:", (e as any)?.status ?? e);
+    }
+  }
+  return await callOpenAI(system, user, toolDef);
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-    if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") ?? "";
+    if (!OPENAI_API_KEY && !Deno.env.get("ANTHROPIC_API_KEY")) throw new Error("Nenhuma chave de IA configurada (ANTHROPIC_API_KEY ou OPENAI_API_KEY)");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
