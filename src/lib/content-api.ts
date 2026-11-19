@@ -33,14 +33,48 @@ export function bibleChapterRequest(
   };
 }
 
+/** Capítulos já lidos nesta sessão: voltar a um capítulo ou trocar de versão e voltar não refaz o pedido. */
+const BIBLE_CACHE_MAX = 60;
+const bibleCache = new Map<string, unknown[]>();
+const bibleCacheKey = ({ version, bookId, chapter }: BibleChapterRequest) => `${version}:${bookId}:${chapter}`;
+
+export function clearBibleChapterCache() {
+  bibleCache.clear();
+}
+
+/** Espera entre tentativas quando o provedor (bolls.life) limita pedidos (429) ou cai (5xx). */
+export const BIBLE_RETRY_DELAYS_MS = [700, 1800];
+const sleep = (ms: number, signal?: AbortSignal) => new Promise<void>((resolve, reject) => {
+  const id = setTimeout(resolve, ms);
+  signal?.addEventListener("abort", () => { clearTimeout(id); reject(new DOMException("aborted", "AbortError")); }, { once: true });
+});
+
 /** Busca um capítulo e devolve a lista crua de versículos (formato bolls.life). */
-export async function fetchBibleChapter(request: BibleChapterRequest, init: { signal?: AbortSignal } = {}): Promise<unknown[]> {
+export async function fetchBibleChapter(
+  request: BibleChapterRequest,
+  init: { signal?: AbortSignal; retryDelaysMs?: number[] } = {},
+): Promise<unknown[]> {
+  const key = bibleCacheKey(request);
+  const cached = bibleCache.get(key);
+  if (cached) return cached;
   const { url, headers } = bibleChapterRequest(request);
-  const res = await fetch(url, { headers, signal: init.signal });
-  if (!res.ok) throw new Error(`bible_http_${res.status}`);
-  const data: unknown = await res.json();
-  if (!Array.isArray(data)) throw new Error("bible_invalid_response");
-  return data;
+  const delays = init.retryDelaysMs ?? BIBLE_RETRY_DELAYS_MS;
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, { headers, signal: init.signal });
+    if (!res.ok) {
+      const transient = res.status === 429 || res.status >= 500;
+      if (transient && attempt < delays.length) {
+        await sleep(delays[attempt], init.signal);
+        continue;
+      }
+      throw new Error(`bible_http_${res.status}`);
+    }
+    const data: unknown = await res.json();
+    if (!Array.isArray(data) || data.length === 0) throw new Error("bible_invalid_response");
+    if (bibleCache.size >= BIBLE_CACHE_MAX) bibleCache.delete(bibleCache.keys().next().value as string);
+    bibleCache.set(key, data);
+    return data;
+  }
 }
 
 /**

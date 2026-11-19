@@ -207,11 +207,15 @@ const BibliaPage = () => {
   }, [bookNames]);
 
   // Carregar versículos
+  // Só a resposta do último pedido vale: trocar de versão/capítulo rápido não deixa a resposta velha por cima.
+  const chapterRequestId = useRef(0);
   const fetchChapter = useCallback(async () => {
+    const requestId = ++chapterRequestId.current;
     setLoading(true);
     setFailed(false);
     try {
       const data = await fetchBibleChapter({ version, bookId, chapter });
+      if (requestId !== chapterRequestId.current) return;
       if (Array.isArray(data)) {
         const cleaned = data.map((v: any) => ({
           pk: v.pk ?? v.verse,
@@ -220,12 +224,16 @@ const BibliaPage = () => {
         }));
         setVerses(cleaned);
       } else {
+        setVerses([]);
         setFailed(true);
       }
     } catch {
+      if (requestId !== chapterRequestId.current) return;
+      // Sem isto, a tela continuava mostrando o capítulo anterior (ou a outra versão) com o título novo.
+      setVerses([]);
       setFailed(true);
     } finally {
-      setLoading(false);
+      if (requestId === chapterRequestId.current) setLoading(false);
     }
   }, [bookId, chapter, version]);
 
