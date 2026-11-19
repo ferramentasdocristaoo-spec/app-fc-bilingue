@@ -1,4 +1,43 @@
-# Pendente para o Jarvis — App bilíngue (wt-brasil, branch `brasil-cache`)
+# Pendente para o Jarvis — App FC (wt-final, branch `app-novo`)
+
+## 2026-11-19 · App funcionando de ponta a ponta (pt-BR) — teste real no navegador e correções
+Feito por **Noé** (Tecnologia), com 2 ajudantes na Jornada e revisão do code-reviewer. Pedido do dono: "trabalhe pesado no app do Ferramentas do Cristão e faça ele funcionar". **Sem push, sem deploy, sem SQL, sem secrets.** 15 commits locais no `app-novo` (e99b6aa..c542b84).
+
+**Como testei:** `vite` local na porta 3177 + Chrome headless (Playwright), conta `ferramentasdocristaoo@gmail.com` (a `kawaisolutions@gmail.com` não está aprovada), 390×844 e 1440×900, pt-BR, IA de verdade.
+
+**O que funcionou já no teste:** login (entrar, janela nova mantém, sair), Início, Bíblia pt-BR (16 versões, padrão ARA, livros, capítulos, ouvir em voz pt-BR, próximo capítulo), Oficina (gerou esboço em ~26 s; Copiar, TXT, PDF/impressão, salvar rascunho), Meus Esboços, Raio-X/Devocional/Nomes/Mineração (IA em 6–12 s; 2ª vez sai do cache local pt-BR em ~1,5 s, `cacheHit: true`), Voz de Deus, Púlpito, Mural (lista e formulário; **não publiquei pedido** para não sujar o mural real), Livraria (coleção e leitor com marca d'água), Jornada, Ajustes (idioma, A−/A+, tema escuro), troca de idioma, desktop com Dock.
+
+**O que estava quebrado e foi corrigido (commits):**
+- `faa6965` Hambúrguer do topo no celular abria o menu lateral antigo → agora abre a folha **MenuSheet** (mesma da aba Menu).
+- `a1491ef` Bíblia: quando o capítulo falhava (ex.: **429 do bolls.life**, visto ao trocar para NVI) a tela continuava com o texto anterior sob o título novo. Agora mostra o aviso; novas tentativas em 429/5xx; cache da sessão; `bible-proxy` com Cache-Control (vale após deploy da função).
+- `7c2b683` Legibilidade: 50 regras de CSS + 4 `text-xs` abaixo de 14 px → 14 px. Varredura: 0 textos < 14 px nas 14 telas.
+- `81e9602` + `c6e8d2e` Contraste: livro dourado da estante 4,7→7,8:1; tokens `--gold-ink`, `--ink-2`, `--ink-3` ajustados. Varredura: 0 textos < 7:1 nos dois temas.
+- `b351f3a` Login: a RPC `app_access_info` ainda não existe no banco (404 a cada abertura) → lembra por 10 min e usa `app_access_status`.
+- `a247959` Raio-X pela barra do versículo abria vazio (ignorava `?ref=`) → já analisa.
+- `d2ff0a2` Meus Esboços prometia "editar" e não tinha botão → **Continuar na Oficina** (substitui o mesmo item, sem duplicar).
+- `a961618` X dos diálogos com 48 px de toque e rótulo traduzido.
+- `2122951` "Salvar" versículo gravava mas não aparecia em lugar nenhum → seção **Versículos salvos** na Estante (abrir/remover); estante e "Continuar leitura" viraram botões (teclado/leitor de tela).
+- `0ef5993` Achados da revisão: finalizado não vira rascunho ao trocar; edição em andamento não se perde; "Fechar e começar outro" no editor; "Pregar" guarda o trabalho aberto; Raio-X não repete a chamada paga ao voltar/recarregar; pedidos velhos da Bíblia são cancelados; `[]` não vai para cache.
+- `891c96f` + `c542b84` **Jornada: Números e Josué interativos** (paradas no mapa, quiz, famílias, linha do tempo, capítulos com título próprio, 6 idiomas) — `pendente-revisao-humana`.
+
+**Qualidade:** `npm test` **238/238**, `npm run build` ok, `tsc` só com os 10 erros que já existiam, varredura final sem erro de página nem requisição falhando (fora o 404 esperado da RPC).
+
+**Levantamento da Jornada (66 livros):** com camada interativa e capítulos próprios: **Gênesis, Êxodo, Números, Josué**. Os outros 62 têm seções, mas capítulos genéricos ("Seção · N", mesma descrição) e nenhuma parada/quiz. **Atos** não cabe no mapa-base atual (long. 28,5–49,5: Roma, Atenas, Corinto, Filipos ficam fora) — precisa gerar um mapa-base mais largo (`scripts/journey-map/build_base_map.py`) antes. Próximos sugeridos no mesmo padrão: Levítico, Deuteronômio, Juízes, Rute, 1–2 Samuel.
+
+**Depende do dono ("confirma"):**
+1. **Push do `app-novo` + deploy de produção** (Pages `app-fc-bilingue`, conta FC).
+2. **SQL dos planos** no SQL Editor do Supabase FC-Bilingue: `supabase/migrations/20261114010000_sku_plans_e_idiomas.sql` e depois `supabase/sql/2026-11-14-sku-plans-kawaipay.sql` com os **IDs dos 6 produtos KawaiPay** (o 404 de `app_access_info` some com isso).
+3. **Deploy das funções** `purchase-webhook` (com `--no-verify-jwt`) e `bible-proxy` (Cache-Control); `ai-assistant` só se mudar algo.
+4. **Cache pt-BR "sujo"**: respostas pt-BR geradas antes de 17/11 saíram em português de Portugal (ex.: Raio-X de João 3:16 com "unigénito"). Limpeza sugerida (dono roda no SQL Editor): `DELETE FROM public.ai_cache WHERE cache_key LIKE '%"lang":"pt-BR"%' AND created_at < '2026-11-17';`
+5. Secrets `FC_BRASIL_URL`/`FC_BRASIL_SERVICE_KEY` para o cache compartilhado com o FC Brasil (hoje tudo sai do cache local, `cacheSource: "local"`).
+6. **Login dos clientes** (hoje modo "email"; senha ou link mágico) e e-mail de teste aprovado para o dono (`kawaisolutions@gmail.com` não entra).
+7. Revisão humana dos textos de Números e Josué (e dos de Gênesis/Êxodo).
+8. **bolls.life limita pedidos (429)**: a produção usa a `bible-proxy` do Supabase; o Worker `fc-content` (cache na borda) resolveria de vez — decidir se liga `VITE_CONTENT_API_URL`.
+
+**Não confirmado:** qual provedor respondeu (Anthropic ou OpenAI) — a resposta da função não informa; ver nos logs da `ai-assistant`.
+
+---
+
 
 ## 2026-11-14 · Versões brasileiras da Bíblia e cache de IA compartilhado com o FC Brasil (branch local `brasil-cache`, commits 80c10b5 e cccf855)
 Feito por Noé (Tecnologia). Decisão do dono por voz (14/11): um app só; o brasileiro volta ao bilíngue. Worktree `wt-brasil` criado a partir do `app-novo` (7272166); o `wt-final` do Jafé não foi tocado. **Merge no `app-novo` fica com o Jarvis.** Sem push, sem deploy, sem `supabase db push`, nenhum segredo em arquivo.
