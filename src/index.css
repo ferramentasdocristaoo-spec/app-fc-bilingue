@@ -42,7 +42,7 @@
     --paper-2: 216 48% 13%;
     --ink: 41 42% 88%;
     --ink-2: 41 12% 70%;
-    --ink-3: 218 12% 62%;
+    --ink-3: 218 12% 68%; /* 7:1 ou mais sobre o fundo e os cartões (regra FC; era 62%) */
     --gold: 40 50% 57%;
     --gold-ink: 41 55% 67%;
     --gold-soft: 40 30% 26%;
@@ -107,10 +107,10 @@
     --paper: 40 47% 94%;
     --paper-2: 41 42% 89%;
     --ink: 216 45% 16%;
-    --ink-2: 218 17% 35%;
-    --ink-3: 218 14% 38%;
+    --ink-2: 218 17% 28%; /* 7:1 ou mais sobre papel, cartão e bege (regra FC; era 35%) */
+    --ink-3: 218 14% 30%; /* idem (era 38%) */
     --gold: 40 48% 47%;
-    --gold-ink: 40 58% 28%;
+    --gold-ink: 40 58% 22%; /* idem (era 28%) */
     --gold-soft: 40 45% 84%;
     --rule: 41 39% 78%;
     --rule-soft: 41 40% 86%;
