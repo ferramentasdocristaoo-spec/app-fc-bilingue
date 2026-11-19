@@ -45,8 +45,10 @@ export function clearBibleChapterCache() {
 /** Espera entre tentativas quando o provedor (bolls.life) limita pedidos (429) ou cai (5xx). */
 export const BIBLE_RETRY_DELAYS_MS = [700, 1800];
 const sleep = (ms: number, signal?: AbortSignal) => new Promise<void>((resolve, reject) => {
-  const id = setTimeout(resolve, ms);
-  signal?.addEventListener("abort", () => { clearTimeout(id); reject(new DOMException("aborted", "AbortError")); }, { once: true });
+  if (signal?.aborted) { reject(new DOMException("aborted", "AbortError")); return; }
+  const onAbort = () => { clearTimeout(id); reject(new DOMException("aborted", "AbortError")); };
+  const id = setTimeout(() => { signal?.removeEventListener("abort", onAbort); resolve(); }, ms);
+  signal?.addEventListener("abort", onAbort, { once: true });
 });
 
 /** Busca um capítulo e devolve a lista crua de versículos (formato bolls.life). */

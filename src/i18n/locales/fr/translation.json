@@ -156,7 +156,8 @@
     "fromOtherStages": "Reprendre des autres étapes",
     "themeShort": "Thème",
     "durationMinutes": "Durée (minutes)",
-    "buildOutline": "Composer le plan"
+    "buildOutline": "Composer le plan",
+    "closeEditor": "Fermer et en commencer un autre"
   },
   "esbocos": {
     "description": "Gérez tous vos plans sauvegardés. Modifiez, partagez ou supprimez selon les besoins.",

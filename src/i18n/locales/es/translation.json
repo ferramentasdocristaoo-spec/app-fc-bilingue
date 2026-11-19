@@ -156,7 +156,8 @@
     "fromOtherStages": "Traer de las otras etapas",
     "themeShort": "Tema",
     "durationMinutes": "Duración (minutos)",
-    "buildOutline": "Armar el bosquejo"
+    "buildOutline": "Armar el bosquejo",
+    "closeEditor": "Cerrar y empezar otro"
   },
   "esbocos": {
     "description": "Administra todos tus esquemas guardados. Edita, comparte o elimina según sea necesario.",

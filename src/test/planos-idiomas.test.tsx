@@ -168,7 +168,7 @@ describe("Tela de assinatura vencida / bloqueada", () => {
     localStorage.setItem("fc-sermon-auth-email", "antigo@exemplo.com");
     const first = render(<AuthProvider><Probe /></AuthProvider>);
     expect(await screen.findByText("dentro:antigo@exemplo.com")).toBeInTheDocument();
-    await waitFor(() => expect(sessionStorage.getItem(SEM_ACCESS_INFO_KEY)).toBe("1"));
+    await waitFor(() => expect(Number(sessionStorage.getItem(SEM_ACCESS_INFO_KEY))).toBeGreaterThan(0));
     first.unmount();
     rpc.mockClear();
     render(<AuthProvider><Probe /></AuthProvider>);

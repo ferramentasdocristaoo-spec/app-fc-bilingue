@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ToolError } from "@/components/ToolKit";
 import { toast } from "@/hooks/use-toast";
 import { fetchBibleChapter } from "@/lib/content-api";
+import { novoPedidoNaOficina } from "@/lib/oficina-store";
 import { cleanBibleText } from "@/lib/bible-text";
 import { DEFAULT_VERSION_BY_LANG, VERSIONS_BY_LANG, normalizeBibleLanguage } from "@/data/bible-versions";
 import { FontSizeContext } from "@/hooks/use-font-size";
@@ -241,12 +242,18 @@ const BibliaPage = () => {
   // Carregar versículos
   // Só a resposta do último pedido vale: trocar de versão/capítulo rápido não deixa a resposta velha por cima.
   const chapterRequestId = useRef(0);
+  const chapterAbort = useRef<AbortController | null>(null);
+  useEffect(() => () => chapterAbort.current?.abort(), []);
   const fetchChapter = useCallback(async () => {
     const requestId = ++chapterRequestId.current;
+    // Pedido anterior (outra versão/capítulo) é cancelado: não fica tentando de novo no 429.
+    chapterAbort.current?.abort();
+    const controller = new AbortController();
+    chapterAbort.current = controller;
     setLoading(true);
     setFailed(false);
     try {
-      const data = await fetchBibleChapter({ version, bookId, chapter });
+      const data = await fetchBibleChapter({ version, bookId, chapter }, { signal: controller.signal });
       if (requestId !== chapterRequestId.current) return;
       if (Array.isArray(data)) {
         const cleaned = data.map((v: any) => ({
@@ -378,13 +385,11 @@ const BibliaPage = () => {
 
   const handleAcaoPregar = () => {
     try {
-      localStorage.setItem(
-        "fc-oficina-atual",
-        JSON.stringify({
-          textoBase: refVersiculo,
-          titulo: "",
-        })
-      );
+      novoPedidoNaOficina(refVersiculo, {
+        introduction: t("oficina.introduction"),
+        application: t("oficina.application"),
+        conclusion: t("oficina.conclusion"),
+      });
     } catch { /* vazio */ }
     toast({
       title: t("biblia.sentToWorkshop"),

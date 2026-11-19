@@ -34,7 +34,7 @@ describe("Bíblia: Estante (66 Livros) e Leitura Direção A", () => {
       version: "OL",
       bookId: 43,
       chapter: 3,
-    });
+    }, expect.anything());
   });
 
   it("renderiza a estante com os grupos bíblicos e o cartão de continuar", () => {

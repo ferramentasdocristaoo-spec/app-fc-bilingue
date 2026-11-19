@@ -83,25 +83,37 @@ export function salvarSermao(sermao: Omit<Sermao, "data">, origemData?: string):
 }
 
 /**
+ * Guarda em Meus Esboços o trabalho aberto na Oficina, se houver texto e se ele mudou.
+ * Esboço que veio de Meus Esboços (origemData) mantém o status e os campos originais; sem mudança, nada é gravado.
+ */
+export function guardarTrabalhoAberto(labels: EsbocoLabels): void {
+  const atual = readProgress();
+  const textoAtual = atual.modoEdicao ? atual.conteudoEditavel ?? "" : atual.resultado ? esbocoParaTexto(atual.resultado, labels) : "";
+  if (!textoAtual.trim()) return;
+  const original = atual.origemData ? readSermoes().find((s) => s.data === atual.origemData) : undefined;
+  if (original && original.conteudo === textoAtual) return;
+  salvarSermao(
+    {
+      titulo: atual.resultado?.titulo || atual.titulo || original?.titulo || "",
+      textoBase: atual.resultado?.texto_base || atual.textoBase || original?.textoBase || "",
+      tema: atual.tema || original?.tema || "",
+      tipo: atual.tipo || original?.tipo || "",
+      conteudo: textoAtual,
+      status: original?.status ?? "rascunho",
+    },
+    original ? atual.origemData : undefined,
+  );
+}
+
+/**
  * Abre um esboço salvo na Oficina, em modo de edição de texto. Se havia outro trabalho aberto e não salvo na
- * Oficina, ele é guardado antes como rascunho em Meus Esboços — nada se perde.
+ * Oficina, ele é guardado antes em Meus Esboços — nada se perde. Se o próprio esboço já está aberto, a edição
+ * em andamento é mantida (não volta ao texto salvo).
  */
 export function continuarNaOficina(sermao: Sermao, labels: EsbocoLabels): void {
   const atual = readProgress();
-  const textoAtual = atual.modoEdicao ? atual.conteudoEditavel ?? "" : atual.resultado ? esbocoParaTexto(atual.resultado, labels) : "";
-  if (textoAtual.trim() && atual.origemData !== sermao.data) {
-    salvarSermao(
-      {
-        titulo: atual.resultado?.titulo || atual.titulo || "",
-        textoBase: atual.resultado?.texto_base || atual.textoBase || "",
-        tema: atual.tema ?? "",
-        tipo: atual.tipo ?? "",
-        conteudo: textoAtual,
-        status: "rascunho",
-      },
-      atual.origemData,
-    );
-  }
+  if (atual.origemData === sermao.data && atual.modoEdicao) return;
+  guardarTrabalhoAberto(labels);
   const progress: OficinaProgress = {
     titulo: sermao.titulo,
     textoBase: sermao.textoBase,
@@ -112,6 +124,18 @@ export function continuarNaOficina(sermao: Sermao, labels: EsbocoLabels): void {
     conteudoEditavel: sermao.conteudo,
     modoEdicao: true,
     origemData: sermao.data,
+  };
+  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+}
+
+/** "Pregar" a partir da Bíblia: guarda o trabalho aberto e começa um pedido novo com a passagem. */
+export function novoPedidoNaOficina(textoBase: string, labels: EsbocoLabels): void {
+  guardarTrabalhoAberto(labels);
+  const atual = readProgress();
+  const progress: OficinaProgress = {
+    titulo: "", textoBase, tema: "", tipo: "",
+    tempoIdx: Array.isArray(atual.tempoIdx) ? atual.tempoIdx : [2],
+    resultado: null, conteudoEditavel: "", modoEdicao: false,
   };
   localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
 }

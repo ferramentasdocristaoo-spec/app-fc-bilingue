@@ -57,23 +57,33 @@ interface AccessInfo {
  * (20261102010000) → leitura direta da tabela (instalações antigas). Falha de rede = "unavailable":
  * quem já estava logado continua (o app abre sem internet), quem está entrando vê um aviso.
  */
-/** Sessão em que o banco respondeu que a RPC app_access_info não existe (migração ainda não aplicada). */
+/** Momento em que o banco respondeu que a RPC app_access_info não existe (migração ainda não aplicada). */
 export const SEM_ACCESS_INFO_KEY = "fc-sem-app-access-info";
+/** Depois disso pergunta de novo: quando o SQL for aplicado, o plano passa a valer sem precisar fechar a aba/PWA. */
+export const SEM_ACCESS_INFO_TTL_MS = 10 * 60 * 1000;
 
 function rpcInexistente(error: unknown): boolean {
-  const e = error as { code?: string; status?: number } | null;
-  return !!e && (e.code === "PGRST202" || e.status === 404);
+  return (error as { code?: string } | null)?.code === "PGRST202";
+}
+
+function lembrouSemAccessInfo(): boolean {
+  try {
+    const desde = Number(sessionStorage.getItem(SEM_ACCESS_INFO_KEY));
+    return desde > 0 && Date.now() - desde < SEM_ACCESS_INFO_TTL_MS;
+  } catch {
+    return false;
+  }
 }
 
 async function checkAccess(email: string): Promise<AccessInfo> {
   // RPCs novas ainda fora dos tipos gerados. Se o banco já disse que app_access_info não existe,
-  // não pergunta de novo nesta sessão (evita um 404 a cada abertura até o SQL ser aplicado).
-  const pularInfo = typeof sessionStorage !== "undefined" && sessionStorage.getItem(SEM_ACCESS_INFO_KEY) === "1";
+  // não pergunta de novo por 10 min (evita um 404 a cada abertura até o SQL ser aplicado).
+  const pularInfo = lembrouSemAccessInfo();
   const info = pularInfo
     ? { data: null, error: { code: "PGRST202" } }
     : ((await supabase.rpc("app_access_info" as never, { _email: email } as never)) as { data: unknown; error: unknown });
   if (!pularInfo && rpcInexistente(info.error)) {
-    try { sessionStorage.setItem(SEM_ACCESS_INFO_KEY, "1"); } catch { /* modo privado */ }
+    try { sessionStorage.setItem(SEM_ACCESS_INFO_KEY, String(Date.now())); } catch { /* modo privado */ }
   }
   if (!info.error && info.data && typeof info.data === "object") {
     const d = info.data as { status?: string; plan?: string | null; idiomas_liberados?: boolean };

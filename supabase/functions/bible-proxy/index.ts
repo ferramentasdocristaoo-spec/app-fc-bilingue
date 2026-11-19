@@ -38,9 +38,9 @@ Deno.serve(async (req) => {
     }
 
     // Texto bíblico não muda: o navegador guarda por 1 dia e poupa pedidos ao bolls.life (que responde 429 quando
-    // recebe muitos de uma vez).
+    // recebe muitos de uma vez). Lista vazia não vai para o cache (o app trata como erro e tenta de novo).
     return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json', ...(data.length > 0 ? { 'Cache-Control': 'public, max-age=86400' } : {}) },
     })
   } catch (e) {
     return new Response(JSON.stringify({ error: 'Failed to fetch bible text' }), {

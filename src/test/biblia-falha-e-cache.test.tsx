@@ -103,7 +103,7 @@ describe("Bíblia: versículos salvos aparecem na Estante", () => {
     // Salvar o mesmo versículo de novo não repete.
     spy.mockClear();
     fireEvent.click(screen.getByRole("button", { name: new RegExp(`^${salvos[0].ref}`) }));
-    await waitFor(() => expect(spy).toHaveBeenCalledWith({ version: "ARA", bookId: 19, chapter: 23 }));
+    await waitFor(() => expect(spy).toHaveBeenCalledWith({ version: "ARA", bookId: 19, chapter: 23 }, expect.anything()));
     fireEvent.click(await screen.findByText(/Deitar-me faz/));
     fireEvent.click(screen.getByRole("button", { name: i18n.t("biblia.actionSave") }));
     expect(JSON.parse(localStorage.getItem("fc-versiculos-guardados") || "[]")).toHaveLength(1);

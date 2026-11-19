@@ -156,7 +156,8 @@
     "fromOtherStages": "Portare dalle altre tappe",
     "themeShort": "Tema",
     "durationMinutes": "Durata (minuti)",
-    "buildOutline": "Costruire la scaletta"
+    "buildOutline": "Costruire la scaletta",
+    "closeEditor": "Chiudi e iniziane un altro"
   },
   "esbocos": {
     "description": "Gestisci tutti i tuoi schemi salvati. Modifica, condividi o elimina secondo le necessità.",

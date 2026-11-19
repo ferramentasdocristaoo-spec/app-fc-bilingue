@@ -156,7 +156,8 @@
     "fromOtherStages": "Aus den anderen Etappen übernehmen",
     "themeShort": "Thema",
     "durationMinutes": "Dauer (Minuten)",
-    "buildOutline": "Gliederung erstellen"
+    "buildOutline": "Gliederung erstellen",
+    "closeEditor": "Schließen und neu beginnen"
   },
   "esbocos": {
     "description": "Verwalten Sie alle Ihre gespeicherten Gliederungen. Bearbeiten, teilen oder löschen Sie nach Bedarf.",

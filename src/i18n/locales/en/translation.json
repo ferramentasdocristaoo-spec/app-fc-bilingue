@@ -156,7 +156,8 @@
     "fromOtherStages": "Bring from the other stages",
     "themeShort": "Theme",
     "durationMinutes": "Duration (minutes)",
-    "buildOutline": "Build the outline"
+    "buildOutline": "Build the outline",
+    "closeEditor": "Close and start another"
   },
   "esbocos": {
     "description": "Manage all your saved outlines. Edit, share, or delete as needed.",

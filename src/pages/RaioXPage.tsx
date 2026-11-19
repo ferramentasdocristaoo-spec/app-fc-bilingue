@@ -17,7 +17,7 @@ interface RaioXResult {
 const RaioXPage = () => {
   const { t } = useTranslation();
   // A barra do versículo na Bíblia manda para cá com ?ref=João 3:16: já preenche e analisa.
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const refInicial = (searchParams.get("ref") ?? "").trim();
   const [referencia, setReferencia] = useState(refInicial);
   const [refPesquisada, setRefPesquisada] = useState("");
@@ -39,6 +39,8 @@ const RaioXPage = () => {
   useEffect(() => {
     if (!refInicial || autoBuscou.current) return;
     autoBuscou.current = true;
+    // Tira o ?ref da URL: voltar, recarregar ou reabrir a PWA não gasta outra chamada de IA.
+    setSearchParams({}, { replace: true });
     void buscar(refInicial);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refInicial]);

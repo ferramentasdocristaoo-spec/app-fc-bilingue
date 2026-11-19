@@ -156,7 +156,8 @@
     "fromOtherStages": "Trazer das outras etapas",
     "themeShort": "Tema",
     "durationMinutes": "Duração (minutos)",
-    "buildOutline": "Montar o esboço"
+    "buildOutline": "Montar o esboço",
+    "closeEditor": "Fechar e começar outro"
   },
   "esbocos": {
     "description": "Gerencie todos os seus esboços salvos. Edite, compartilhe ou exclua conforme precisar.",

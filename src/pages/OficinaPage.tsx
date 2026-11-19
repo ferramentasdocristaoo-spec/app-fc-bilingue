@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import { PROGRESS_KEY, esbocoParaTexto, readProgress, salvarSermao, type EsbocoResult, type OficinaProgress } from "@/lib/oficina-store";
+import { PROGRESS_KEY, esbocoParaTexto, guardarTrabalhoAberto, readProgress, salvarSermao, type EsbocoResult, type OficinaProgress } from "@/lib/oficina-store";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, Check, ArrowRight } from "lucide-react";
@@ -175,6 +175,26 @@ const OficinaPage = () => {
       setConteudoEditavel(converterParaTexto(resultado));
       setModoEdicao(true);
     }
+  };
+
+  const limparOficina = () => {
+    setTitulo("");
+    setTextoBase("");
+    setTema("");
+    setTipo("");
+    setResultado(null);
+    setModoEdicao(false);
+    setConteudoEditavel("");
+    setOrigemData(undefined);
+  };
+
+  const handleFechar = () => {
+    guardarTrabalhoAberto({
+      introduction: t("oficina.introduction"),
+      application: t("oficina.application"),
+      conclusion: t("oficina.conclusion"),
+    });
+    limparOficina();
   };
 
   const handleSave = (status: "rascunho" | "finalizado") => {
@@ -536,7 +556,12 @@ const OficinaPage = () => {
       {modoEdicao && !loading && (
         <div className="studio-editor">
           <div className="studio-editor-bar">
-            {/* Esboço aberto de Meus Esboços só tem o texto: não há folha para onde voltar. */}
+            {/* Esboço aberto de Meus Esboços só tem o texto: no lugar de "voltar à folha", fechar (guarda a edição se mudou). */}
+            {!resultado && (
+              <button type="button" className="ed-link" onClick={handleFechar}>
+                ← {t("oficina.closeEditor")}
+              </button>
+            )}
             {resultado && (
               <button
                 type="button"
