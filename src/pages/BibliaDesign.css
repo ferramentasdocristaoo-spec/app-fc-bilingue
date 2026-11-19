@@ -227,7 +227,7 @@
 .vol-navy { background: #122238; color: #f4ecd8; }
 .vol-leather { background: #5c3a21; color: #fff; }
 .vol-blue { background: #274060; color: #fff; }
-.vol-gold { background: #967f4d; color: #1c140c; }
+.vol-gold { background: #c2a66a; color: #1c140c; } /* 7,8:1 (regra FC de contraste; antes #967f4d = 4,7:1) */
 .vol-bordeaux { background: #6b1d22; color: #fff; }
 
 /* Modal de escolha de capítulo */
