@@ -28,13 +28,26 @@ const TabLink = ({ to, label, icon: Icon, end }: Tab) => (
   </NavLink>
 );
 
+interface BottomNavProps {
+  /** Estado da folha controlado de fora (o DashboardLayout abre a mesma folha pelo hambúrguer do topo). */
+  menuOpen?: boolean;
+  onMenuOpenChange?: (open: boolean) => void;
+}
+
 /** Barra fixa inferior do celular: Início | Bíblia | [Oficina] | Jornada | Menu.
  *  "Menu" sobe a folha de cartõezinhos (MenuSheet), no lugar do menu lateral. */
-export function BottomNav() {
+export function BottomNav({ menuOpen: menuOpenProp, onMenuOpenChange }: BottomNavProps = {}) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpenLocal, setMenuOpenLocal] = useState(false);
+  const controlled = menuOpenProp !== undefined;
+  const menuOpen = controlled ? menuOpenProp : menuOpenLocal;
+  const setMenuOpen = (open: boolean) => {
+    if (!controlled) setMenuOpenLocal(open);
+    onMenuOpenChange?.(open);
+  };
   // Trocou de página: a folha fecha.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { setMenuOpen(false); }, [pathname]);
   const oficinaActive = pathname === "/oficina" || pathname.startsWith("/oficina/");
 
@@ -54,7 +67,7 @@ export function BottomNav() {
         <button
           type="button"
           className={`bnav-tab${menuOpen ? " is-active" : ""}`}
-          onClick={() => setMenuOpen((v) => !v)}
+          onClick={() => setMenuOpen(!menuOpen)}
           aria-expanded={menuOpen}
           aria-haspopup="dialog"
         >

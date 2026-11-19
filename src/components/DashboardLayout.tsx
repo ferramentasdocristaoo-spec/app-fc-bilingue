@@ -1,8 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
 import { BottomNav } from "@/components/BottomNav";
 import { Dock } from "@/components/Dock";
 import { LanguageFlags } from "@/components/LanguageFlags";
@@ -18,16 +16,18 @@ import { useFontSize } from "@/hooks/use-font-size";
 import { appLogo } from "@/lib/branding";
 import { parentPath } from "@/lib/parent-path";
 
-const MenuButton = () => {
+/** Hambúrguer do topo no celular: abre a mesma folha de cartõezinhos (MenuSheet) da aba Menu da barra inferior. */
+const MenuButton = ({ open, onOpen }: { open: boolean; onOpen: () => void }) => {
   const { t } = useTranslation();
-  const { toggleSidebar } = useSidebar();
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={toggleSidebar}
-      className="menu-toggle h-11 w-11 hover:bg-transparent"
+      onClick={onOpen}
+      className="menu-toggle h-12 w-12 hover:bg-transparent"
       aria-label={t("dashboard.menu")}
+      aria-haspopup="dialog"
+      aria-expanded={open}
     >
       <Menu className="!h-6 !w-6" strokeWidth={1.75} />
     </Button>
@@ -43,6 +43,8 @@ const DashboardLayout = () => {
   const { pathname, hash } = useLocation();
   const parent = parentPath(pathname);
   const mainRef = useRef<HTMLElement>(null);
+  // Folha do menu do celular: abre pelo hambúrguer do topo e pela aba Menu da barra inferior.
+  const [menuOpen, setMenuOpen] = useState(false);
   // Sem isto, ir ao capítulo seguinte abre a página nova já rolada até ao fim.
   useEffect(() => {
     if (hash) return;
@@ -51,18 +53,17 @@ const DashboardLayout = () => {
   }, [pathname, hash]);
 
   return (
-    <SidebarProvider defaultOpen={!isMobile}>
+    <>
       {/* Altura da tela fixa: quem rola é o <main>, não a janela. Assim o cabeçalho (bandeiras, A−/A+, tema) fica sempre
           à vista no computador e os blocos "sticky" das páginas (faixa de etapas da Início, coluna de pedido) funcionam. */}
       <div className="h-dvh min-h-0 flex w-full overflow-hidden">
-        {/* Celular: menu lateral (abre pela aba "Menu" da barra inferior). Desktop: Dock embaixo, sem lateral. */}
-        {isMobile && <nav aria-label={t("dashboard.menu")} className="contents"><AppSidebar /></nav>}
+        {/* Celular: folha de cartõezinhos (MenuSheet, dentro da BottomNav). Desktop: Dock embaixo, sem lateral. */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Desktop: grelha marca | bandeiras | tema. De 768 a 1023 px as bandeiras centram no espaço que sobra;
               a partir de 1024 px as três colunas das pontas são iguais e as bandeiras ficam no centro exato do ecrã. */}
           <header className="h-14 flex items-center justify-between gap-1 border-b border-rule-soft bg-background px-1 shrink-0 md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-3 md:px-6 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
             <div className="flex min-w-0 items-center md:hidden">
-              <MenuButton />
+              <MenuButton open={menuOpen} onOpen={() => setMenuOpen(true)} />
               {/* Celular: o nome inteiro não cabe, então entra o brasão; fora do início, a seta para o nível acima. */}
               {parent ? (
                 <Link to={parent} aria-label={t("common.backTo")} className="flex h-11 w-11 items-center justify-center text-ink-2 hover:text-foreground">
@@ -106,11 +107,11 @@ const DashboardLayout = () => {
           <main ref={mainRef} className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
             <div className={`${fontSizeClass} bnav-spacer`}><Outlet /></div>
           </main>
-          <BottomNav />
+          <BottomNav menuOpen={menuOpen} onMenuOpenChange={setMenuOpen} />
           {!isMobile && <Dock />}
         </div>
       </div>
-    </SidebarProvider>
+    </>
   );
 };
 

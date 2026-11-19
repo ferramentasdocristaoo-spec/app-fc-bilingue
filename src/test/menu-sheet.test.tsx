@@ -1,9 +1,10 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@/i18n";
 import i18n from "i18next";
 import { BottomNav } from "@/components/BottomNav";
+import DashboardLayout from "@/components/DashboardLayout";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { FontSizeProvider } from "@/hooks/use-font-size";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -119,5 +120,33 @@ describe("Menu do celular em cartõezinhos", () => {
     const dialog = await screen.findByRole("dialog", { name: "Menü" });
     expect(within(dialog).getByRole("link", { name: "Predigtwerkstatt" })).toBeInTheDocument();
     expect(within(dialog).getByRole("region", { name: "Vorbereitung" })).toBeInTheDocument();
+  });
+
+  it("o hambúrguer do topo abre a mesma folha de cartõezinhos (não o menu lateral antigo)", async () => {
+    const original = window.innerWidth;
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: 390 });
+    const { supabase } = await import("@/integrations/supabase/client");
+    vi.mocked(supabase.rpc).mockResolvedValue({ data: null, error: { message: "offline" } } as never);
+    if (!HTMLElement.prototype.scrollTo) HTMLElement.prototype.scrollTo = () => {};
+    window.scrollTo = () => {};
+    window.matchMedia = window.matchMedia || ((() => ({ matches: true, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia);
+    render(
+      <MemoryRouter initialEntries={["/biblia"]}>
+        <ThemeProvider><FontSizeProvider><AuthProvider>
+          <Routes><Route element={<DashboardLayout />}><Route path="/biblia" element={<p>Bíblia</p>} /></Route></Routes>
+        </AuthProvider></FontSizeProvider></ThemeProvider>
+      </MemoryRouter>,
+    );
+    const [hamburger, tab] = screen.getAllByRole("button", { name: "Menu" });
+    expect(hamburger).toHaveClass("menu-toggle");
+    expect(hamburger).toHaveAttribute("aria-haspopup", "dialog");
+    fireEvent.click(hamburger);
+    const dialog = await screen.findByRole("dialog", { name: "Menu" });
+    expect(dialog.querySelectorAll("a.msheet-card")).toHaveLength(12);
+    expect(document.querySelector("[data-sidebar=sidebar]")).toBeNull();
+    // Os dois botões refletem a mesma folha aberta.
+    await waitFor(() => expect(tab).toHaveAttribute("aria-expanded", "true"));
+    expect(hamburger).toHaveAttribute("aria-expanded", "true");
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: original });
   });
 });
