@@ -8,7 +8,7 @@ import { LanguageFlags } from "@/components/LanguageFlags";
 import { Toaster } from "@/components/ui/toaster";
 import AccessDeniedPage from "@/pages/AccessDeniedPage";
 import { RENEW_URL } from "@/lib/planos";
-import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { AuthProvider, useAuth, SEM_ACCESS_INFO_KEY } from "@/hooks/use-auth";
 
 const rpc = vi.fn();
 vi.mock("@/integrations/supabase/client", () => ({
@@ -158,6 +158,24 @@ describe("Tela de assinatura vencida / bloqueada", () => {
     expect(await screen.findByText("dentro:ok@exemplo.com")).toBeInTheDocument();
     await waitFor(() => expect(getPlanoAtual()).toEqual({ plan: "br_12m", idiomasLiberados: false }));
     await waitFor(() => expect(i18n.language).toBe("pt-BR"));
+  });
+
+  it("RPC app_access_info ainda não aplicada (404): cai na app_access_status e não pergunta de novo na sessão", async () => {
+    sessionStorage.clear();
+    rpc.mockImplementation(async (fn: string) => fn === "app_access_info"
+      ? { data: null, error: { code: "PGRST202", message: "Could not find the function" } }
+      : { data: "ok", error: null });
+    localStorage.setItem("fc-sermon-auth-email", "antigo@exemplo.com");
+    const first = render(<AuthProvider><Probe /></AuthProvider>);
+    expect(await screen.findByText("dentro:antigo@exemplo.com")).toBeInTheDocument();
+    await waitFor(() => expect(sessionStorage.getItem(SEM_ACCESS_INFO_KEY)).toBe("1"));
+    first.unmount();
+    rpc.mockClear();
+    render(<AuthProvider><Probe /></AuthProvider>);
+    expect(await screen.findByText("dentro:antigo@exemplo.com")).toBeInTheDocument();
+    await waitFor(() => expect(rpc).toHaveBeenCalledWith("app_access_status", { _email: "antigo@exemplo.com" }));
+    expect(rpc).not.toHaveBeenCalledWith("app_access_info", expect.anything());
+    sessionStorage.clear();
   });
 
   it("sem rede (RPC e tabela falham): quem já estava dentro continua dentro", async () => {

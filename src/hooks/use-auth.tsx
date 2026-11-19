@@ -57,9 +57,24 @@ interface AccessInfo {
  * (20261102010000) → leitura direta da tabela (instalações antigas). Falha de rede = "unavailable":
  * quem já estava logado continua (o app abre sem internet), quem está entrando vê um aviso.
  */
+/** Sessão em que o banco respondeu que a RPC app_access_info não existe (migração ainda não aplicada). */
+export const SEM_ACCESS_INFO_KEY = "fc-sem-app-access-info";
+
+function rpcInexistente(error: unknown): boolean {
+  const e = error as { code?: string; status?: number } | null;
+  return !!e && (e.code === "PGRST202" || e.status === 404);
+}
+
 async function checkAccess(email: string): Promise<AccessInfo> {
-  // RPCs novas ainda fora dos tipos gerados.
-  const info = (await supabase.rpc("app_access_info" as never, { _email: email } as never)) as { data: unknown; error: unknown };
+  // RPCs novas ainda fora dos tipos gerados. Se o banco já disse que app_access_info não existe,
+  // não pergunta de novo nesta sessão (evita um 404 a cada abertura até o SQL ser aplicado).
+  const pularInfo = typeof sessionStorage !== "undefined" && sessionStorage.getItem(SEM_ACCESS_INFO_KEY) === "1";
+  const info = pularInfo
+    ? { data: null, error: { code: "PGRST202" } }
+    : ((await supabase.rpc("app_access_info" as never, { _email: email } as never)) as { data: unknown; error: unknown });
+  if (!pularInfo && rpcInexistente(info.error)) {
+    try { sessionStorage.setItem(SEM_ACCESS_INFO_KEY, "1"); } catch { /* modo privado */ }
+  }
   if (!info.error && info.data && typeof info.data === "object") {
     const d = info.data as { status?: string; plan?: string | null; idiomas_liberados?: boolean };
     const status = RPC_STATUS[d.status ?? ""];
