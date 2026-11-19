@@ -166,6 +166,7 @@
     "copyButton": "Copier",
     "pdfButton": "PDF",
     "txtButton": "TXT",
+    "editButton": "Continuer dans l’Atelier",
     "deleteButton": "Supprimer",
     "copiedNotif": "Copier",
     "deletedNotif": "Supprimé",

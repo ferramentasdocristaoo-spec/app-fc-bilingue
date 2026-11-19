@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
+import { PROGRESS_KEY, esbocoParaTexto, readProgress, salvarSermao, type EsbocoResult, type OficinaProgress } from "@/lib/oficina-store";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, Check, ArrowRight } from "lucide-react";
@@ -19,40 +20,11 @@ function sliderToMinutes(val: number): number {
   return tempoMarks[Math.min(val, tempoMarks.length - 1)];
 }
 
-interface EsbocoResult {
-  titulo: string;
-  texto_base: string;
-  introducao: { gancho: string; contextualizacao: string };
-  pontos: { titulo: string; conteudo: string; versiculos: string[] }[];
-  aplicacao_pratica: string;
-  conclusao: string;
-}
-
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-const PROGRESS_KEY = "fc-oficina-atual";
-
-type Saved = {
-  titulo: string;
-  textoBase: string;
-  tema: string;
-  tipo: string;
-  tempoIdx: number[];
-  resultado: EsbocoResult | null;
-  conteudoEditavel: string;
-  modoEdicao: boolean;
-};
-
-function readSaved(): Partial<Saved> {
-  try {
-    return JSON.parse(localStorage.getItem(PROGRESS_KEY) ?? "{}");
-  } catch {
-    return {};
-  }
-}
 
 const OficinaPage = () => {
   const { t, i18n } = useTranslation();
-  const [saved] = useState(readSaved);
+  const [saved] = useState(readProgress);
   const [titulo, setTitulo] = useState(saved.titulo ?? "");
   const [textoBase, setTextoBase] = useState(saved.textoBase ?? "");
   const [tema, setTema] = useState(saved.tema ?? "");
@@ -61,6 +33,8 @@ const OficinaPage = () => {
   const [resultado, setResultado] = useState<EsbocoResult | null>(saved.resultado ?? null);
   const [modoEdicao, setModoEdicao] = useState(saved.modoEdicao ?? false);
   const [conteudoEditavel, setConteudoEditavel] = useState(saved.conteudoEditavel ?? "");
+  // Esboço de Meus Esboços sendo continuado aqui: salvar substitui o mesmo item.
+  const [origemData, setOrigemData] = useState<string | undefined>(saved.origemData);
   const [faltaTema, setFaltaTema] = useState(false);
   const temaRef = useRef<HTMLInputElement>(null);
   const { callAi, loading, failed } = useAi();
@@ -100,12 +74,13 @@ const OficinaPage = () => {
           resultado,
           conteudoEditavel,
           modoEdicao,
-        } satisfies Saved)
+          origemData,
+        } satisfies OficinaProgress)
       );
     } catch {
       /* armazenamento indisponível */
     }
-  }, [titulo, textoBase, tema, tipo, tempoIdx, resultado, conteudoEditavel, modoEdicao]);
+  }, [titulo, textoBase, tema, tipo, tempoIdx, resultado, conteudoEditavel, modoEdicao, origemData]);
 
   const temas = [
     t("garimpo.suggestionAnxiety"),
@@ -145,16 +120,12 @@ const OficinaPage = () => {
     }
   };
 
-  const converterParaTexto = (r: EsbocoResult) => {
-    let text = `${r.titulo}\n${r.texto_base}\n\n`;
-    text += `${t("oficina.introduction").toUpperCase()}\n${r.introducao.gancho}\n${r.introducao.contextualizacao}\n\n`;
-    r.pontos.forEach((p, i) => {
-      text += `${i + 1}. ${p.titulo}\n${p.conteudo}\n${p.versiculos.join(", ")}\n\n`;
+  const converterParaTexto = (r: EsbocoResult) =>
+    esbocoParaTexto(r, {
+      introduction: t("oficina.introduction"),
+      application: t("oficina.application"),
+      conclusion: t("oficina.conclusion"),
     });
-    text += `${t("oficina.application").toUpperCase()}\n${r.aplicacao_pratica}\n\n`;
-    text += `${t("oficina.conclusion").toUpperCase()}\n${r.conclusao}`;
-    return text;
-  };
 
   const textoAtual = () =>
     modoEdicao ? conteudoEditavel : resultado ? converterParaTexto(resultado) : "";
@@ -207,23 +178,18 @@ const OficinaPage = () => {
   };
 
   const handleSave = (status: "rascunho" | "finalizado") => {
-    const sermao = {
-      titulo: tituloAtual(),
-      textoBase: resultado?.texto_base || textoBase,
-      tema,
-      tipo,
-      conteudo: textoAtual(),
-      status,
-      data: new Date().toISOString(),
-    };
-    let existing: unknown[] = [];
-    try {
-      existing = JSON.parse(localStorage.getItem("fc-sermoes") || "[]");
-    } catch {
-      /* lista recomeça */
-    }
-    existing.push(sermao);
-    localStorage.setItem("fc-sermoes", JSON.stringify(existing));
+    salvarSermao(
+      {
+        titulo: tituloAtual(),
+        textoBase: resultado?.texto_base || textoBase,
+        tema,
+        tipo,
+        conteudo: textoAtual(),
+        status,
+      },
+      origemData,
+    );
+    setOrigemData(undefined);
     setTitulo("");
     setTextoBase("");
     setTema("");
@@ -570,13 +536,16 @@ const OficinaPage = () => {
       {modoEdicao && !loading && (
         <div className="studio-editor">
           <div className="studio-editor-bar">
-            <button
-              type="button"
-              className="ed-link"
-              onClick={() => setModoEdicao(false)}
-            >
-              ← {t("oficina.backToSheet")}
-            </button>
+            {/* Esboço aberto de Meus Esboços só tem o texto: não há folha para onde voltar. */}
+            {resultado && (
+              <button
+                type="button"
+                className="ed-link"
+                onClick={() => setModoEdicao(false)}
+              >
+                ← {t("oficina.backToSheet")}
+              </button>
+            )}
             {exportar}
           </div>
           <Textarea

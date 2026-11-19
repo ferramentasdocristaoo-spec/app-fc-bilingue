@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
 import { Input } from "@/components/ui/input";
@@ -7,33 +7,26 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { copySermonText, downloadSermonTxt, printSermon } from "@/lib/sermon-export";
-
-interface Sermao {
-  titulo: string;
-  textoBase: string;
-  tema: string;
-  tipo: string;
-  conteudo: string;
-  status: string;
-  data: string;
-}
-
-function readSermons(): Sermao[] {
-  try {
-    const parsed = JSON.parse(localStorage.getItem("fc-sermoes") || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
+import { continuarNaOficina, readSermoes, type Sermao } from "@/lib/oficina-store";
 
 const EsbocosPage = () => {
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage || i18n.language;
   const [busca, setBusca] = useState("");
-  const [sermoes, setSermoes] = useState<Sermao[]>(readSermons);
+  const [sermoes, setSermoes] = useState<Sermao[]>(readSermoes);
   const [selecionado, setSelecionado] = useState<Sermao | null>(null);
   const [excluindo, setExcluindo] = useState(false);
+  const navigate = useNavigate();
+
+  const handleContinuar = () => {
+    if (!selecionado) return;
+    continuarNaOficina(selecionado, {
+      introduction: t("oficina.introduction"),
+      application: t("oficina.application"),
+      conclusion: t("oficina.conclusion"),
+    });
+    navigate("/oficina");
+  };
 
   const filtrados = useMemo(() => {
     const q = busca.trim().toLocaleLowerCase();
@@ -108,6 +101,7 @@ const EsbocosPage = () => {
           {selecionado && (
             <div className="sermon-open">
               <p className="sermon-meta">{statusLabel(selecionado.status)} · {dataLabel(selecionado.data)}{selecionado.tema ? ` · ${selecionado.tema}` : ""}</p>
+              <button type="button" className="ed-btn ed-btn-primary mt-4" onClick={handleContinuar}>{t("esbocos.editButton")}</button>
               <div className="studio-export">
                 <button type="button" onClick={handleCopiar}>{t("esbocos.copyButton")}</button>
                 <button type="button" onClick={handleDownloadPdf}>{t("esbocos.pdfButton")}</button>
