@@ -24,7 +24,7 @@
 .jstep-bar i { display: block; height: 100%; background: hsl(var(--gold)); transition: width .3s ease; }
 .jstep-num { font: 500 0.875rem/1.2 var(--font-brand); letter-spacing: .06em; color: hsl(var(--gold-ink)); }
 .jstep-title { font: 600 1.0625rem/1.25 var(--font-display); color: hsl(var(--ink-2)); }
-.jstep-meta { font: 400 0.8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
+.jstep-meta { font: 400 0.875rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
 .jstep-check { color: hsl(var(--gold-ink)); font-weight: 600; }
 .jstep-item:hover .jstep-title { color: hsl(var(--ink)); }
 .jstep-item.is-done .jstep-title { color: hsl(var(--ink)); }
@@ -44,20 +44,20 @@
 .jmove-head h3 { margin: 8px 0 10px; font: 600 clamp(1.75rem, 4.5vw, 2.375rem)/1.12 var(--font-display); color: hsl(var(--ink)); }
 .jtags { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 20px 0 0; }
 .jtags > div { min-width: 0; }
-.jtags dt { font: 500 0.75rem/1.4 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
+.jtags dt { font: 500 0.875rem/1.4 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
 .jtags dd { margin: 2px 0 0; padding-bottom: 4px; border-bottom: 1px solid hsl(var(--gold-soft)); font: 400 1.0625rem/1.4 var(--font-text); color: hsl(var(--ink)); }
 .jtags dd em { font-style: italic; font-size: 0.875rem; color: hsl(var(--ink-3)); }
 .jtags-small { gap: 10px 24px; margin-top: 16px; }
 .jtags-small dd { font-size: 0.9375rem; }
 .jmove-connection { margin: 18px 0 0; padding-left: 12px; border-left: 2px solid hsl(var(--gold-soft)); font: italic 400 1rem/1.6 var(--font-text); color: hsl(var(--ink-2)); max-width: 62ch; }
-.jmove-connection span { font: normal 500 0.75rem/1 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); margin-right: 6px; }
+.jmove-connection span { font: normal 500 0.875rem/1 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); margin-right: 6px; }
 .jmove-read { margin: 32px 0 0; }
 
 /* ---------- Mapa + paragem ---------- */
 .jstage { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 32px; align-items: start; }
 @media (min-width: 900px) { .jstage { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 0; } .jstage-stop { padding-left: 28px; margin-left: 28px; border-left: 1px solid hsl(var(--rule)); } }
 .jstage-map { margin: 0; border: 1px solid hsl(var(--rule)); border-radius: 4px; overflow: hidden; background: hsl(var(--journey-sea)); }
-.jstage-map figcaption { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px 12px; background: hsl(var(--paper-2)); border-top: 1px solid hsl(var(--rule)); font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.jstage-map figcaption { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px 12px; background: hsl(var(--paper-2)); border-top: 1px solid hsl(var(--rule)); font: 400 0.875rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
 
 .jmap { display: block; width: 100%; height: auto; aspect-ratio: 1000 / 765; touch-action: manipulation; }
 .jmap-sea { fill: hsl(var(--journey-sea)); }
@@ -85,7 +85,7 @@
 .jmap-stop:hover .jmap-dot { stroke: hsl(var(--gold-ink)); stroke-width: 2.2; }
 .jmap-stop:focus-visible .jmap-dot { stroke: hsl(var(--gold)); stroke-width: 3.5; }
 
-.jstage-count { font: 500 0.8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
+.jstage-count { font: 500 0.875rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); font-variant-numeric: tabular-nums; }
 .jstage-stop h4 { margin: 6px 0 4px; font: 600 clamp(1.625rem, 4vw, 2rem)/1.15 var(--font-display); color: hsl(var(--ink)); }
 .jstage-ref { font: 500 0.875rem/1.4 var(--font-ui); color: hsl(var(--gold-ink)); }
 .jstage-stop > p { margin: 12px 0 0; font: 400 1.0625rem/1.7 var(--font-text); color: hsl(var(--ink)); }
@@ -98,8 +98,8 @@
 .jstops li { scroll-snap-align: start; }
 .jstops button { display: flex; flex-direction: column; gap: 2px; width: 100%; min-height: 44px; padding: 0 10px 8px 0; border: 0; background: none; text-align: left; cursor: pointer; font: inherit; }
 .jstops-bar { display: block; height: 2px; margin-bottom: 8px; background: hsl(var(--rule)); }
-.jstops-num { font: 500 0.75rem/1.2 var(--font-brand); color: hsl(var(--ink-3)); }
-.jstops-name { font: 400 0.8125rem/1.3 var(--font-ui); color: hsl(var(--ink-3)); }
+.jstops-num { font: 500 0.875rem/1.2 var(--font-brand); color: hsl(var(--ink-3)); }
+.jstops-name { font: 400 0.875rem/1.3 var(--font-ui); color: hsl(var(--ink-3)); }
 .jstops button.is-visited .jstops-bar { background: hsl(var(--gold)); }
 .jstops button.is-visited .jstops-name { color: hsl(var(--ink-2)); }
 .jstops button.is-active .jstops-bar { background: hsl(var(--journey-wine)); height: 3px; }
@@ -111,7 +111,7 @@
 .jaids { display: grid; grid-template-columns: 1fr; gap: 40px; }
 @media (min-width: 900px) { .jaids { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; } }
 .jaid h3 { margin: 6px 0 14px; font: 600 1.5rem/1.2 var(--font-display); color: hsl(var(--ink)); }
-.jaid-note { margin: 14px 0 0; font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.jaid-note { margin: 14px 0 0; font: 400 0.875rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
 
 .jfam, .jfam ul { list-style: none; margin: 0; padding: 0; }
 .jfam ul { margin-left: 10px; padding-left: 16px; border-left: 1px solid hsl(var(--gold-soft)); }
@@ -119,7 +119,7 @@
 .jfam ul > li::before { content: ""; position: absolute; left: -16px; top: 0.95em; width: 12px; height: 1px; background: hsl(var(--gold-soft)); }
 .jfam-name { font: 400 1.0625rem/1.4 var(--font-text); color: hsl(var(--ink)); }
 .jfam-name.is-line { font-weight: 600; color: hsl(var(--gold-ink)); }
-.jfam-spouse { font: 400 0.8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); }
+.jfam-spouse { font: 400 0.875rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); }
 
 /* A faixa fica em linha só quando há largura; na coluna de 1/3 do desktop e no celular, empilha. */
 .jera { display: flex; flex-direction: column; gap: 14px; }
@@ -127,21 +127,21 @@
 .jera-zone { padding-top: 10px; border-top: 2px dashed hsl(var(--rule)); }
 .jera-zone.is-dated { border-top-style: solid; }
 .jera-zone.is-active { border-top-color: hsl(var(--journey-wine)); }
-.jera-zone small { display: block; font: 500 0.6875rem/1.3 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: hsl(var(--ink-3)); padding-right: 6px; }
+.jera-zone small { display: block; font: 500 0.875rem/1.3 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: hsl(var(--ink-3)); padding-right: 6px; }
 .jera-zone ol { list-style: none; margin: 8px 0 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; }
-.jera-zone li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font: 500 0.75rem/1.2 var(--font-brand); color: hsl(var(--ink-3)); }
+.jera-zone li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font: 500 0.875rem/1.2 var(--font-brand); color: hsl(var(--ink-3)); }
 .jera-zone li i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid hsl(var(--ink-3)); background: hsl(var(--paper)); }
 .jera-zone li.is-active { color: hsl(var(--journey-wine)); }
 .jera-zone li.is-active i { background: hsl(var(--journey-wine)); border-color: hsl(var(--journey-wine)); }
 .jera-zone.is-dated ol { flex-direction: column; gap: 8px; }
 .jera-zone.is-dated li { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-family: var(--font-ui); }
 .jera-zone.is-dated li span { font-weight: 600; color: hsl(var(--ink-2)); font-variant-numeric: tabular-nums; }
-.jera-zone.is-dated li em { flex-basis: 100%; padding-left: 15px; font: italic 400 0.8125rem/1.3 var(--font-text); color: hsl(var(--ink-3)); }
-.jera-next { padding: 10px 0 0 8px; border-top: 2px dotted hsl(var(--rule)); font: 500 0.75rem/1.3 var(--font-ui); color: hsl(var(--ink-3)); white-space: nowrap; }
+.jera-zone.is-dated li em { flex-basis: 100%; padding-left: 15px; font: italic 400 0.875rem/1.3 var(--font-text); color: hsl(var(--ink-3)); }
+.jera-next { padding: 10px 0 0 8px; border-top: 2px dotted hsl(var(--rule)); font: 500 0.875rem/1.3 var(--font-ui); color: hsl(var(--ink-3)); white-space: nowrap; }
 
 .jquiz fieldset { margin: 0; padding: 0; border: 0; }
 .jquiz legend { margin-bottom: 12px; font: 400 1.0625rem/1.5 var(--font-text); color: hsl(var(--ink)); }
-.jquiz legend small { display: block; margin-top: 2px; font: 500 0.75rem/1.4 var(--font-ui); color: hsl(var(--gold-ink)); }
+.jquiz legend small { display: block; margin-top: 2px; font: 500 0.875rem/1.4 var(--font-ui); color: hsl(var(--gold-ink)); }
 .jquiz-option { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 8px; padding: 8px 12px; border: 1px solid hsl(var(--rule)); border-radius: 4px; font: 400 0.9375rem/1.35 var(--font-ui); color: hsl(var(--ink)); cursor: pointer; }
 .jquiz-option:hover { border-color: hsl(var(--gold)); }
 .jquiz-option input { accent-color: hsl(var(--gold-ink)); width: 16px; height: 16px; flex: none; }
@@ -171,7 +171,7 @@
 /* No escuro a gravura fica como prancha clara, ligeiramente atenuada (sem inverter a obra). */
 :root:not(.light) .jfigure img { filter: brightness(.86) sepia(.12); }
 .jfigure-missing { aspect-ratio: 6 / 5; border: 1px dashed hsl(var(--rule)); border-radius: 4px; background: repeating-linear-gradient(45deg, hsl(var(--gold) / .06) 0 12px, transparent 12px 24px); }
-.jfigure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.jfigure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.875rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
 .jfigure figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
 .jfigure figcaption a { color: hsl(var(--gold-ink)); text-decoration: none; }
 
@@ -184,14 +184,14 @@
 .jtab-image { position: relative; line-height: 0; border: 1px solid hsl(var(--rule)); border-radius: 4px; overflow: hidden; background: hsl(var(--paper-2)); }
 .jtab-image img { display: block; width: 100%; height: auto; }
 :root:not(.light) .jtab-image img { filter: brightness(.9); }
-.jtab-pin { position: absolute; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin: -14px 0 0 -14px; padding: 0; border: 1.5px solid #fff8e8; border-radius: 50%; background: #1b2a41; color: #fff8e8; font: 700 0.75rem/1 var(--font-ui); cursor: pointer; box-shadow: 0 1px 4px rgb(0 0 0 / .45); }
+.jtab-pin { position: absolute; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin: -14px 0 0 -14px; padding: 0; border: 1.5px solid #fff8e8; border-radius: 50%; background: #1b2a41; color: #fff8e8; font: 700 0.875rem/1 var(--font-ui); cursor: pointer; box-shadow: 0 1px 4px rgb(0 0 0 / .45); }
 .jtab-pin:hover { background: #7a2e3a; }
 .jtab-pin.is-active { background: #8a2a3a; transform: scale(1.15); }
 .jtab-pin:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 2px; }
-.jtab-figure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
+.jtab-figure figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font: 400 0.875rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
 .jtab-figure figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
 .jtab-plan { margin-top: 24px; }
-.jtab-plan figcaption { font: 400 0.8125rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); margin-top: 8px; }
+.jtab-plan figcaption { font: 400 0.875rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); margin-top: 8px; }
 .jtab-plan figcaption strong { font: italic 400 0.9375rem/1.4 var(--font-text); color: hsl(var(--ink-2)); }
 .jtab-plan svg { display: block; width: 100%; height: auto; margin-top: 8px; }
 .jtab-room { fill: hsl(var(--paper-2)); stroke: hsl(var(--ink-2)); stroke-width: 1.5; }

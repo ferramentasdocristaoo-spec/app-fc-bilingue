@@ -6,7 +6,7 @@
 
 .ed-eyebrow {
   display: block;
-  font: 500 0.75rem/1.4 var(--font-ui);
+  font: 500 0.875rem/1.4 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: hsl(var(--gold-ink));
@@ -86,7 +86,7 @@
 .ed-panel { padding: 16px 0; border-top: 1px solid hsl(var(--rule)); }
 .ed-panel > * + * { margin-top: 8px; }
 .ed-panel-form > * + * { margin-top: 20px; }
-.ed-panel-title { font: 500 0.75rem/1.4 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
+.ed-panel-title { font: 500 0.875rem/1.4 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
 .ed-panel-body { font: 400 1.0625rem/1.65 var(--font-text); color: hsl(var(--ink)); }
 .ed-section-title { margin-top: 12px; font: 600 1.5rem/1.2 var(--font-display); color: hsl(var(--ink)); }
 .ed-result-title { font: 600 clamp(1.75rem, 4vw, 2.25rem)/1.15 var(--font-display); color: hsl(var(--ink)); }
@@ -121,7 +121,7 @@
 }
 .ed-field[aria-invalid="true"] { border-bottom-color: hsl(var(--destructive)); box-shadow: 0 1px 0 0 hsl(var(--destructive)); }
 .ed-select svg { flex: none; }
-.ed-label { display: block; font: 500 .8125rem/1.4 var(--font-ui); color: hsl(var(--ink-2)); }
+.ed-label { display: block; font: 500 0.875rem/1.4 var(--font-ui); color: hsl(var(--ink-2)); }
 .ed-hint { margin-top: 6px; font: 400 .875rem/1.5 var(--font-ui); color: hsl(var(--ink-3)); }
 .ed-error { margin-top: 6px; font: 500 .875rem/1.5 var(--font-ui); color: hsl(var(--destructive)); }
 
@@ -170,7 +170,7 @@
 .ed-result-section > p, .ed-result-text { max-width: 72ch; margin: 0; font: 400 1.0625rem/1.75 var(--font-text); color: hsl(var(--ink)); white-space: pre-wrap; }
 .ed-result-item { padding: 14px 0; border-top: 1px solid hsl(var(--rule-soft)); }
 .ed-result-item:first-of-type { border-top: 0; padding-top: 0; }
-.ed-result-item h4 { margin: 0 0 4px; font: 500 .8125rem/1.4 var(--font-ui); letter-spacing: .04em; color: hsl(var(--gold-ink)); }
+.ed-result-item h4 { margin: 0 0 4px; font: 500 0.875rem/1.4 var(--font-ui); letter-spacing: .04em; color: hsl(var(--gold-ink)); }
 .ed-result-item p { max-width: 72ch; margin: 0; font: 400 1.0625rem/1.65 var(--font-text); color: hsl(var(--ink)); }
 .ed-result-item p + p { margin-top: 6px; }
 .ed-result-item .ed-sub { font: 400 .9375rem/1.55 var(--font-ui); color: hsl(var(--ink-2)); }
@@ -211,14 +211,14 @@
 .bible-listen svg { width: 18px; height: 18px; }
 .bible-text { margin-bottom: 40px; font: 400 1.125rem/1.75 var(--font-text); color: hsl(var(--ink)); }
 .bible-text p { margin: 0 0 10px; padding: 0 4px; margin-inline: -4px; border-radius: 2px; transition: background-color .2s ease; scroll-margin-top: 24px; }
-.bible-text sup { position: relative; top: -.1em; margin-right: 5px; font: 600 .75rem/0 var(--font-ui); color: hsl(var(--gold-ink)); vertical-align: baseline; top: -.45em; }
+.bible-text sup { position: relative; top: -.1em; margin-right: 5px; font: 600 0.875rem/0 var(--font-ui); color: hsl(var(--gold-ink)); vertical-align: baseline; top: -.45em; }
 .bible-text .is-selected { background: hsl(var(--gold) / .14); }
 .bible-text .is-reading { background: hsl(var(--gold) / .26); }
 .bible-nav { display: flex; justify-content: space-between; gap: 16px; padding-top: 16px; border-top: 1px solid hsl(var(--rule)); }
 .bible-nav button { display: inline-flex; align-items: center; gap: 10px; min-height: 52px; text-align: left; font: 600 1.1875rem/1.2 var(--font-display); color: hsl(var(--ink)); }
 .bible-nav button:hover { color: hsl(var(--gold-ink)); }
 .bible-nav .is-next { text-align: right; }
-.bible-nav small { display: block; font: 400 .8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); }
+.bible-nav small { display: block; font: 400 0.875rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); }
 .bible-nav svg { flex: none; width: 18px; height: 18px; color: hsl(var(--gold-ink)); }
 
 /* ---------- Mural ---------- */
@@ -235,9 +235,9 @@
 /* ---------- Livraria ---------- */
 .book-cover { position: relative; aspect-ratio: 2 / 3; width: 100%; padding: 6px 6px 6px 12px; background: hsl(var(--oxblood)); border-radius: 1px 3px 3px 1px; box-shadow: inset 5px 0 0 rgb(0 0 0 / .28), var(--shadow-page); color: hsl(41 60% 82%); transition: box-shadow .2s ease; }
 .book-cover-frame { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: space-between; padding: 14px 10px; text-align: center; border: 1px solid hsl(41 55% 60% / .55); }
-.book-cover-volume { margin: 0; font: 500 .75rem/1.3 var(--font-brand); letter-spacing: .08em; color: hsl(41 60% 72%); }
+.book-cover-volume { margin: 0; font: 500 0.875rem/1.3 var(--font-brand); letter-spacing: .08em; color: hsl(41 60% 72%); }
 .book-cover-title { margin: 0; font: 600 clamp(1rem, 1.6vw + .55rem, 1.3125rem)/1.15 var(--font-display); }
-.book-cover-orn { font-size: .75rem; color: hsl(41 60% 72%); }
+.book-cover-orn { font-size: 0.875rem; color: hsl(41 60% 72%); }
 a:hover .book-cover { box-shadow: inset 5px 0 0 rgb(0 0 0 / .28), 0 18px 36px -18px hsl(216 45% 16% / .55); }
 .library-shelf { display: flex; flex-direction: column; }
 .library-item { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 20px; padding: 28px 0; border-bottom: 1px solid hsl(var(--rule-soft)); }

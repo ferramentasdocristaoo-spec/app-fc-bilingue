@@ -108,7 +108,7 @@ const LoginPage = () => {
           <LanguageSwitcher className="justify-center" variant="horizontal" />
         </div>
 
-        <p className="mt-6 text-xs text-ink-3 text-center max-w-xs leading-relaxed">
+        <p className="mt-6 text-sm text-ink-3 text-center max-w-xs leading-relaxed">
           {t("login.footer")}
         </p>
       </div>

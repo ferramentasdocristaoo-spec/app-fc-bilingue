@@ -362,7 +362,7 @@ const OficinaPage = () => {
               <label className="oficina-field-label" htmlFor="oficina-tema">
                 <span>{t("oficina.themeShort")}</span>
                 {faltaTema && (
-                  <span className="text-red-500 font-normal text-xs">
+                  <span className="text-red-500 font-normal text-sm">
                     {t("oficina.themeRequired")}
                   </span>
                 )}

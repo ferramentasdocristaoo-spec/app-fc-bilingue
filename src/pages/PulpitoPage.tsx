@@ -38,9 +38,9 @@ const PulpitoPage = () => {
               <h3 className="font-semibold text-sm text-foreground">{s.titulo}</h3>
               <span className="ed-chip">{s.tema}</span>
             </div>
-            <p className="text-xs text-muted-foreground">{s.autor} • {s.textoBase}</p>
+            <p className="text-sm text-muted-foreground">{s.autor} • {s.textoBase}</p>
             <p className="ed-panel-body">{s.resumo}</p>
-            <Button variant="outline" size="sm" className="self-end text-xs" onClick={() => clonar(s)}>
+            <Button variant="outline" size="sm" className="self-end min-h-12 text-sm" onClick={() => clonar(s)}>
               {t("pulpito.cloneButton")}
             </Button>
           </div>

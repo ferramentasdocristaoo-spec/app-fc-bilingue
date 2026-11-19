@@ -93,7 +93,7 @@
   .oficina-stages a {
     flex-direction: column;
     gap: 4px;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     min-height: 64px;
     padding: 6px 4px;
   }
@@ -226,7 +226,7 @@
 }
 
 .oficina-from-tag {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: hsl(var(--gold-ink));
   letter-spacing: 0.02em;

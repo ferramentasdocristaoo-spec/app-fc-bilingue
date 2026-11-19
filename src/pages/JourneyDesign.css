@@ -37,7 +37,7 @@
 .journey-toc-head .ed-num { font-size: 1rem; }
 .journey-toc-head h2 { margin: 0; font: 600 clamp(1.625rem, 4vw, 2rem)/1.15 var(--font-display); }
 .journey-toc-head p { margin: 4px 0 0; font: italic 400 1rem/1.5 var(--font-text); color: hsl(var(--ink-2)); }
-.journey-toc-head small { font: 500 0.8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); white-space: nowrap; }
+.journey-toc-head small { font: 500 0.875rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); white-space: nowrap; }
 
 .journey-toc-group { margin-top: 32px; }
 .journey-toc-group > h4 { margin: 0 0 4px; }
@@ -55,7 +55,7 @@
 .journey-toc-copy { display: flex; flex-direction: column; min-width: 0; }
 .journey-toc-copy strong { font: 600 1.3125rem/1.25 var(--font-display); }
 .journey-toc-copy span { margin-top: 2px; font: 400 0.9375rem/1.5 var(--font-text); color: hsl(var(--ink-2)); }
-.journey-toc-status { font: 400 0.8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.journey-toc-status { font: 400 0.875rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .journey-toc-group a.has-progress .journey-toc-status { color: hsl(var(--gold-ink)); font-weight: 600; }
 .journey-toc-group a:hover strong { color: hsl(var(--gold-ink)); }
 .journey-toc-group a:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 2px; }
@@ -121,7 +121,7 @@
 @media (min-width: 900px) { .journey-margin-note { padding: 0 0 0 24px; border-top: 0; border-left: 1px solid hsl(var(--rule)); } }
 .journey-margin-note dt {
   margin-top: 20px;
-  font: 500 0.75rem/1.4 var(--font-ui);
+  font: 500 0.875rem/1.4 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: hsl(var(--gold-ink));
@@ -166,7 +166,7 @@
   color: hsl(var(--ink));
   text-decoration: none;
 }
-.journey-chapters b { flex: none; width: 28px; text-align: right; font: 500 0.8125rem/1.4 var(--font-brand); color: hsl(var(--gold-ink)); }
+.journey-chapters b { flex: none; width: 28px; text-align: right; font: 500 0.875rem/1.4 var(--font-brand); color: hsl(var(--gold-ink)); }
 .journey-chapters a span { flex: 1; min-width: 0; }
 .journey-chapters a i { font-style: normal; color: hsl(var(--gold)); }
 .journey-chapters a.done { color: hsl(var(--ink-3)); }
@@ -184,7 +184,7 @@
 }
 .journey-book-nav a { display: flex; flex-direction: column; color: hsl(var(--ink)); text-decoration: none; }
 .journey-book-nav a.is-next { text-align: right; margin-left: auto; }
-.journey-book-nav small { font: 500 0.75rem/1.4 var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: hsl(var(--ink-3)); }
+.journey-book-nav small { font: 500 0.875rem/1.4 var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: hsl(var(--ink-3)); }
 .journey-book-nav strong { font: 500 clamp(1.5rem, 4vw, 1.875rem)/1.2 var(--font-display); }
 .journey-book-nav a:hover strong { color: hsl(var(--gold-ink)); }
 
@@ -212,7 +212,7 @@
 .chapter-context dd { margin: 0; font: 400 1rem/1.55 var(--font-text); color: hsl(var(--ink)); }
 .chapter-connection { margin: 0 0 8px; font: italic 400 1rem/1.6 var(--font-text); color: hsl(var(--ink-2)); }
 .chapter-reading blockquote { margin: 40px 0 0; padding: 4px 0 4px 20px; border-left: 2px solid hsl(var(--gold)); font: italic 400 1.25rem/1.5 var(--font-text); color: hsl(var(--ink)); }
-.chapter-reading blockquote small { display: block; margin-bottom: 6px; font: 500 .75rem/1.4 var(--font-ui); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
+.chapter-reading blockquote small { display: block; margin-bottom: 6px; font: 500 0.875rem/1.4 var(--font-ui); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
 .chapter-notes { display: flex; flex-direction: column; padding: 20px; background: hsl(var(--paper-2)); border-radius: 2px; }
 @media (min-width: 1024px) { .chapter-notes { position: sticky; top: 24px; } }
 .chapter-notes label { font: 500 .9375rem/1.4 var(--font-ui); color: hsl(var(--ink)); }
@@ -224,7 +224,7 @@
 /* ---------- Fontes e licenças ---------- */
 .journey-sources h1 { margin: 24px 0 12px; font: 600 clamp(2rem, 5vw, 2.75rem)/1.1 var(--font-display); color: hsl(var(--ink)); }
 .journey-sources section { max-width: 72ch; margin-top: 32px; padding-top: 16px; border-top: 1px solid hsl(var(--rule)); font: 400 1.0625rem/1.6 var(--font-text); color: hsl(var(--ink)); }
-.journey-sources h2 { margin: 0 0 8px; font: 500 0.75rem/1.4 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
+.journey-sources h2 { margin: 0 0 8px; font: 500 0.875rem/1.4 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--gold-ink)); }
 .journey-sources a { color: hsl(var(--gold-ink)); text-decoration: underline; text-decoration-color: hsl(var(--gold)); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .journey-sources dd { margin: 0 0 12px; color: hsl(var(--ink-2)); }
 .journey-sources ul { list-style: none; margin: 12px 0 0; padding: 0; }
@@ -237,7 +237,7 @@
 .chapter-step-navigation a { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 12px 0; text-decoration: none; font: 600 1.125rem/1.25 var(--font-display); color: hsl(var(--ink)); }
 .chapter-step-navigation a:hover { color: hsl(var(--gold-ink)); }
 .chapter-step-navigation a:last-child:not(:first-child) { justify-content: flex-end; text-align: right; }
-.chapter-step-navigation small { display: block; font: 400 .8125rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); }
+.chapter-step-navigation small { display: block; font: 400 0.875rem/1.4 var(--font-ui); color: hsl(var(--ink-3)); }
 .chapter-step-navigation svg { flex: none; width: 18px; height: 18px; color: hsl(var(--gold-ink)); }
 
 @media (min-width: 1280px) {

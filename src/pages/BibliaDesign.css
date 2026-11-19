@@ -109,7 +109,7 @@
 }
 
 .estante-continuar-kicker {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: #d2b26f;
   letter-spacing: 0.05em;
@@ -218,7 +218,7 @@
 }
 
 .estante-livro-caps {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   opacity: 0.95;
 }
@@ -434,7 +434,7 @@
   justify-content: center;
   gap: 5px;
   min-height: 58px;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #fff;
   background: transparent;
