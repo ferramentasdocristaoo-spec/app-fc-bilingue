@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
 import { ToolError, ToolForm, ToolPromise, ToolWait } from "@/components/ToolKit";
@@ -15,28 +16,40 @@ interface RaioXResult {
 
 const RaioXPage = () => {
   const { t } = useTranslation();
-  const [referencia, setReferencia] = useState("");
+  // A barra do versículo na Bíblia manda para cá com ?ref=João 3:16: já preenche e analisa.
+  const [searchParams] = useSearchParams();
+  const refInicial = (searchParams.get("ref") ?? "").trim();
+  const [referencia, setReferencia] = useState(refInicial);
   const [refPesquisada, setRefPesquisada] = useState("");
   const [resultado, setResultado] = useState<RaioXResult | null>(null);
   const { callAi, loading, failed } = useAi();
   const books = t("biblia.books", { returnObjects: true }) as string[];
   const exemplos = [`${books[42]} 3:16`, `${books[18]} 23:1`, `${books[44]} 8:28`];
 
-  const buscar = async () => {
-    if (!referencia.trim()) return;
-    setRefPesquisada(referencia.trim());
+  const buscar = async (ref: string = referencia) => {
+    const alvo = ref.trim();
+    if (!alvo) return;
+    setRefPesquisada(alvo);
     setResultado(null);
-    const result = await callAi("raio-x", { referencia: referencia.trim() });
+    const result = await callAi("raio-x", { referencia: alvo });
     if (result && typeof result === "object") setResultado(result as unknown as RaioXResult);
   };
 
+  const autoBuscou = useRef(false);
+  useEffect(() => {
+    if (!refInicial || autoBuscou.current) return;
+    autoBuscou.current = true;
+    void buscar(refInicial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refInicial]);
+
   return (
     <PageShell title={t("sidebar.raioX.title")} lede={t("raioX.description")} width="tool">
-      <ToolForm id="raio-x-ref" label={t("raioX.label")} placeholder={t("raioX.placeholder")} value={referencia} onChange={setReferencia} onSubmit={buscar} submitLabel={t("raioX.submit")} loading={loading} examples={exemplos} />
+      <ToolForm id="raio-x-ref" label={t("raioX.label")} placeholder={t("raioX.placeholder")} value={referencia} onChange={setReferencia} onSubmit={() => buscar()} submitLabel={t("raioX.submit")} loading={loading} examples={exemplos} />
 
       {!resultado && !loading && !failed && <ToolPromise items={[t("raioX.comparative"), t("raioX.keywords"), t("raioX.historical"), t("raioX.literary"), t("raioX.theological")]} />}
       {loading && <ToolWait label={t("raioX.loading", { reference: refPesquisada })} />}
-      {failed && !loading && <ToolError onRetry={buscar} />}
+      {failed && !loading && <ToolError onRetry={() => buscar()} />}
 
       {resultado && !loading && (
         <article className="ed-result">
