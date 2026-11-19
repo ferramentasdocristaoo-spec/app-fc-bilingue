@@ -71,3 +71,53 @@ describe("Bíblia: falha ao carregar não deixa o texto anterior na tela", () =>
     expect(await screen.findByText(i18n.t("biblia.errorMessage"))).toBeInTheDocument();
   });
 });
+
+describe("Bíblia: versículos salvos aparecem na Estante", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await i18n.changeLanguage("pt-BR");
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it("Salvar na barra do versículo mostra o versículo na Estante; tocar abre o capítulo; X remove", async () => {
+    const spy = vi.spyOn(contentApi, "fetchBibleChapter").mockResolvedValue([
+      { pk: 1, verse: 1, text: "O Senhor é o meu pastor; nada me faltará." },
+      { pk: 2, verse: 2, text: "Deitar-me faz em verdes pastos." },
+    ]);
+    render(
+      <MemoryRouter initialEntries={["/biblia?bookId=19&chapter=23"]}>
+        <FontSizeProvider><BibliaPage /></FontSizeProvider>
+      </MemoryRouter>,
+    );
+    fireEvent.click(await screen.findByText(/Deitar-me faz/));
+    fireEvent.click(screen.getByRole("button", { name: i18n.t("biblia.actionSave") }));
+    const salvos = JSON.parse(localStorage.getItem("fc-versiculos-guardados") || "[]");
+    expect(salvos[0]).toMatchObject({ bookId: 19, chapter: 23, verse: 2, version: "ARA" });
+
+    // Volta para a Estante: o salvo aparece com a referência e o texto.
+    fireEvent.click(screen.getByRole("button", { name: /^Salmos 23$/ }));
+    const secao = await screen.findByRole("region", { name: "Versículos salvos" });
+    expect(secao).toHaveTextContent(salvos[0].ref);
+    expect(secao).toHaveTextContent("Deitar-me faz em verdes pastos.");
+
+    // Salvar o mesmo versículo de novo não repete.
+    spy.mockClear();
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(`^${salvos[0].ref}`) }));
+    await waitFor(() => expect(spy).toHaveBeenCalledWith({ version: "ARA", bookId: 19, chapter: 23 }));
+    fireEvent.click(await screen.findByText(/Deitar-me faz/));
+    fireEvent.click(screen.getByRole("button", { name: i18n.t("biblia.actionSave") }));
+    expect(JSON.parse(localStorage.getItem("fc-versiculos-guardados") || "[]")).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole("button", { name: /^Salmos 23$/ }));
+    fireEvent.click(await screen.findByRole("button", { name: `Remover ${salvos[0].ref} dos salvos` }));
+    expect(screen.queryByRole("region", { name: "Versículos salvos" })).not.toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem("fc-versiculos-guardados") || "[]")).toHaveLength(0);
+  });
+
+  it("salvos antigos (só ref e texto) aparecem, sem quebrar", async () => {
+    localStorage.setItem("fc-versiculos-guardados", JSON.stringify([{ ref: "João 3:16", texto: "Porque Deus amou o mundo", data: "2026-11-01T00:00:00Z" }]));
+    render(<MemoryRouter initialEntries={["/biblia"]}><FontSizeProvider><BibliaPage /></FontSizeProvider></MemoryRouter>);
+    const secao = await screen.findByRole("region", { name: "Versículos salvos" });
+    expect(secao).toHaveTextContent("Porque Deus amou o mundo");
+  });
+});

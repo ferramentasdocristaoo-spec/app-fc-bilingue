@@ -48,7 +48,7 @@ describe("Bíblia: Estante (66 Livros) e Leitura Direção A", () => {
 
     // Deve mostrar as abas Estante e Leitura
     expect(screen.getByRole("button", { name: /estante \(66 livros\)/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /leitura/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^\s*leitura$/i })).toBeInTheDocument();
 
     // Deve mostrar grupos da estante
     expect(screen.getByText("Pentateuco")).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe("Bíblia: Estante (66 Livros) e Leitura Direção A", () => {
     );
 
     // Clica no botão de leitura
-    fireEvent.click(screen.getByRole("button", { name: /leitura/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^\s*leitura$/i }));
 
     // Deve carregar o título do capítulo e os versículos
     expect(await screen.findByText(/no princípio criou deus/i)).toBeInTheDocument();

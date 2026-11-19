@@ -407,7 +407,9 @@
     "savedFavorite": "¡Versículo guardado en favoritos!",
     "saved": "¡Guardado!",
     "copied": "Copiado al portapapeles",
-    "copyError": "Error al copiar"
+    "copyError": "Error al copiar",
+    "savedVerses": "Versículos guardados",
+    "removeSaved": "Quitar {{ref}} de guardados"
   },
   "install": {
     "title": "Instalar Herramientas del Cristiano",

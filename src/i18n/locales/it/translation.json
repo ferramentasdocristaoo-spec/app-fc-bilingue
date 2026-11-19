@@ -407,7 +407,9 @@
     "savedFavorite": "Versetto salvato nei preferiti!",
     "saved": "Salvato!",
     "copied": "Copiato negli appunti",
-    "copyError": "Errore durante la copia"
+    "copyError": "Errore durante la copia",
+    "savedVerses": "Versetti salvati",
+    "removeSaved": "Rimuovi {{ref}} dai salvati"
   },
   "install": {
     "title": "Installa Strumenti del Cristiano",

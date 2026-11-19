@@ -407,7 +407,9 @@
     "savedFavorite": "Vers in den Favoriten gespeichert!",
     "saved": "Gespeichert!",
     "copied": "In die Zwischenablage kopiert",
-    "copyError": "Kopieren fehlgeschlagen"
+    "copyError": "Kopieren fehlgeschlagen",
+    "savedVerses": "Gespeicherte Verse",
+    "removeSaved": "{{ref}} aus den gespeicherten Versen entfernen"
   },
   "install": {
     "title": "Werkzeuge des Christen installieren",

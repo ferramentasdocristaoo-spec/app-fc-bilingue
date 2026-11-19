@@ -407,7 +407,9 @@
     "savedFavorite": "Verse saved to favorites!",
     "saved": "Saved!",
     "copied": "Copied to clipboard",
-    "copyError": "Could not copy"
+    "copyError": "Could not copy",
+    "savedVerses": "Saved verses",
+    "removeSaved": "Remove {{ref}} from saved"
   },
   "install": {
     "title": "Install Christian's Tools",

@@ -16,6 +16,7 @@ import {
   Cross,
   BookOpen,
   Library,
+  X,
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToolError } from "@/components/ToolKit";
@@ -25,6 +26,21 @@ import { cleanBibleText } from "@/lib/bible-text";
 import { DEFAULT_VERSION_BY_LANG, VERSIONS_BY_LANG, normalizeBibleLanguage } from "@/data/bible-versions";
 import { FontSizeContext } from "@/hooks/use-font-size";
 import "./BibliaDesign.css";
+
+const SALVOS_KEY = "fc-versiculos-guardados";
+/** Versículo salvo. Os antigos (antes de 19/11/2026) só têm ref/texto/data: aparecem, mas sem abrir o capítulo. */
+type VersiculoSalvo = { ref: string; texto: string; data: string; bookId?: number; chapter?: number; verse?: number; version?: string };
+function lerSalvos(): VersiculoSalvo[] {
+  try {
+    const lista = JSON.parse(localStorage.getItem(SALVOS_KEY) || "[]");
+    if (!Array.isArray(lista)) return [];
+    return lista
+      .filter((s) => s && typeof s.ref === "string")
+      .sort((a, b) => String(b.data).localeCompare(String(a.data)));
+  } catch {
+    return [];
+  }
+}
 
 const SPEECH_LANG: Record<string, string> = {
   "pt-PT": "pt-PT",
@@ -206,6 +222,22 @@ const BibliaPage = () => {
     return { bookId: 1, chapter: 1, nome: `${nomeLivro(1)} 1` };
   }, [bookNames]);
 
+  // Versículos salvos pela barra do versículo (no aparelho). Os mais novos primeiro.
+  const [salvos, setSalvos] = useState<VersiculoSalvo[]>(lerSalvos);
+  const removerSalvo = (data: string) => {
+    const novos = salvos.filter((s) => s.data !== data);
+    try { localStorage.setItem(SALVOS_KEY, JSON.stringify(novos)); } catch { /* vazio */ }
+    setSalvos(novos);
+  };
+  const abrirSalvo = (s: VersiculoSalvo) => {
+    if (!s.bookId || !s.chapter) return;
+    if (s.version && versions.some((item) => item.id === s.version)) setVersion(s.version);
+    setBookId(s.bookId);
+    setChapter(s.chapter);
+    setSelectedVerse(null);
+    setModo("leitor");
+  };
+
   // Carregar versículos
   // Só a resposta do último pedido vale: trocar de versão/capítulo rápido não deixa a resposta velha por cima.
   const chapterRequestId = useRef(0);
@@ -363,13 +395,14 @@ const BibliaPage = () => {
 
   const handleAcaoGuardar = () => {
     try {
-      const guardados = JSON.parse(localStorage.getItem("fc-versiculos-guardados") || "[]");
-      guardados.push({
-        ref: refVersiculo,
-        texto: versoSelecionadoObj?.text || "",
-        data: new Date().toISOString(),
-      });
-      localStorage.setItem("fc-versiculos-guardados", JSON.stringify(guardados));
+      const verse = selectedVerse || 1;
+      const semRepetir = salvos.filter((s) => !(s.bookId === bookId && s.chapter === chapter && s.verse === verse));
+      const novos: VersiculoSalvo[] = [
+        { ref: refVersiculo, texto: versoSelecionadoObj?.text || "", data: new Date().toISOString(), bookId, chapter, verse, version },
+        ...semRepetir,
+      ];
+      localStorage.setItem(SALVOS_KEY, JSON.stringify(novos));
+      setSalvos(novos);
       toast({
         title: t("biblia.savedFavorite"),
         description: refVersiculo,
@@ -449,7 +482,8 @@ const BibliaPage = () => {
 
           {/* Cartão de Continuar Leitura */}
           {!buscaEstante && (
-            <div
+            <button
+              type="button"
               className="estante-continuar-card"
               onClick={() => {
                 setBookId(ultimoLido.bookId);
@@ -462,8 +496,31 @@ const BibliaPage = () => {
                 <span className="estante-continuar-kicker">{t("biblia.continueReading")}</span>
                 <div className="estante-continuar-titulo">{ultimoLido.nome}</div>
               </div>
-              <ChevronRight size={26} />
-            </div>
+              <ChevronRight size={26} aria-hidden="true" />
+            </button>
+          )}
+
+          {/* Versículos salvos pela barra do versículo */}
+          {!buscaEstante && salvos.length > 0 && (
+            <section className="estante-grupo estante-salvos" aria-labelledby="estante-salvos-titulo">
+              <div className="estante-grupo-header">
+                <span id="estante-salvos-titulo">{t("biblia.savedVerses")}</span>
+                <span className="estante-grupo-count">{salvos.length}</span>
+              </div>
+              <ul className="estante-salvos-lista">
+                {salvos.map((s) => (
+                  <li key={s.data} className="estante-salvo">
+                    <button type="button" className="estante-salvo-abrir" onClick={() => abrirSalvo(s)} disabled={!s.bookId}>
+                      <strong>{s.ref}</strong>
+                      {s.texto && <span>{s.texto}</span>}
+                    </button>
+                    <button type="button" className="estante-salvo-remover" onClick={() => removerSalvo(s.data)} aria-label={t("biblia.removeSaved", { ref: s.ref })} title={t("biblia.removeSaved", { ref: s.ref })}>
+                      <X size={20} aria-hidden="true" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
 
           {/* Prateleiras agrupadas */}
@@ -491,7 +548,8 @@ const BibliaPage = () => {
                   {livrosDoGrupo.map((b, idx) => {
                     const cor = CORES_VOLUMES[(b.id + idx) % CORES_VOLUMES.length];
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={b.id}
                         className={`estante-livro ${cor}`}
                         onClick={() => handleSelecionarLivro(b)}
@@ -499,7 +557,7 @@ const BibliaPage = () => {
                       >
                         <span className="estante-livro-nome">{nomeLivro(b.id)}</span>
                         <span className="estante-livro-caps">{t("biblia.chaptersShort", { count: b.chapters })}</span>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>

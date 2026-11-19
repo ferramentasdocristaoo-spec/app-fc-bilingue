@@ -407,7 +407,9 @@
     "savedFavorite": "Verset enregistré dans les favoris !",
     "saved": "Enregistré !",
     "copied": "Copié dans le presse-papiers",
-    "copyError": "Impossible de copier"
+    "copyError": "Impossible de copier",
+    "savedVerses": "Versets enregistrés",
+    "removeSaved": "Retirer {{ref}} des versets enregistrés"
   },
   "install": {
     "title": "Installer Outils du Chrétien",

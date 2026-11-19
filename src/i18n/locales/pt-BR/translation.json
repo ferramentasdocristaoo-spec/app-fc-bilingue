@@ -407,7 +407,9 @@
     "savedFavorite": "Versículo salvo nos favoritos!",
     "saved": "Salvo!",
     "copied": "Copiado para a área de transferência",
-    "copyError": "Erro ao copiar"
+    "copyError": "Erro ao copiar",
+    "savedVerses": "Versículos salvos",
+    "removeSaved": "Remover {{ref}} dos salvos"
   },
   "install": {
     "title": "Instalar Ferramentas do Cristão",
