@@ -1,5 +1,7 @@
 import type { JourneyLanguage } from "./types";
 import type { BibleRef } from "./references";
+import { numbersPeople } from "./numbers-people";
+import { joshuaPeople } from "./joshua-people";
 
 /**
  * Camada interativa de Génesis: paragens no mapa, ponto de paragem (quiz),
@@ -37,7 +39,7 @@ export interface JourneyInteractiveSection {
   tabernacle?: { figure: JourneyFigure; parts: TabernaclePart[] };
 }
 
-export const journeyPeople: Record<string, L> = {
+export const basePeople: Record<string, L> = {
   god: L("Deus", "God", "Dios", "Dieu", "Dio", "Gott"),
   serpent: L("Serpente", "Serpent", "Serpiente", "Serpent", "Serpente", "Schlange"),
   adam: L("Adão", "Adam", "Adán", "Adam", "Adamo", "Adam"),
@@ -98,6 +100,10 @@ export const journeyPeople: Record<string, L> = {
   eleazar: L("Eleazar", "Eleazar", "Eleazar", "Éléazar", "Eleazar", "Eleasar"),
   ithamar: L("Itamar", "Ithamar", "Itamar", "Ithamar", "Itamar", "Itamar"),
 };
+
+// Números e Josué (19/11/2026, pendente de revisão humana): pessoas próprias em arquivos separados.
+export const journeyPeople: Record<string, L> = { ...basePeople, ...numbersPeople, ...joshuaPeople };
+
 
 export const genesisInteractive: Record<string, JourneyInteractiveSection> = {
   creation: {

@@ -1,4 +1,6 @@
 import type { JourneyLanguage } from "./types";
+import { numbersPlaces } from "./numbers-places";
+import { joshuaPlaces } from "./joshua-places";
 
 /**
  * Gazetteer da Jornada.
@@ -23,7 +25,7 @@ export interface JourneyPlace {
 const n = (pt: string, en: string, es: string, fr: string, it: string, de: string): Record<JourneyLanguage, string> =>
   ({ "pt-PT": pt, en, es, fr, it, de });
 
-export const journeyPlaces: Record<string, JourneyPlace> = {
+export const basePlaces: Record<string, JourneyPlace> = {
   // Éden e Node: sem localização conhecida. O ponto é só indicativo (perto do Tigre e Eufrates, Gn 2:14).
   eden: { id: "eden", openBibleId: "af3daeb", lon: 46.2, lat: 31.9, confidence: "unknown", areaKm: 170, names: n("Éden", "Eden", "Edén", "Éden", "Eden", "Eden") },
   "tigris-euphrates": { id: "tigris-euphrates", openBibleId: "a38ebfd", lon: 47.4421, lat: 31.0043, confidence: "probable", names: n("Tigre e Eufrates", "Tigris and Euphrates", "Tigris y Éufrates", "Tigre et Euphrate", "Tigri ed Eufrate", "Tigris und Euphrat") },
@@ -69,3 +71,7 @@ export const journeyMapLabels: { id: string; lon: number; lat: number; kind: "wa
 ];
 
 export const journeyPlace = (id: string) => journeyPlaces[id];
+
+// Números e Josué (19/11/2026, pendente de revisão humana): lugares próprios em arquivos separados.
+// shittim e jordan existem nos dois, com os mesmos dados.
+export const journeyPlaces: Record<string, JourneyPlace> = { ...basePlaces, ...numbersPlaces, ...joshuaPlaces };

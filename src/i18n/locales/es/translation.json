@@ -707,7 +707,13 @@
     "mapKadesh": "Cades",
     "mapNebo": "Nebo",
     "exodusFallbackTitle": "Éxodo",
-    "exodusFallbackDescription": "De la esclavitud a la presencia de Dios en medio del pueblo."
+    "exodusFallbackDescription": "De la esclavitud a la presencia de Dios en medio del pueblo.",
+    "timeNumbers": "Del Sinaí a las llanuras de Moab",
+    "timeNoteNumbers": "Fechas aproximadas según la cronología tradicional, con la salida de Egipto hacia 1446 a.C. (a partir de 1 R 6:1). Muchos estudiosos proponen fechas posteriores.",
+    "nextBookNumbers": "Deuteronomio",
+    "timeJoshua": "La entrada en Canaán",
+    "timeNoteJoshua": "Fechas aproximadas según la cronología tradicional (salida de Egipto hacia 1446 a.C., a partir de 1 R 6:1). Muchos estudiosos sitúan la entrada en Canaán más tarde, en el siglo XIII a.C.",
+    "nextBookJoshua": "Jueces"
   },
   "tools": {
     "youGet": "Lo que recibirás",

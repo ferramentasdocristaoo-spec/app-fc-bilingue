@@ -707,7 +707,13 @@
     "mapKadesh": "Kadesch",
     "mapNebo": "Nebo",
     "exodusFallbackTitle": "Exodus",
-    "exodusFallbackDescription": "Von der Sklaverei zur Gegenwart Gottes mitten im Volk."
+    "exodusFallbackDescription": "Von der Sklaverei zur Gegenwart Gottes mitten im Volk.",
+    "timeNumbers": "Vom Sinai in die Steppen Moabs",
+    "timeNoteNumbers": "Ungefähre Daten nach der traditionellen Chronologie, mit dem Auszug aus Ägypten um 1446 v. Chr. (ausgehend von 1. Könige 6,1). Viele Fachleute schlagen spätere Daten vor.",
+    "nextBookNumbers": "Deuteronomium",
+    "timeJoshua": "Der Einzug in Kanaan",
+    "timeNoteJoshua": "Ungefähre Daten nach der traditionellen Chronologie (Auszug um 1446 v. Chr., ausgehend von 1. Könige 6,1). Viele Fachleute setzen den Einzug in Kanaan später an, im 13. Jahrhundert v. Chr.",
+    "nextBookJoshua": "Richter"
   },
   "tools": {
     "youGet": "Was Sie erhalten",

@@ -707,7 +707,13 @@
     "mapKadesh": "Cades",
     "mapNebo": "Nebo",
     "exodusFallbackTitle": "Êxodo",
-    "exodusFallbackDescription": "Da escravidão à presença de Deus no meio do povo."
+    "exodusFallbackDescription": "Da escravidão à presença de Deus no meio do povo.",
+    "timeNumbers": "Do Sinai às planícies de Moabe",
+    "timeNoteNumbers": "Datas aproximadas pela cronologia tradicional, com a saída do Egito por volta de 1446 a.C. (a partir de 1 Rs 6:1). Muitos estudiosos propõem datas mais tardias.",
+    "nextBookNumbers": "Deuteronómio",
+    "timeJoshua": "A entrada em Canaã",
+    "timeNoteJoshua": "Datas aproximadas pela cronologia tradicional (saída do Egito por volta de 1446 a.C., segundo 1 Rs 6:1). Muitos estudiosos situam a entrada em Canaã mais tarde, no século XIII a.C.",
+    "nextBookJoshua": "Juízes"
   },
   "tools": {
     "youGet": "O que vais receber",

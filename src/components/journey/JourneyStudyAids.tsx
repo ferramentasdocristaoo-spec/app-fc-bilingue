@@ -52,7 +52,7 @@ export function JourneyEra({ book, sectionSlug, language }: { book: JourneyBook;
       </div>}
       <div className={`jera-zone is-dated${activeDated ? " is-active" : ""}`}>
         <small>{t(data.zoneKey)}</small>
-        <ol>{marks.map(mark => <li key={mark.year} className={activeDated ? "is-active" : ""}><i /><span>{t("journey.yearBC", { year: Math.abs(mark.year ?? 0) })}</span><em>{mark.label[language]}</em></li>)}</ol>
+        <ol>{marks.map((mark, i) => <li key={`${mark.year}-${i}`} className={activeDated ? "is-active" : ""}><i /><span>{t("journey.yearBC", { year: Math.abs(mark.year ?? 0) })}</span><em>{mark.label[language]}</em></li>)}</ol>
       </div>
       <div className="jera-next" aria-hidden>→ {t(data.nextKey)}</div>
     </div>

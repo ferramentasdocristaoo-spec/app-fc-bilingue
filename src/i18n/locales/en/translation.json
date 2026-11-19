@@ -707,7 +707,13 @@
     "mapKadesh": "Kadesh",
     "mapNebo": "Nebo",
     "exodusFallbackTitle": "Exodus",
-    "exodusFallbackDescription": "From slavery to God's presence among his people."
+    "exodusFallbackDescription": "From slavery to God's presence among his people.",
+    "timeNumbers": "From Sinai to the plains of Moab",
+    "timeNoteNumbers": "Approximate dates from the traditional chronology, with the departure from Egypt around 1446 BC (based on 1 Kgs 6:1). Many scholars propose later dates.",
+    "nextBookNumbers": "Deuteronomy",
+    "timeJoshua": "Entering Canaan",
+    "timeNoteJoshua": "Approximate dates from the traditional chronology (exodus around 1446 BC, based on 1 Kgs 6:1). Many scholars place the entry into Canaan later, in the 13th century BC.",
+    "nextBookJoshua": "Judges"
   },
   "tools": {
     "youGet": "What you will get",
