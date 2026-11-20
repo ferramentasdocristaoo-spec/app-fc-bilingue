@@ -716,7 +716,10 @@
     "nextBookJoshua": "Juízes",
     "timeLeviticus": "No Sinai",
     "timeNoteLeviticus": "Datas aproximadas pela cronologia tradicional: o tabernáculo foi erguido no segundo ano depois da saída do Egito (Êx 40:17), por volta de 1445 a.C. Todo o livro passa-se ao pé do Sinai. Muitos estudiosos propõem datas mais tardias.",
-    "nextBookLeviticus": "Números"
+    "nextBookLeviticus": "Números",
+    "timeDeuteronomy": "Os discursos nas planícies de Moabe",
+    "timeNoteDeuteronomy": "Datas aproximadas segundo a cronologia tradicional (saída do Egito por volta de 1446 a.C., segundo 1 Rs 6:1). Os discursos de Moisés acontecem no 40.º ano (Dt 1:3). Muitos estudiosos propõem datas mais tardias.",
+    "nextBookDeuteronomy": "Josué"
   },
   "tools": {
     "youGet": "O que vais receber",

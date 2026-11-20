@@ -1,10 +1,19 @@
 import type { JourneyBook, JourneyLanguage, JourneySection } from "./types";
+import { buildDeuteronomyChapters } from "./deuteronomy-content";
 
 const langs: JourneyLanguage[] = ["pt-PT", "en", "es", "fr", "it", "de"];
 const local = <T>(values: T[]) => Object.fromEntries(langs.map((language, index) => [language, values[index]])) as Record<JourneyLanguage, T>;
 const names = local(["Deuteronómio", "Deuteronomy", "Deuteronomio", "Deutéronome", "Deuteronomio", "Deuteronomium"]);
 const descriptions = local(["Moisés prepara uma nova geração para amar, lembrar e obedecer a Deus.", "Moses prepares a new generation to love, remember and obey God.", "Moisés prepara a una nueva generación para amar, recordar y obedecer a Dios.", "Moïse prépare une nouvelle génération à aimer, se souvenir et obéir à Dieu.", "Mosè prepara una nuova generazione ad amare, ricordare e obbedire a Dio.", "Mose bereitet eine neue Generation darauf vor, Gott zu lieben, sich zu erinnern und zu gehorchen."]);
-const prompts = local(["Que verdade precisas recordar e colocar em prática?", "What truth do you need to remember and put into practice?", "¿Qué verdad necesitas recordar y poner en práctica?", "Quelle vérité devez-vous vous rappeler et mettre en pratique ?", "Quale verità devi ricordare e mettere in pratica?", "Welche Wahrheit sollst du dir ins Gedächtnis rufen und umsetzen?"]);
+// Princípios (ESTADO: PENDENTE DE REVISÃO HUMANA): Dt 6:4-5; 8:3; 30:19-20.
+const principles = local([
+  ["Deus pede um amor inteiro: de todo o coração, de toda a alma e de toda a força (Dt 6:4-5).", "O homem não vive só de pão, mas de tudo o que sai da boca do Senhor (Dt 8:3).", "Diante da vida e da morte, Deus chama o seu povo a escolher a vida, amando-o e apegando-se a ele (Dt 30:19-20)."],
+  ["God asks for a whole love: with all the heart, all the soul and all the strength (Deut 6:4–5).", "Man does not live by bread alone, but by every word that comes from the mouth of the Lord (Deut 8:3).", "Before life and death, God calls his people to choose life, loving him and holding fast to him (Deut 30:19–20)."],
+  ["Dios pide un amor completo: de todo corazón, de toda alma y con todas las fuerzas (Dt 6:4-5).", "No solo de pan vive el hombre, sino de todo lo que sale de la boca del Señor (Dt 8:3).", "Ante la vida y la muerte, Dios llama a su pueblo a escoger la vida, amándolo y siguiéndolo a él (Dt 30:19-20)."],
+  ["Dieu demande un amour entier : de tout le cœur, de toute l'âme et de toute la force (Dt 6,4-5).", "L'homme ne vit pas de pain seulement, mais de tout ce qui sort de la bouche du Seigneur (Dt 8,3).", "Devant la vie et la mort, Dieu appelle son peuple à choisir la vie, en l'aimant et en s'attachant à lui (Dt 30,19-20)."],
+  ["Dio chiede un amore totale: con tutto il cuore, con tutta l'anima e con tutte le forze (Dt 6,4-5).", "L'uomo non vive di solo pane, ma di quanto esce dalla bocca del Signore (Dt 8,3).", "Davanti alla vita e alla morte, Dio chiama il suo popolo a scegliere la vita, amandolo e restando unito a lui (Dt 30,19-20)."],
+  ["Gott fordert eine ganze Liebe: von ganzem Herzen, von ganzer Seele und mit aller Kraft (5. Mose 6,4–5).", "Der Mensch lebt nicht vom Brot allein, sondern von allem, was aus dem Mund des Herrn kommt (5. Mose 8,3).", "Vor Leben und Tod ruft Gott sein Volk, das Leben zu wählen, indem es ihn liebt und ihm anhängt (5. Mose 30,19–20)."],
+]);
 const rows = [
   ["remember", 1, 4, ["Recordar o caminho percorrido", "Remembering the journey", "Recordar el camino recorrido", "Se souvenir du chemin parcouru", "Ricordare il cammino percorso", "An den zurückgelegten Weg erinnern"]],
   ["covenant-law", 5, 11, ["Amar a Deus e guardar a aliança", "Love God and keep the covenant", "Amar a Dios y guardar el pacto", "Aimer Dieu et garder l'alliance", "Amare Dio e custodire l'alleanza", "Gott lieben und den Bund halten"]],
@@ -20,7 +29,7 @@ const characters = local([["Moisés", "Josué", "Israel"], ["Moses", "Joshua", "
 
 export const deuteronomy: JourneyBook = {
   slug: "deuteronomy", testament: "old-testament", category: "pentateuch", bibleBookId: 5, chapterCount: 34, position: 5, coverKey: "deuteronomy",
-  overview: Object.fromEntries(langs.map(language => [language, { title: names[language], description: descriptions[language], author: authors[language], date: "c. 1405", nameOrigin: origins[language], context: descriptions[language], themes: themes[language], characters: characters[language], principles: [prompts[language]] }])) as JourneyBook["overview"],
+  overview: Object.fromEntries(langs.map(language => [language, { title: names[language], description: descriptions[language], author: authors[language], date: "c. 1405", nameOrigin: origins[language], context: descriptions[language], themes: themes[language], characters: characters[language], principles: principles[language] }])) as JourneyBook["overview"],
   sections,
-  chapters: Array.from({ length: 34 }, (_, index) => { const number = index + 1; const section = sections.find(item => number >= item.startChapter && number <= item.endChapter)!; return { number, sectionSlug: section.slug, content: Object.fromEntries(langs.map(language => [language, { title: `${section.content[language].title} · ${number}`, description: descriptions[language], reflectionPrompt: prompts[language] }])) as JourneyBook["chapters"][number]["content"] }; }),
+  chapters: buildDeuteronomyChapters(),
 };

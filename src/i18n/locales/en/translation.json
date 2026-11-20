@@ -716,7 +716,10 @@
     "nextBookJoshua": "Judges",
     "timeLeviticus": "At Sinai",
     "timeNoteLeviticus": "Approximate dates from the traditional chronology: the tabernacle was set up in the second year after leaving Egypt (Exod 40:17), around 1445 BC. The whole book takes place at the foot of Sinai. Many scholars propose later dates.",
-    "nextBookLeviticus": "Numbers"
+    "nextBookLeviticus": "Numbers",
+    "timeDeuteronomy": "Speeches on the plains of Moab",
+    "timeNoteDeuteronomy": "Approximate dates from the traditional chronology (exodus around 1446 BC, based on 1 Kgs 6:1). Moses' speeches take place in the 40th year (Deut 1:3). Many scholars propose later dates.",
+    "nextBookDeuteronomy": "Joshua"
   },
   "tools": {
     "youGet": "What you will get",

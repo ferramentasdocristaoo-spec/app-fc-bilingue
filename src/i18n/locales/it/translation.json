@@ -716,7 +716,10 @@
     "nextBookJoshua": "Giudici",
     "timeLeviticus": "Al Sinai",
     "timeNoteLeviticus": "Date approssimative secondo la cronologia tradizionale: il tabernacolo fu eretto nel secondo anno dopo l'uscita dall'Egitto (Es 40,17), verso il 1445 a.C. Tutto il libro si svolge ai piedi del Sinai. Molti studiosi propongono date più tarde.",
-    "nextBookLeviticus": "Numeri"
+    "nextBookLeviticus": "Numeri",
+    "timeDeuteronomy": "Discorsi nelle steppe di Moab",
+    "timeNoteDeuteronomy": "Date approssimative secondo la cronologia tradizionale (uscita dall'Egitto verso il 1446 a.C., in base a 1 Re 6,1). I discorsi di Mosè avvengono nel 40° anno (Dt 1,3). Molti studiosi propongono date più tarde.",
+    "nextBookDeuteronomy": "Giosuè"
   },
   "tools": {
     "youGet": "Cosa riceverai",
