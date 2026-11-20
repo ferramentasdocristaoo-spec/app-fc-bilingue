@@ -157,7 +157,22 @@
     "themeShort": "Tema",
     "durationMinutes": "Durata (minuti)",
     "buildOutline": "Costruire la scaletta",
-    "closeEditor": "Chiudi e iniziane un altro"
+    "closeEditor": "Chiudi e iniziane un altro",
+    "noteLabel": "Nota",
+    "addNote": "＋ Nota",
+    "notePlaceholder": "Scrivi la tua nota…",
+    "removeNote": "Rimuovi nota",
+    "editPart": "Modifica questa parte",
+    "donePart": "Fatto",
+    "partTitle": "Titolo del punto",
+    "partText": "Testo della parte",
+    "partVerses": "Versetti (separati da virgole)",
+    "editInSheet": "Modifica sul foglio",
+    "sheetHint": "Tocca “Modifica questa parte” per cambiare il testo o “＋ Nota” per aggiungere le tue osservazioni. Tutto finisce nel PDF.",
+    "pdfPreparing": "Preparazione del PDF…",
+    "pdfReady": "PDF pronto",
+    "pdfSaved": "Il file è stato scaricato.",
+    "pdfFailed": "Non è stato possibile creare il PDF. Abbiamo aperto la stampa del browser al suo posto."
   },
   "esbocos": {
     "description": "Gestisci tutti i tuoi schemi salvati. Modifica, condividi o elimina secondo le necessità.",
@@ -179,7 +194,16 @@
     "statusDraft": "Bozza",
     "statusFinal": "Concluso",
     "deleteTitle": "Eliminare questo schema?",
-    "deleteHint": "Non potrai recuperarlo."
+    "deleteHint": "Non potrai recuperarlo.",
+    "backupTitle": "Copia di sicurezza",
+    "backupHint": "I tuoi schemi sono salvati su questo dispositivo, non su internet. Fai una copia ogni tanto e conserva il file su Drive, nella posta o sul computer.",
+    "backupButton": "Fai una copia di sicurezza",
+    "restoreButton": "Ripristina copia",
+    "backupDone": "Copia salvata con {{count}} schemi.",
+    "restoreDone": "Copia ripristinata: {{novos}} nuovi, {{atualizados}} aggiornati, {{iguais}} già presenti.",
+    "restoreInvalid": "Questo file non è una copia degli schemi dell'app.",
+    "backupEmpty": "Non ci sono ancora schemi da copiare.",
+    "notesCount": "note: {{count}}"
   },
   "raioX": {
     "description": "Analizza i versetti biblici in profondità con confronto di versioni, etimologia e contesto storico.",

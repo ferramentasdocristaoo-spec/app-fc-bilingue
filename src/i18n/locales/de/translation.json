@@ -157,7 +157,22 @@
     "themeShort": "Thema",
     "durationMinutes": "Dauer (Minuten)",
     "buildOutline": "Gliederung erstellen",
-    "closeEditor": "Schließen und neu beginnen"
+    "closeEditor": "Schließen und neu beginnen",
+    "noteLabel": "Notiz",
+    "addNote": "＋ Notiz",
+    "notePlaceholder": "Schreiben Sie Ihre Notiz…",
+    "removeNote": "Notiz entfernen",
+    "editPart": "Diesen Teil bearbeiten",
+    "donePart": "Fertig",
+    "partTitle": "Titel des Punktes",
+    "partText": "Text dieses Teils",
+    "partVerses": "Bibelstellen (durch Kommas getrennt)",
+    "editInSheet": "Auf dem Blatt bearbeiten",
+    "sheetHint": "Tippen Sie auf „Diesen Teil bearbeiten“, um den Text zu ändern, oder auf „＋ Notiz“, um eigene Anmerkungen zu schreiben. Alles kommt ins PDF.",
+    "pdfPreparing": "PDF wird vorbereitet…",
+    "pdfReady": "PDF fertig",
+    "pdfSaved": "Die Datei wurde heruntergeladen.",
+    "pdfFailed": "Das PDF konnte nicht erstellt werden. Stattdessen wurde das Druckfenster des Browsers geöffnet."
   },
   "esbocos": {
     "description": "Verwalten Sie alle Ihre gespeicherten Gliederungen. Bearbeiten, teilen oder löschen Sie nach Bedarf.",
@@ -179,7 +194,16 @@
     "statusDraft": "Entwurf",
     "statusFinal": "Abgeschlossen",
     "deleteTitle": "Diese Gliederung löschen?",
-    "deleteHint": "Sie kann danach nicht wiederhergestellt werden."
+    "deleteHint": "Sie kann danach nicht wiederhergestellt werden.",
+    "backupTitle": "Sicherungskopie",
+    "backupHint": "Ihre Gliederungen sind auf diesem Gerät gespeichert, nicht im Internet. Erstellen Sie ab und zu eine Kopie und bewahren Sie die Datei in Drive, in Ihrer E-Mail oder auf dem Computer auf.",
+    "backupButton": "Sicherungskopie erstellen",
+    "restoreButton": "Kopie wiederherstellen",
+    "backupDone": "Kopie mit {{count}} Gliederungen gespeichert.",
+    "restoreDone": "Kopie wiederhergestellt: {{novos}} neu, {{atualizados}} aktualisiert, {{iguais}} schon vorhanden.",
+    "restoreInvalid": "Diese Datei ist keine Sicherungskopie der App.",
+    "backupEmpty": "Es gibt noch keine Gliederungen zum Sichern.",
+    "notesCount": "Notizen: {{count}}"
   },
   "raioX": {
     "description": "Analysieren Sie Bibelverse gründlich mit Übersetzungsvergleich, Etymologie und historischem Kontext.",

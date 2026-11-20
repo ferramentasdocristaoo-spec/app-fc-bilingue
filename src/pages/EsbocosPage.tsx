@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PageShell from "@/components/PageShell";
@@ -7,7 +7,30 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { copySermonText, downloadSermonTxt, printSermon } from "@/lib/sermon-export";
-import { continuarNaOficina, readSermoes, type Sermao } from "@/lib/oficina-store";
+import {
+  continuarNaOficina,
+  criarCopiaSeguranca,
+  lerCopiaSeguranca,
+  partesDoTexto,
+  pedirArmazenamentoPersistente,
+  readSermoes,
+  restaurarCopiaSeguranca,
+  type Sermao,
+} from "@/lib/oficina-store";
+import { textoParaPartes } from "@/lib/sermon-parts";
+import { montarDadosPdf } from "@/lib/pdf/dados-pdf";
+import { baixarSermaoPdf, prepararPdf } from "@/lib/pdf/sermon-pdf-browser";
+
+/** Lê o arquivo como texto (FileReader serve também em navegadores sem File.text, como iPhones antigos). */
+function lerArquivoTexto(arquivo: File): Promise<string> {
+  if (typeof arquivo.text === "function") return arquivo.text();
+  return new Promise((ok, falha) => {
+    const leitor = new FileReader();
+    leitor.onload = () => ok(String(leitor.result ?? ""));
+    leitor.onerror = () => falha(leitor.error);
+    leitor.readAsText(arquivo);
+  });
+}
 
 const EsbocosPage = () => {
   const { t, i18n } = useTranslation();
@@ -17,6 +40,22 @@ const EsbocosPage = () => {
   const [selecionado, setSelecionado] = useState<Sermao | null>(null);
   const [excluindo, setExcluindo] = useState(false);
   const navigate = useNavigate();
+  const [gerandoPdf, setGerandoPdf] = useState(false);
+  const arquivoRef = useRef<HTMLInputElement>(null);
+  const labels = {
+    introduction: t("oficina.introduction"),
+    application: t("oficina.application"),
+    conclusion: t("oficina.conclusion"),
+  };
+
+  // Os esboços vivem no aparelho: pede ao navegador para não apagá-los sozinho.
+  useEffect(() => {
+    void pedirArmazenamentoPersistente();
+  }, []);
+
+  useEffect(() => {
+    if (selecionado) prepararPdf(language);
+  }, [selecionado, language]);
 
   const handleContinuar = () => {
     if (!selecionado) return;
@@ -43,15 +82,60 @@ const EsbocosPage = () => {
     else toast({ title: t("common.error"), description: t("oficina.copyFailed"), variant: "destructive" });
   };
 
-  const handleDownloadPdf = () => {
-    if (!selecionado) return;
-    const linhas = selecionado.conteudo.split("\n");
-    const corpo = linhas[0] === selecionado.titulo ? linhas.slice(linhas[1] === selecionado.textoBase ? 2 : 1).join("\n") : selecionado.conteudo;
-    if (printSermon(selecionado.titulo || t("esbocos.defaultTitle"), selecionado.textoBase, corpo, language)) {
-      toast({ title: t("esbocos.pdfButton"), description: t("oficina.exportPrintHint") });
-    } else {
+  const imprimirReserva = (sermao: Sermao) => {
+    const linhas = sermao.conteudo.split("\n");
+    const corpo = linhas[0] === sermao.titulo ? linhas.slice(linhas[1] === sermao.textoBase ? 2 : 1).join("\n") : sermao.conteudo;
+    if (!printSermon(sermao.titulo || t("esbocos.defaultTitle"), sermao.textoBase, corpo, language)) {
       toast({ title: t("common.error"), description: t("oficina.popupBlocked"), variant: "destructive" });
     }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!selecionado || gerandoPdf) return;
+    const s = selecionado;
+    const partes = s.partes?.length ? s.partes : partesDoTexto(s.conteudo, labels, s.titulo, s.textoBase) ?? textoParaPartes(s.conteudo, labels, s.titulo, s.textoBase);
+    setGerandoPdf(true);
+    try {
+      const entrega = await baixarSermaoPdf(montarDadosPdf({ titulo: s.titulo, passagem: s.textoBase, partes, data: s.data, idioma: language, t }));
+      if (entrega === "baixado") toast({ title: t("oficina.pdfReady"), description: t("oficina.pdfSaved") });
+    } catch (erro) {
+      console.error("PDF do esboço:", erro);
+      toast({ title: t("common.error"), description: t("oficina.pdfFailed"), variant: "destructive" });
+      imprimirReserva(s);
+    } finally {
+      setGerandoPdf(false);
+    }
+  };
+
+  const handleCopiaSeguranca = () => {
+    const copia = criarCopiaSeguranca();
+    if (!copia.sermoes.length) {
+      toast({ title: t("esbocos.backupTitle"), description: t("esbocos.backupEmpty") });
+      return;
+    }
+    const blob = new Blob([JSON.stringify(copia, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `esbocos-${copia.exportadoEm.slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    toast({ title: t("esbocos.backupTitle"), description: t("esbocos.backupDone", { count: copia.sermoes.length }) });
+  };
+
+  const handleRestaurar = async (arquivo: File | undefined) => {
+    if (!arquivo) return;
+    const importados = lerCopiaSeguranca(await lerArquivoTexto(arquivo));
+    if (!importados) {
+      toast({ title: t("common.error"), description: t("esbocos.restoreInvalid"), variant: "destructive" });
+      return;
+    }
+    const r = restaurarCopiaSeguranca(importados);
+    setSermoes(r.lista);
+    void pedirArmazenamentoPersistente();
+    toast({ title: t("esbocos.backupTitle"), description: t("esbocos.restoreDone", { novos: r.novos, atualizados: r.atualizados, iguais: r.iguais }) });
   };
 
   const handleExcluir = () => {
@@ -93,6 +177,26 @@ const EsbocosPage = () => {
         </>
       )}
 
+      <section className="ed-backup" aria-labelledby="backup-titulo">
+        <h2 id="backup-titulo">{t("esbocos.backupTitle")}</h2>
+        <p>{t("esbocos.backupHint")}</p>
+        <div className="ed-backup-acoes">
+          <button type="button" className="ed-btn ed-btn-primary" onClick={handleCopiaSeguranca}>{t("esbocos.backupButton")}</button>
+          <button type="button" className="ed-btn ed-btn-ghost" onClick={() => arquivoRef.current?.click()}>{t("esbocos.restoreButton")}</button>
+          <input
+            ref={arquivoRef}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            data-testid="restaurar-arquivo"
+            onChange={(e) => {
+              void handleRestaurar(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+        </div>
+      </section>
+
       <Dialog open={!!selecionado} onOpenChange={(open) => !open && setSelecionado(null)}>
         <DialogContent className="max-h-[90dvh] max-w-2xl overflow-y-auto rounded-sm">
           <DialogHeader className="text-left">
@@ -104,7 +208,7 @@ const EsbocosPage = () => {
               <button type="button" className="ed-btn ed-btn-primary mt-4" onClick={handleContinuar}>{t("esbocos.editButton")}</button>
               <div className="studio-export">
                 <button type="button" onClick={handleCopiar}>{t("esbocos.copyButton")}</button>
-                <button type="button" onClick={handleDownloadPdf}>{t("esbocos.pdfButton")}</button>
+                <button type="button" onClick={handleDownloadPdf} disabled={gerandoPdf} aria-busy={gerandoPdf}>{gerandoPdf ? t("oficina.pdfPreparing") : t("esbocos.pdfButton")}</button>
                 <button type="button" onClick={() => downloadSermonTxt(selecionado.titulo, selecionado.conteudo)}>{t("esbocos.txtButton")}</button>
               </div>
               <div className="sermon-text">{selecionado.conteudo}</div>

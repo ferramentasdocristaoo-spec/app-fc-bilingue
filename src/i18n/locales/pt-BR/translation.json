@@ -157,7 +157,22 @@
     "themeShort": "Tema",
     "durationMinutes": "Duração (minutos)",
     "buildOutline": "Montar o esboço",
-    "closeEditor": "Fechar e começar outro"
+    "closeEditor": "Fechar e começar outro",
+    "noteLabel": "Anotação",
+    "addNote": "＋ Anotação",
+    "notePlaceholder": "Escreva sua anotação…",
+    "removeNote": "Remover anotação",
+    "editPart": "Editar esta parte",
+    "donePart": "Concluir",
+    "partTitle": "Título do tópico",
+    "partText": "Texto da parte",
+    "partVerses": "Versículos (separados por vírgula)",
+    "editInSheet": "Editar na folha",
+    "sheetHint": "Toque em “Editar esta parte” para mudar o texto ou em “＋ Anotação” para escrever suas observações. Tudo vai para o PDF.",
+    "pdfPreparing": "Preparando o PDF…",
+    "pdfReady": "PDF pronto",
+    "pdfSaved": "O arquivo foi baixado.",
+    "pdfFailed": "Não foi possível montar o PDF. Abrimos a impressão do navegador no lugar."
   },
   "esbocos": {
     "description": "Gerencie todos os seus esboços salvos. Edite, compartilhe ou exclua conforme precisar.",
@@ -179,7 +194,16 @@
     "statusDraft": "Rascunho",
     "statusFinal": "Finalizado",
     "deleteTitle": "Excluir este esboço?",
-    "deleteHint": "Não será possível recuperá-lo depois."
+    "deleteHint": "Não será possível recuperá-lo depois.",
+    "backupTitle": "Cópia de segurança",
+    "backupHint": "Seus esboços ficam salvos neste aparelho, não na internet. Faça uma cópia de vez em quando e guarde o arquivo no Drive, no e-mail ou no computador.",
+    "backupButton": "Fazer cópia de segurança",
+    "restoreButton": "Restaurar cópia",
+    "backupDone": "Cópia salva com {{count}} esboços.",
+    "restoreDone": "Cópia restaurada: {{novos}} novos, {{atualizados}} atualizados, {{iguais}} já estavam aqui.",
+    "restoreInvalid": "Este arquivo não é uma cópia de esboços do app.",
+    "backupEmpty": "Ainda não há esboços para copiar.",
+    "notesCount": "anotações: {{count}}"
   },
   "raioX": {
     "description": "Analise versículos bíblicos em profundidade com comparação de versões, etimologia e contexto histórico.",

@@ -157,7 +157,22 @@
     "themeShort": "Thème",
     "durationMinutes": "Durée (minutes)",
     "buildOutline": "Composer le plan",
-    "closeEditor": "Fermer et en commencer un autre"
+    "closeEditor": "Fermer et en commencer un autre",
+    "noteLabel": "Note",
+    "addNote": "＋ Note",
+    "notePlaceholder": "Écrivez votre note…",
+    "removeNote": "Supprimer la note",
+    "editPart": "Modifier cette partie",
+    "donePart": "Terminé",
+    "partTitle": "Titre du point",
+    "partText": "Texte de la partie",
+    "partVerses": "Versets (séparés par des virgules)",
+    "editInSheet": "Modifier sur la page",
+    "sheetHint": "Touchez « Modifier cette partie » pour changer le texte ou « ＋ Note » pour ajouter vos remarques. Tout va dans le PDF.",
+    "pdfPreparing": "Préparation du PDF…",
+    "pdfReady": "PDF prêt",
+    "pdfSaved": "Le fichier a été téléchargé.",
+    "pdfFailed": "Le PDF n'a pas pu être créé. Nous avons ouvert l'impression du navigateur à la place."
   },
   "esbocos": {
     "description": "Gérez tous vos plans sauvegardés. Modifiez, partagez ou supprimez selon les besoins.",
@@ -179,7 +194,16 @@
     "statusDraft": "Brouillon",
     "statusFinal": "Finalisé",
     "deleteTitle": "Supprimer ce plan ?",
-    "deleteHint": "Vous ne pourrez pas le récupérer."
+    "deleteHint": "Vous ne pourrez pas le récupérer.",
+    "backupTitle": "Sauvegarde",
+    "backupHint": "Vos plans sont enregistrés sur cet appareil, pas en ligne. Faites une sauvegarde de temps en temps et gardez le fichier dans Drive, dans vos e-mails ou sur l'ordinateur.",
+    "backupButton": "Faire une sauvegarde",
+    "restoreButton": "Restaurer une sauvegarde",
+    "backupDone": "Sauvegarde enregistrée avec {{count}} plans.",
+    "restoreDone": "Sauvegarde restaurée : {{novos}} nouveaux, {{atualizados}} mis à jour, {{iguais}} déjà présents.",
+    "restoreInvalid": "Ce fichier n'est pas une sauvegarde de plans de l'application.",
+    "backupEmpty": "Il n'y a pas encore de plans à sauvegarder.",
+    "notesCount": "notes : {{count}}"
   },
   "raioX": {
     "description": "Analysez les versets bibliques en profondeur avec comparaison de versions, étymologie et contexte historique.",

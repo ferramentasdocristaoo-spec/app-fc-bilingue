@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import { PROGRESS_KEY, esbocoParaTexto, guardarTrabalhoAberto, readProgress, salvarSermao, type EsbocoResult, type OficinaProgress } from "@/lib/oficina-store";
+import { PROGRESS_KEY, guardarTrabalhoAberto, partesDoTexto, pedirArmazenamentoPersistente, readProgress, salvarSermao, type EsbocoResult, type OficinaProgress } from "@/lib/oficina-store";
+import { partesParaTexto, resultadoParaPartes, textoParaPartes, type Parte } from "@/lib/sermon-parts";
+import { montarDadosPdf } from "@/lib/pdf/dados-pdf";
+import { baixarSermaoPdf, prepararPdf } from "@/lib/pdf/sermon-pdf-browser";
+import FolhaPartes from "@/components/oficina/FolhaPartes";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, Check, ArrowRight } from "lucide-react";
@@ -20,8 +24,6 @@ function sliderToMinutes(val: number): number {
   return tempoMarks[Math.min(val, tempoMarks.length - 1)];
 }
 
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-
 const OficinaPage = () => {
   const { t, i18n } = useTranslation();
   const [saved] = useState(readProgress);
@@ -35,6 +37,11 @@ const OficinaPage = () => {
   const [conteudoEditavel, setConteudoEditavel] = useState(saved.conteudoEditavel ?? "");
   // Esboço de Meus Esboços sendo continuado aqui: salvar substitui o mesmo item.
   const [origemData, setOrigemData] = useState<string | undefined>(saved.origemData);
+  // Esboço em partes (folha editável). Trabalho salvo por versões antigas só tem `resultado`: deriva dele.
+  const [partes, setPartes] = useState<Parte[] | null>(
+    () => saved.partes ?? (saved.resultado ? resultadoParaPartes(saved.resultado) : null),
+  );
+  const [gerandoPdf, setGerandoPdf] = useState(false);
   const [faltaTema, setFaltaTema] = useState(false);
   const temaRef = useRef<HTMLInputElement>(null);
   const { callAi, loading, failed } = useAi();
@@ -75,12 +82,13 @@ const OficinaPage = () => {
           conteudoEditavel,
           modoEdicao,
           origemData,
+          partes,
         } satisfies OficinaProgress)
       );
     } catch {
       /* armazenamento indisponível */
     }
-  }, [titulo, textoBase, tema, tipo, tempoIdx, resultado, conteudoEditavel, modoEdicao, origemData]);
+  }, [titulo, textoBase, tema, tipo, tempoIdx, resultado, conteudoEditavel, modoEdicao, origemData, partes]);
 
   const temas = [
     t("garimpo.suggestionAnxiety"),
@@ -95,7 +103,13 @@ const OficinaPage = () => {
 
   const tipos = t("workspace.types", { returnObjects: true }) as string[];
   const minutos = sliderToMinutes(tempoIdx[0]);
-  const emEstudio = (resultado || modoEdicao) && !loading;
+  const emEstudio = (partes || modoEdicao) && !loading;
+  const idioma = i18n.resolvedLanguage || i18n.language;
+
+  // Fontes e gerador do PDF carregados antes do toque (no iPhone o compartilhar exige resposta rápida).
+  useEffect(() => {
+    if (emEstudio) prepararPdf(idioma);
+  }, [emEstudio, idioma]);
 
   const handleGenerateAi = async () => {
     if (!titulo.trim()) {
@@ -105,6 +119,7 @@ const OficinaPage = () => {
     }
     setFaltaTema(false);
     setResultado(null);
+    setPartes(null);
     setModoEdicao(false);
     const result = await callAi("gerar-esboco", {
       titulo,
@@ -115,21 +130,25 @@ const OficinaPage = () => {
     });
     if (result && typeof result === "object") {
       setResultado(result as unknown as EsbocoResult);
+      setPartes(resultadoParaPartes(result as unknown as EsbocoResult));
       document.querySelector("main")?.scrollTo(0, 0);
       window.scrollTo(0, 0);
     }
   };
 
-  const converterParaTexto = (r: EsbocoResult) =>
-    esbocoParaTexto(r, {
-      introduction: t("oficina.introduction"),
-      application: t("oficina.application"),
-      conclusion: t("oficina.conclusion"),
-    });
+  const labels = {
+    introduction: t("oficina.introduction"),
+    application: t("oficina.application"),
+    conclusion: t("oficina.conclusion"),
+  };
 
-  const textoAtual = () =>
-    modoEdicao ? conteudoEditavel : resultado ? converterParaTexto(resultado) : "";
   const tituloAtual = () => resultado?.titulo || titulo;
+  const passagemAtual = () => resultado?.texto_base || textoBase;
+  const textoAtual = () =>
+    modoEdicao ? conteudoEditavel : partes ? partesParaTexto(tituloAtual(), passagemAtual(), partes, labels) : "";
+  /** Partes que valem agora: as da folha, ou as lidas do texto corrido no modo "Editar texto". */
+  const partesAtuais = (): Parte[] =>
+    modoEdicao ? textoParaPartes(conteudoEditavel, labels, tituloAtual(), passagemAtual()) : partes ?? [];
 
   const handleCopiar = async () => {
     if (await copySermonText(textoAtual())) {
@@ -143,27 +162,32 @@ const OficinaPage = () => {
     }
   };
 
-  const handleDownloadPdf = () => {
+  /** Imprimir pelo navegador: só se o PDF próprio falhar (ex.: fontes sem rede). */
+  const imprimirReserva = () => {
     const corpo = textoAtual().split("\n");
     const semCabecalho =
       corpo[0] === tituloAtual()
-        ? corpo.slice(corpo[1] === (resultado?.texto_base ?? "") ? 2 : 1).join("\n")
+        ? corpo.slice(corpo[1] === passagemAtual() ? 2 : 1).join("\n")
         : corpo.join("\n");
-    if (
-      printSermon(
-        tituloAtual(),
-        resultado?.texto_base ?? textoBase,
-        semCabecalho,
-        i18n.resolvedLanguage || i18n.language
-      )
-    ) {
-      toast({ title: t("oficina.pdfButton"), description: t("oficina.exportPrintHint") });
-    } else {
-      toast({
-        title: t("common.error"),
-        description: t("oficina.popupBlocked"),
-        variant: "destructive",
-      });
+    if (!printSermon(tituloAtual(), passagemAtual(), semCabecalho, idioma)) {
+      toast({ title: t("common.error"), description: t("oficina.popupBlocked"), variant: "destructive" });
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (gerandoPdf) return;
+    setGerandoPdf(true);
+    try {
+      const entrega = await baixarSermaoPdf(
+        montarDadosPdf({ titulo: tituloAtual(), passagem: passagemAtual(), partes: partesAtuais(), data: new Date(), idioma, t }),
+      );
+      if (entrega === "baixado") toast({ title: t("oficina.pdfReady"), description: t("oficina.pdfSaved") });
+    } catch (erro) {
+      console.error("PDF do sermão:", erro);
+      toast({ title: t("common.error"), description: t("oficina.pdfFailed"), variant: "destructive" });
+      imprimirReserva();
+    } finally {
+      setGerandoPdf(false);
     }
   };
 
@@ -171,10 +195,16 @@ const OficinaPage = () => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   const handleEditar = () => {
-    if (resultado) {
-      setConteudoEditavel(converterParaTexto(resultado));
+    if (partes) {
+      setConteudoEditavel(partesParaTexto(tituloAtual(), passagemAtual(), partes, labels));
       setModoEdicao(true);
     }
+  };
+
+  /** Do texto corrido de volta para a folha: o texto editado é lido em partes (nada se perde). */
+  const handleVoltarFolha = () => {
+    setPartes(textoParaPartes(conteudoEditavel, labels, tituloAtual(), passagemAtual()));
+    setModoEdicao(false);
   };
 
   const limparOficina = () => {
@@ -183,17 +213,14 @@ const OficinaPage = () => {
     setTema("");
     setTipo("");
     setResultado(null);
+    setPartes(null);
     setModoEdicao(false);
     setConteudoEditavel("");
     setOrigemData(undefined);
   };
 
   const handleFechar = () => {
-    guardarTrabalhoAberto({
-      introduction: t("oficina.introduction"),
-      application: t("oficina.application"),
-      conclusion: t("oficina.conclusion"),
-    });
+    guardarTrabalhoAberto(labels);
     limparOficina();
   };
 
@@ -201,22 +228,17 @@ const OficinaPage = () => {
     salvarSermao(
       {
         titulo: tituloAtual(),
-        textoBase: resultado?.texto_base || textoBase,
+        textoBase: passagemAtual(),
         tema,
         tipo,
         conteudo: textoAtual(),
         status,
+        partes: modoEdicao ? partesDoTexto(conteudoEditavel, labels, tituloAtual(), passagemAtual()) : partes ?? undefined,
       },
       origemData,
     );
-    setOrigemData(undefined);
-    setTitulo("");
-    setTextoBase("");
-    setTema("");
-    setTipo("");
-    setResultado(null);
-    setModoEdicao(false);
-    setConteudoEditavel("");
+    void pedirArmazenamentoPersistente();
+    limparOficina();
     toast({
       title: status === "rascunho" ? t("oficina.draftSaved") : t("oficina.sermonFinalized"),
     });
@@ -227,8 +249,8 @@ const OficinaPage = () => {
       <button type="button" onClick={handleCopiar}>
         {t("oficina.copyButton")}
       </button>
-      <button type="button" onClick={handleDownloadPdf}>
-        {t("oficina.pdfButton")}
+      <button type="button" onClick={handleDownloadPdf} disabled={gerandoPdf} aria-busy={gerandoPdf}>
+        {gerandoPdf ? t("oficina.pdfPreparing") : t("oficina.pdfButton")}
       </button>
       <button
         type="button"
@@ -332,7 +354,7 @@ const OficinaPage = () => {
         </ol>
       </nav>
 
-      {!resultado && !modoEdicao && !loading && (
+      {!partes && !modoEdicao && !loading && (
         <div className="oficina-grid">
           {/* Coluna do Formulário */}
           <form
@@ -469,79 +491,56 @@ const OficinaPage = () => {
 
       {loading && <ToolWait label={t("oficina.generating")} />}
 
-      {resultado && !loading && !modoEdicao && (
+      {partes && !loading && !modoEdicao && (
         <div className="studio-shell">
           <nav className="studio-outline" aria-label={t("oficina.contents")}>
             <span className="ed-eyebrow">{t("oficina.contents")}</span>
             <ol>
-              <li>
-                <button type="button" onClick={() => irPara("sec-intro")}>
-                  {t("oficina.introduction")}
-                </button>
-              </li>
-              {resultado.pontos.map((p, i) => (
-                <li key={p.titulo}>
-                  <button type="button" onClick={() => irPara(`sec-ponto-${i}`)}>
-                    {p.titulo}
-                  </button>
-                </li>
-              ))}
-              <li>
-                <button type="button" onClick={() => irPara("sec-aplicacao")}>
-                  {t("oficina.application")}
-                </button>
-              </li>
-              <li>
-                <button type="button" onClick={() => irPara("sec-conclusao")}>
-                  {t("oficina.conclusion")}
-                </button>
-              </li>
+              {(() => {
+                let n = -1;
+                return partes.map((p) => {
+                  const ehPonto = p.tipo === "ponto";
+                  if (ehPonto) n += 1;
+                  const alvo = ehPonto ? `sec-ponto-${n}` : p.tipo === "introducao" ? "sec-intro" : p.tipo === "aplicacao" ? "sec-aplicacao" : p.tipo === "conclusao" ? "sec-conclusao" : `sec-${p.id}`;
+                  const nome = p.tipo === "introducao" ? labels.introduction : p.tipo === "aplicacao" ? labels.application : p.tipo === "conclusao" ? labels.conclusion : p.titulo;
+                  if (!nome.trim()) return null;
+                  return (
+                    <li key={p.id}>
+                      <button type="button" onClick={() => irPara(alvo)}>
+                        {nome}
+                      </button>
+                    </li>
+                  );
+                });
+              })()}
             </ol>
             {exportar}
-            <button
-              type="button"
-              className="ed-link"
-              onClick={() => setResultado(null)}
-            >
-              {t("oficina.backToForm")}
-            </button>
+            {resultado && (
+              <button
+                type="button"
+                className="ed-link"
+                onClick={() => {
+                  setResultado(null);
+                  setPartes(null);
+                }}
+              >
+                {t("oficina.backToForm")}
+              </button>
+            )}
+            {!resultado && (
+              <button type="button" className="ed-link" onClick={handleFechar}>
+                {t("oficina.closeEditor")}
+              </button>
+            )}
           </nav>
 
           <article className="studio-document">
             <header>
-              <h2 className="ed-result-title">{resultado.titulo}</h2>
-              {resultado.texto_base && <p>{resultado.texto_base}</p>}
+              <h2 className="ed-result-title">{tituloAtual()}</h2>
+              {passagemAtual() && <p>{passagemAtual()}</p>}
             </header>
 
-            <section id="sec-intro">
-              <h3 className="studio-eyebrow">{t("oficina.introduction")}</h3>
-              <p className="studio-hook">{resultado.introducao.gancho}</p>
-              <p>{resultado.introducao.contextualizacao}</p>
-            </section>
-
-            {resultado.pontos.map((p, i) => (
-              <section key={i} id={`sec-ponto-${i}`}>
-                <h3 className="studio-point">
-                  <span className="ed-num" aria-hidden>
-                    {ROMAN[i] ?? i + 1}
-                  </span>
-                  {p.titulo}
-                </h3>
-                <p>{p.conteudo}</p>
-                {p.versiculos.length > 0 && (
-                  <p className="studio-refs">{p.versiculos.join(" · ")}</p>
-                )}
-              </section>
-            ))}
-
-            <section id="sec-aplicacao">
-              <h3 className="studio-eyebrow">{t("oficina.application")}</h3>
-              <p>{resultado.aplicacao_pratica}</p>
-            </section>
-            <section id="sec-conclusao">
-              <h3 className="studio-eyebrow">{t("oficina.conclusion")}</h3>
-              <p>{resultado.conclusao}</p>
-            </section>
+            <FolhaPartes partes={partes} labels={labels} onChange={setPartes} />
 
             <footer className="studio-footer">
               <button type="button" className="ed-link" onClick={handleEditar}>
@@ -556,19 +555,13 @@ const OficinaPage = () => {
       {modoEdicao && !loading && (
         <div className="studio-editor">
           <div className="studio-editor-bar">
-            {/* Esboço aberto de Meus Esboços só tem o texto: no lugar de "voltar à folha", fechar (guarda a edição se mudou). */}
+            {/* Volta para a folha lendo o texto em partes; esboço aberto de Meus Esboços também pode ser fechado. */}
+            <button type="button" className="ed-link" onClick={handleVoltarFolha}>
+              ← {t("oficina.editInSheet")}
+            </button>
             {!resultado && (
               <button type="button" className="ed-link" onClick={handleFechar}>
-                ← {t("oficina.closeEditor")}
-              </button>
-            )}
-            {resultado && (
-              <button
-                type="button"
-                className="ed-link"
-                onClick={() => setModoEdicao(false)}
-              >
-                ← {t("oficina.backToSheet")}
+                {t("oficina.closeEditor")}
               </button>
             )}
             {exportar}

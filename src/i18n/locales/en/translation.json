@@ -157,7 +157,22 @@
     "themeShort": "Theme",
     "durationMinutes": "Duration (minutes)",
     "buildOutline": "Build the outline",
-    "closeEditor": "Close and start another"
+    "closeEditor": "Close and start another",
+    "noteLabel": "Note",
+    "addNote": "＋ Note",
+    "notePlaceholder": "Write your note…",
+    "removeNote": "Remove note",
+    "editPart": "Edit this part",
+    "donePart": "Done",
+    "partTitle": "Point title",
+    "partText": "Text of this part",
+    "partVerses": "Verses (separated by commas)",
+    "editInSheet": "Edit on the page",
+    "sheetHint": "Tap “Edit this part” to change the text or “＋ Note” to add your own remarks. Everything goes into the PDF.",
+    "pdfPreparing": "Preparing the PDF…",
+    "pdfReady": "PDF ready",
+    "pdfSaved": "The file has been downloaded.",
+    "pdfFailed": "The PDF could not be created. We opened the browser's print window instead."
   },
   "esbocos": {
     "description": "Manage all your saved outlines. Edit, share, or delete as needed.",
@@ -179,7 +194,16 @@
     "statusDraft": "Draft",
     "statusFinal": "Finished",
     "deleteTitle": "Delete this outline?",
-    "deleteHint": "You will not be able to recover it."
+    "deleteHint": "You will not be able to recover it.",
+    "backupTitle": "Backup",
+    "backupHint": "Your outlines are saved on this device, not online. Make a backup now and then and keep the file in Drive, in your e-mail or on your computer.",
+    "backupButton": "Make a backup",
+    "restoreButton": "Restore a backup",
+    "backupDone": "Backup saved with {{count}} outlines.",
+    "restoreDone": "Backup restored: {{novos}} new, {{atualizados}} updated, {{iguais}} already here.",
+    "restoreInvalid": "This file is not an outline backup from the app.",
+    "backupEmpty": "There are no outlines to back up yet.",
+    "notesCount": "notes: {{count}}"
   },
   "raioX": {
     "description": "Analyze Bible verses in depth with version comparison, etymology, and historical context.",
