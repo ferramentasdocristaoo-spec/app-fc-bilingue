@@ -42,9 +42,11 @@ export function JourneyMovement({ book, section, language, testament, onProgress
   const place = stop?.placeId ? journeyPlaces[stop.placeId] : undefined;
   const stopTitle = stop ? stop.title?.[language] ?? place?.names[language] ?? "" : "";
 
-  // No Êxodo os dados gerais repetem os personagens do livro e um princípio em rodízio: usa quem aparece nas paragens.
+  // Os dados gerais repetem os personagens do livro inteiro: nos livros interativos (fora Gênesis, que tem
+  // personagens por movimento) usa quem aparece nas paradas deste movimento.
   const isExodus = book.slug === "exodus";
-  const headerPeople = isExodus
+  const peopleFromStops = stops.length > 0 && book.slug !== "genesis";
+  const headerPeople = peopleFromStops
     ? [...new Set(stops.flatMap(item => item.people))].filter(id => id !== "god").map(id => journeyPeople[id]?.[language] ?? id)
     : details.characters;
 
