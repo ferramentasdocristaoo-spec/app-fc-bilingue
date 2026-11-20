@@ -1,5 +1,31 @@
 # Pendente para o Jarvis — App FC (wt-final, branch `app-novo`)
 
+## 2026-11-20 · Jornada: Levítico, Deuteronômio, Juízes e Rute interativos
+Feito por **Noé** (Tecnologia), com 4 ajudantes (um por livro) e revisão do code-reviewer. **Sem push, sem deploy, sem SQL.** 7 commits locais no `app-novo` (2a0718b..85a6b9b), em cima de 0d08bb4 (produção).
+
+**Pronto (mesmo padrão de Gênesis/Êxodo/Números/Josué):** mapa com paradas, quiz por movimento, família, linha do tempo, capítulos com título e descrição próprios, 3 princípios com referência, nos 6 idiomas do conteúdo, tudo `pendente-revisao-humana`.
+- `2a0718b` **Levítico**: 26 paradas, todas no Sinai ou só de texto (o livro não sai do Sinai), família de Arão (Lv 10), gravura *The Scapegoat* (Holman Hunt, 1854–56, PD).
+- `0d1025f` **Deuteronômio**: 28 paradas (Moabe; lembranças de Horebe, Cades, Hesbom, Edrei; Gerizim/Ebal; Nebo), 3 lugares novos, gravura Schnorr 063 (Moisés impõe as mãos sobre Josué).
+- `a2e421a` **Juízes**: 30 paradas (Bezeque a Siló), 19 lugares e 22 pessoas novos, gravuras Schnorr 076 (os 300 de Gideão), 078 (filha de Jefté), 082 (Sansão no templo).
+- `547b814` **Rute**: 13 paradas (Moabe, Belém, campo, eira, porta), genealogia Rt 4:18-22 (Perez a Davi), gravuras Schnorr 084 e 085.
+- `ac84da4` Cabeçalho do movimento: personagens vêm das paradas do próprio movimento (antes Juízes · Sansão listava Débora, Gideão, Jefté). Vale para todos os interativos menos Gênesis.
+- `85a6b9b` 10 achados da revisão (referências, Otniel, Dt 27, Jabim de Jz 4 ≠ Js 11, data do fim dos Juízes etc.).
+- Gravuras: licença conferida na API do Commons ("Public domain"), nenhuma representa Deus (ficaram de fora a Schnorr 064, Deus abraçando Moisés, e a 075, Anjo do Senhor com Gideão). Aparecem sozinhas na página **Fontes e licenças** (`journeyPublicDomainFigures`).
+- Lugares: coordenadas do OpenBible.info (CC BY 4.0), primeira identificação, com `openBibleId` e grau de certeza.
+- Teste do pt-BR corrigido: o `\b` do JS não entende acentos ("Moisés" casava com "és").
+
+**Qualidade:** `npm test` **270/270** (eram 238), `npm run build` ok, `tsc` só com os 10 erros antigos. Chrome headless (390 px, pt-BR): os 4 livros abrem sem erro de página, gravuras carregam, Fontes lista as 7 novas.
+
+**Atenção (pt-BR):** a Jornada não tem chave `pt-BR` própria; o pt-BR lê o `pt-PT`. Nos 4 livros novos o texto da chave `pt-PT` foi escrito na **norma brasileira** (e o título virou "Deuteronômio"), então quem usa pt-PT lê português do Brasil nesses livros. Se o dono quiser os dois separados, é preciso criar `pt-BR` em `JourneyLanguage` (refatoração maior).
+
+**Para a revisão humana:** textos e quizzes dos 4 livros; citações são paráfrases próximas da Almeida, não texto literal; a gravura de Hunt é colorida (as outras são xilogravuras P&B); lugares debatidos (Bete-Peor, Bezeque, Boquim, Ofra, Mispa de Gileade, Aroer, Leí); numeração de Dt 29 e Lv 6 muda nas Bíblias alemã/italiana; datas são da cronologia tradicional (aproximadas).
+
+**Falta construir (próximos, mesma ordem):** 1–2 Samuel, 1–2 Reis, 1–2 Crônicas…; **Atos** (prioridade alta) e Evangelhos precisam antes de um **segundo mapa-base** mais largo (Roma/Grécia ficam fora do atual, long. 28,5–49,5) e de o `JourneyMap` escolher o mapa por livro (`scripts/journey-map/build_base_map.py`).
+
+**Depende do dono:** os mesmos itens de 19/11 abaixo (push + deploy, SQL dos planos etc.) — nada novo aqui exige SQL ou segredo.
+
+---
+
 ## 2026-11-19 · App funcionando de ponta a ponta (pt-BR) — teste real no navegador e correções
 Feito por **Noé** (Tecnologia), com 2 ajudantes na Jornada e revisão do code-reviewer. Pedido do dono: "trabalhe pesado no app do Ferramentas do Cristão e faça ele funcionar". **Sem push, sem deploy, sem SQL, sem secrets.** 15 commits locais no `app-novo` (e99b6aa..c542b84).
 
