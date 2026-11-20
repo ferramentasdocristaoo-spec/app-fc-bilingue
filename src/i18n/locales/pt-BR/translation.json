@@ -722,7 +722,10 @@
     "nextBookDeuteronomy": "Josué",
     "timeJudges": "O tempo dos juízes",
     "timeNoteJudges": "Datas aproximadas pela cronologia tradicional (saída do Egito por volta de 1446 a.C.; Jz 11:26 indica cerca de 300 anos entre a conquista e Jefté). Os juízes podem ter atuado em regiões diferentes ao mesmo tempo, e os capítulos 17–21 parecem ser do começo do período (Jz 18:30; 20:28).",
-    "nextBookJudges": "Rute"
+    "nextBookJudges": "Rute",
+    "timeRuth": "Nos dias dos juízes",
+    "timeNoteRuth": "Datas aproximadas: o livro se passa \"nos dias em que os juízes julgavam\" (Rt 1:1), sem ano preciso. Pela cronologia tradicional, Davi, bisneto de Boaz, nasce por volta de 1040 a.C.",
+    "nextBookRuth": "1 Samuel"
   },
   "tools": {
     "youGet": "O que você vai receber",

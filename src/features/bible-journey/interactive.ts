@@ -4,6 +4,7 @@ import { joshuaInteractive } from "./joshua-interactive";
 import { leviticusInteractive } from "./leviticus-interactive";
 import { deuteronomyInteractive } from "./deuteronomy-interactive";
 import { judgesInteractive } from "./judges-interactive";
+import { ruthInteractive } from "./ruth-interactive";
 import { genesisInteractive, type JourneyFigure, type JourneyInteractiveSection } from "./genesis-interactive";
 
 export interface JourneyInteractiveBook {
@@ -23,6 +24,7 @@ export const journeyInteractiveBooks: Record<string, JourneyInteractiveBook> = {
   joshua: { sections: joshuaInteractive, primeval: false, zoneKey: "journey.timeJoshua", noteKey: "journey.timeNoteJoshua", nextKey: "journey.nextBookJoshua" },
   deuteronomy: { sections: deuteronomyInteractive, primeval: false, zoneKey: "journey.timeDeuteronomy", noteKey: "journey.timeNoteDeuteronomy", nextKey: "journey.nextBookDeuteronomy" },
   judges: { sections: judgesInteractive, primeval: false, zoneKey: "journey.timeJudges", noteKey: "journey.timeNoteJudges", nextKey: "journey.nextBookJudges" },
+  ruth: { sections: ruthInteractive, primeval: false, zoneKey: "journey.timeRuth", noteKey: "journey.timeNoteRuth", nextKey: "journey.nextBookRuth" },
 };
 
 export const getJourneyInteractive = (bookSlug: string, sectionSlug: string): JourneyInteractiveSection | undefined =>

@@ -196,3 +196,13 @@ describe("lugares traduzidos (2 Samuel, Reis, 1 Crônicas e NT)", async () => {
     }
   });
 });
+
+describe("Jornada interativa: registro dos livros de 20/11", () => {
+  it("Levítico, Deuteronômio, Juízes e Rute estão registrados e os lugares repetidos entre livros são idênticos", async () => {
+    const { journeyInteractiveBooks } = await import("@/features/bible-journey/interactive");
+    for (const slug of ["leviticus", "deuteronomy", "judges", "ruth"]) expect(journeyInteractiveBooks[slug], slug).toBeDefined();
+    const { judgesPlaces } = await import("@/features/bible-journey/judges-places");
+    const { ruthPlaces } = await import("@/features/bible-journey/ruth-places");
+    for (const id of Object.keys(judgesPlaces).filter(id => id in ruthPlaces)) expect(judgesPlaces[id], id).toEqual(ruthPlaces[id]);
+  });
+});

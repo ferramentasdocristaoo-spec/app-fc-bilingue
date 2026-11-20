@@ -722,7 +722,10 @@
     "nextBookDeuteronomy": "Josua",
     "timeJudges": "Die Zeit der Richter",
     "timeNoteJudges": "Ungefähre Daten nach der traditionellen Chronologie (Auszug aus Ägypten um 1446 v. Chr.; Ri 11,26 nennt etwa 300 Jahre zwischen der Landnahme und Jeftah). Manche Richter wirkten wohl gleichzeitig in verschiedenen Gegenden, und Kapitel 17–21 scheinen an den Anfang der Zeit zu gehören (Ri 18,30; 20,28).",
-    "nextBookJudges": "Rut"
+    "nextBookJudges": "Rut",
+    "timeRuth": "Zur Zeit der Richter",
+    "timeNoteRuth": "Ungefähre Daten: Das Buch spielt „zu der Zeit, als die Richter richteten“ (Rut 1,1), ohne genaues Jahr. Nach der traditionellen Chronologie wird David, der Urenkel des Boas, um 1040 v. Chr. geboren.",
+    "nextBookRuth": "1. Samuel"
   },
   "tools": {
     "youGet": "Was Sie erhalten",

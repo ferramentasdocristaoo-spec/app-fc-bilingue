@@ -722,7 +722,10 @@
     "nextBookDeuteronomy": "Giosuè",
     "timeJudges": "Il tempo dei giudici",
     "timeNoteJudges": "Date approssimative secondo la cronologia tradizionale (uscita dall'Egitto verso il 1446 a.C.; Gdc 11,26 indica circa 300 anni tra la conquista e Iefte). Alcuni giudici possono aver operato in regioni diverse nello stesso tempo, e i capitoli 17–21 sembrano appartenere all'inizio del periodo (Gdc 18,30; 20,28).",
-    "nextBookJudges": "Rut"
+    "nextBookJudges": "Rut",
+    "timeRuth": "Al tempo dei giudici",
+    "timeNoteRuth": "Date approssimative: il libro è ambientato \"al tempo dei giudici\" (Rt 1,1), senza un anno preciso. Secondo la cronologia tradizionale, Davide, pronipote di Booz, nasce verso il 1040 a.C.",
+    "nextBookRuth": "1 Samuele"
   },
   "tools": {
     "youGet": "Cosa riceverai",

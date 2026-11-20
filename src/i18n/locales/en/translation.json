@@ -722,7 +722,10 @@
     "nextBookDeuteronomy": "Joshua",
     "timeJudges": "The time of the judges",
     "timeNoteJudges": "Approximate dates from the traditional chronology (exodus around 1446 BC; Judg 11:26 gives about 300 years between the conquest and Jephthah). Some judges may have served in different regions at the same time, and chapters 17–21 seem to belong to the early part of the period (Judg 18:30; 20:28).",
-    "nextBookJudges": "Ruth"
+    "nextBookJudges": "Ruth",
+    "timeRuth": "In the days of the judges",
+    "timeNoteRuth": "Approximate dates: the book is set \"in the days when the judges ruled\" (Ruth 1:1), with no exact year. In the traditional chronology, David, Boaz's great-grandson, is born around 1040 BC.",
+    "nextBookRuth": "1 Samuel"
   },
   "tools": {
     "youGet": "What you will get",

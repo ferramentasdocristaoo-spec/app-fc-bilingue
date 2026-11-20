@@ -722,7 +722,10 @@
     "nextBookDeuteronomy": "Josué",
     "timeJudges": "Le temps des juges",
     "timeNoteJudges": "Dates approximatives selon la chronologie traditionnelle (sortie d'Égypte vers 1446 av. J.-C. ; Jg 11,26 indique environ 300 ans entre la conquête et Jephté). Certains juges ont pu agir dans des régions différentes en même temps, et les chapitres 17–21 semblent appartenir au début de la période (Jg 18,30 ; 20,28).",
-    "nextBookJudges": "Ruth"
+    "nextBookJudges": "Ruth",
+    "timeRuth": "Au temps des juges",
+    "timeNoteRuth": "Dates approximatives : le livre se déroule « au temps où les juges gouvernaient » (Rt 1,1), sans année précise. Selon la chronologie traditionnelle, David, arrière-petit-fils de Booz, naît vers 1040 av. J.-C.",
+    "nextBookRuth": "1 Samuel"
   },
   "tools": {
     "youGet": "Ce que vous recevrez",

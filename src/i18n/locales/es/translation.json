@@ -722,7 +722,10 @@
     "nextBookDeuteronomy": "Josué",
     "timeJudges": "El tiempo de los jueces",
     "timeNoteJudges": "Fechas aproximadas según la cronología tradicional (salida de Egipto hacia 1446 a.C.; Jue 11:26 indica unos 300 años entre la conquista y Jefté). Algunos jueces pudieron actuar en regiones distintas al mismo tiempo, y los capítulos 17–21 parecen ser del comienzo del período (Jue 18:30; 20:28).",
-    "nextBookJudges": "Rut"
+    "nextBookJudges": "Rut",
+    "timeRuth": "En los días de los jueces",
+    "timeNoteRuth": "Fechas aproximadas: el libro transcurre \"en los días en que gobernaban los jueces\" (Rt 1:1), sin año preciso. Según la cronología tradicional, David, bisnieto de Booz, nace hacia el 1040 a.C.",
+    "nextBookRuth": "1 Samuel"
   },
   "tools": {
     "youGet": "Lo que recibirás",
