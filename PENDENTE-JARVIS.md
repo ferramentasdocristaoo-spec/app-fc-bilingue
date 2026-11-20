@@ -1,4 +1,35 @@
-# Pendente para o Jarvis — App FC (wt-final, branch `app-novo`)
+# Pendente para o Jarvis — App FC (wt-oficina, branch `oficina-pdf`)
+
+## 2026-11-20 · Oficina: PDF com a marca, edição por partes e cópia de segurança
+Feito por **Aoliabe** (Criação, chefe Bezalel). Worktree `wt-oficina`, branch `oficina-pdf` criada do `app-novo` 0d08bb4 (= produção). Commit local `07d95fc`. **Sem push, sem deploy, sem merge.** A `wt-final` (Noé, Jornada) não foi tocada.
+
+**1 · PDF com a marca (Oficina e Meus Esboços)**
+- Gerado no próprio aparelho com `pdf-lib` + `@pdf-lib/fontkit` (carregados só quando a folha abre; pedaço `sermon-pdf-*.js` de ~514 KB gzip, fora do pacote principal). Texto de verdade, A4, fontes do app (Source Serif 4, Cormorant Garamond, Cinzel) em `.woff` (o fontkit falha ao recortar `.woff2`).
+- **Entrega:** celular (tela de toque) → folha de compartilhar com o arquivo (Salvar em Arquivos, WhatsApp, Imprimir); computador ou sem compartilhar → download direto. Se a geração falhar (ex.: fontes sem rede na 1ª vez), cai na impressão do navegador como antes. Escolhi gerar o arquivo (não `@media print`) porque no iPhone, principalmente no app instalado, a janela de impressão não salva PDF de forma confiável. As fontes `.woff` entram no cache do PWA no 1º uso (offline depois).
+- **3 direções** em `src/lib/pdf/pdf-temas.ts` (cores = tokens do tema claro): A clássica dourada (padrão até o dono escolher), B editorial limpa (menos tinta), C pergaminho. Moldura com cantos ornamentados, capitular, medalhões I/II/III, fleurons, caixa de versículo com fio dourado e referência em versalete (Source Serif: na Cinzel o "1" parece "I"), marca-d'água suave do logo, cabeçalho compacto nas páginas seguintes, rodapé com o nome do app e "n / total". Corpo 12,5 pt, nada < 10,5 pt, contraste ≥ 7:1 (testado).
+- **Logo:** o do app (`appLogo(idioma)`, sem fundo, reduzido para 320 px). Não gerei a opção com o símbolo do Instagram: o arquivo só tem 240 px, com fundo creme, e sairia borrado impresso.
+- **Prévias:** `Kawai-Jarvis/web/palco/fc-pdf-modelo/index.html` (2 PDFs por direção + PNG das páginas). Regerar: `npx vite-node scripts/pdf-modelo/gerar.ts -- <pasta>` (precisa do `pdftoppm`).
+
+**2 · Edição por partes** (`src/components/oficina/FolhaPartes.tsx`, `src/lib/sermon-parts.ts`)
+- Na folha, cada parte tem "Editar esta parte" (campos no lugar: título do tópico, texto, versículos) e "＋ Anotação". "Editar texto" (texto corrido) continua; "← Editar na folha" lê o texto de volta em partes sem perder nada. Anotações ficam no texto corrido como `✎ …` (TXT, copiar, busca).
+- Meus Esboços grava `partes` (com anotações) e `atualizadoEm`; "Continuar na Oficina" abre na folha quando o esboço tem estrutura (texto livre antigo continua no modo texto).
+
+**3 · Cópia de segurança** (Meus Esboços)
+- "Fazer cópia de segurança" baixa `esbocos-AAAA-MM-DD.json` (todos os esboços com partes e anotações); "Restaurar cópia" junta sem duplicar (identificador = data de criação; se existe nos dois, fica a versão gravada por último). `navigator.storage.persist()` ao abrir Meus Esboços e ao salvar/restaurar. Texto explicando que os esboços ficam no aparelho.
+
+**Testado de verdade** (vite local + Chrome headless, conta `ferramentasdocristaoo@gmail.com`, pt-BR): computador 1440×900 (anotação, edição de tópico, PDF baixado em 0,4 s com a anotação e a edição dentro, salvar, cópia baixada, restaurar = 1 item, PDF de Meus Esboços) e celular 390×844 com toque (folha de compartilhar recebeu o PDF de 222 KB 0,35 s após o toque). **Não testado em iPhone/Android físicos**: vale o dono abrir um PDF no celular antes de publicar.
+**Qualidade:** `npm test` **263/263** (238 + 25 novos), `npm run build` ok, ESLint dos arquivos alterados limpo, `tsc` só com os 10 erros que já existiam.
+
+**Depende do dono**
+1. **Escolher a direção do PDF** (A, B ou C, ou mistura) no palco. Trocar o padrão = 1 linha (`TEMA_PDF_PADRAO` em `pdf-temas.ts`).
+2. Merge de `oficina-pdf` no `app-novo` + push + deploy (o Jarvis faz depois do ok). Não há SQL nem função do Supabase nesta entrega.
+3. Teste num iPhone e num Android de verdade (compartilhar → Salvar em Arquivos / Imprimir).
+4. Se quiser o símbolo do Instagram no PDF: arquivo original em alta do designer.
+5. Ideia anotada: opção "economizar tinta" (papel branco, sem textura) para quem imprime em casa; a B já é a mais econômica.
+
+---
+
+# Histórico herdado do `app-novo` (wt-final)
 
 ## 2026-11-19 · App funcionando de ponta a ponta (pt-BR) — teste real no navegador e correções
 Feito por **Noé** (Tecnologia), com 2 ajudantes na Jornada e revisão do code-reviewer. Pedido do dono: "trabalhe pesado no app do Ferramentas do Cristão e faça ele funcionar". **Sem push, sem deploy, sem SQL, sem secrets.** 15 commits locais no `app-novo` (e99b6aa..c542b84).
