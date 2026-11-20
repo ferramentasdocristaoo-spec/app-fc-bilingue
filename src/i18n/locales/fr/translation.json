@@ -713,7 +713,10 @@
     "nextBookNumbers": "Deutéronome",
     "timeJoshua": "L'entrée en Canaan",
     "timeNoteJoshua": "Dates approximatives selon la chronologie traditionnelle (sortie d'Égypte vers 1446 av. J.-C., à partir de 1 R 6,1). De nombreux spécialistes situent l'entrée en Canaan plus tard, au XIIIe siècle av. J.-C.",
-    "nextBookJoshua": "Juges"
+    "nextBookJoshua": "Juges",
+    "timeLeviticus": "Au Sinaï",
+    "timeNoteLeviticus": "Dates approximatives selon la chronologie traditionnelle : le tabernacle fut dressé la deuxième année après la sortie d'Égypte (Ex 40,17), vers 1445 av. J.-C. Tout le livre se déroule au pied du Sinaï. Beaucoup de spécialistes proposent des dates plus tardives.",
+    "nextBookLeviticus": "Nombres"
   },
   "tools": {
     "youGet": "Ce que vous recevrez",

@@ -713,7 +713,10 @@
     "nextBookNumbers": "Deuteronomy",
     "timeJoshua": "Entering Canaan",
     "timeNoteJoshua": "Approximate dates from the traditional chronology (exodus around 1446 BC, based on 1 Kgs 6:1). Many scholars place the entry into Canaan later, in the 13th century BC.",
-    "nextBookJoshua": "Judges"
+    "nextBookJoshua": "Judges",
+    "timeLeviticus": "At Sinai",
+    "timeNoteLeviticus": "Approximate dates from the traditional chronology: the tabernacle was set up in the second year after leaving Egypt (Exod 40:17), around 1445 BC. The whole book takes place at the foot of Sinai. Many scholars propose later dates.",
+    "nextBookLeviticus": "Numbers"
   },
   "tools": {
     "youGet": "What you will get",

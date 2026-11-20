@@ -713,7 +713,10 @@
     "nextBookNumbers": "Deuteronomium",
     "timeJoshua": "Der Einzug in Kanaan",
     "timeNoteJoshua": "Ungefähre Daten nach der traditionellen Chronologie (Auszug um 1446 v. Chr., ausgehend von 1. Könige 6,1). Viele Fachleute setzen den Einzug in Kanaan später an, im 13. Jahrhundert v. Chr.",
-    "nextBookJoshua": "Richter"
+    "nextBookJoshua": "Richter",
+    "timeLeviticus": "Am Sinai",
+    "timeNoteLeviticus": "Ungefähre Daten nach der traditionellen Chronologie: Die Stiftshütte wurde im zweiten Jahr nach dem Auszug aus Ägypten aufgerichtet (2. Mose 40,17), um 1445 v. Chr. Das ganze Buch spielt am Fuß des Sinai. Viele Forscher nehmen spätere Daten an.",
+    "nextBookLeviticus": "Numeri"
   },
   "tools": {
     "youGet": "Was Sie erhalten",

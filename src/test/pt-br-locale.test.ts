@@ -18,7 +18,8 @@ const placeholders = (s: unknown) => (String(s).match(/\{\{[^}]+\}\}/g) ?? []).s
 
 /** Lusitanismos que não podem sobrar no português do Brasil (palavra inteira, sem acento sensível a maiúsculas). */
 const LUSITANISMOS =
-  /\b(tu|teu|tua|teus|tuas|te|ti|contigo|podes|tens|queres|és|estás|vais|partilha\w*|ecrã|ficheiro\w*|utilizador\w*|rato|telemóvel|ementa|génesis|registo|palavra-passe|subscrição|anónimo|aceder|acede|acedes|guardar|guarda|elimina\w*|carregar em|instalar aplicação|nossa aplicação|instala a aplicação|a carregar|a gerar|a enviar|a orar|a analisar|a procurar|a aguardar|a ouvir|a trabalhar|a extrair|aspeto|ligação à internet|paragem|paragens|deuteronómio|crónicas|job|oséias|abdias|filemon)\b/i;
+  // Limites de palavra com acentos (\b do JS não vê "é" como letra: "Moisés" casava com "és").
+  /(?<!\p{L})(tu|teu|tua|teus|tuas|te|ti|contigo|podes|tens|queres|és|estás|vais|partilha\w*|ecrã|ficheiro\w*|utilizador\w*|rato|telemóvel|ementa|génesis|registo|palavra-passe|subscrição|anónimo|aceder|acede|acedes|guardar|guarda|elimina\w*|carregar em|instalar aplicação|nossa aplicação|instala a aplicação|a carregar|a gerar|a enviar|a orar|a analisar|a procurar|a aguardar|a ouvir|a trabalhar|a extrair|aspeto|ligação à internet|paragem|paragens|deuteronómio|crónicas|job|oséias|abdias|filemon)(?!\p{L})/iu;
 
 describe("locale pt-BR", () => {
   const pt = Object.fromEntries(flat(ptPT as Tree));

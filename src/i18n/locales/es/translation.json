@@ -713,7 +713,10 @@
     "nextBookNumbers": "Deuteronomio",
     "timeJoshua": "La entrada en Canaán",
     "timeNoteJoshua": "Fechas aproximadas según la cronología tradicional (salida de Egipto hacia 1446 a.C., a partir de 1 R 6:1). Muchos estudiosos sitúan la entrada en Canaán más tarde, en el siglo XIII a.C.",
-    "nextBookJoshua": "Jueces"
+    "nextBookJoshua": "Jueces",
+    "timeLeviticus": "En el Sinaí",
+    "timeNoteLeviticus": "Fechas aproximadas según la cronología tradicional: el tabernáculo se levantó en el segundo año después de la salida de Egipto (Éx 40:17), hacia 1445 a.C. Todo el libro transcurre al pie del Sinaí. Muchos estudiosos proponen fechas más tardías.",
+    "nextBookLeviticus": "Números"
   },
   "tools": {
     "youGet": "Lo que recibirás",

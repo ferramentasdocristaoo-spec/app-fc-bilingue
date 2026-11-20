@@ -713,7 +713,10 @@
     "nextBookNumbers": "Deuteronomio",
     "timeJoshua": "L'ingresso in Canaan",
     "timeNoteJoshua": "Date approssimative secondo la cronologia tradizionale (uscita dall'Egitto intorno al 1446 a.C., a partire da 1 Re 6,1). Molti studiosi collocano l'ingresso in Canaan più tardi, nel XIII secolo a.C.",
-    "nextBookJoshua": "Giudici"
+    "nextBookJoshua": "Giudici",
+    "timeLeviticus": "Al Sinai",
+    "timeNoteLeviticus": "Date approssimative secondo la cronologia tradizionale: il tabernacolo fu eretto nel secondo anno dopo l'uscita dall'Egitto (Es 40,17), verso il 1445 a.C. Tutto il libro si svolge ai piedi del Sinai. Molti studiosi propongono date più tarde.",
+    "nextBookLeviticus": "Numeri"
   },
   "tools": {
     "youGet": "Cosa riceverai",
