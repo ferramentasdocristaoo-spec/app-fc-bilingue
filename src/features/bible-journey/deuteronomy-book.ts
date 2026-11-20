@@ -3,7 +3,7 @@ import { buildDeuteronomyChapters } from "./deuteronomy-content";
 
 const langs: JourneyLanguage[] = ["pt-PT", "en", "es", "fr", "it", "de"];
 const local = <T>(values: T[]) => Object.fromEntries(langs.map((language, index) => [language, values[index]])) as Record<JourneyLanguage, T>;
-const names = local(["Deuteronómio", "Deuteronomy", "Deuteronomio", "Deutéronome", "Deuteronomio", "Deuteronomium"]);
+const names = local(["Deuteronômio", "Deuteronomy", "Deuteronomio", "Deutéronome", "Deuteronomio", "Deuteronomium"]);
 const descriptions = local(["Moisés prepara uma nova geração para amar, lembrar e obedecer a Deus.", "Moses prepares a new generation to love, remember and obey God.", "Moisés prepara a una nueva generación para amar, recordar y obedecer a Dios.", "Moïse prépare une nouvelle génération à aimer, se souvenir et obéir à Dieu.", "Mosè prepara una nuova generazione ad amare, ricordare e obbedire a Dio.", "Mose bereitet eine neue Generation darauf vor, Gott zu lieben, sich zu erinnern und zu gehorchen."]);
 // Princípios (ESTADO: PENDENTE DE REVISÃO HUMANA): Dt 6:4-5; 8:3; 30:19-20.
 const principles = local([
@@ -29,7 +29,7 @@ const characters = local([["Moisés", "Josué", "Israel"], ["Moses", "Joshua", "
 
 export const deuteronomy: JourneyBook = {
   slug: "deuteronomy", testament: "old-testament", category: "pentateuch", bibleBookId: 5, chapterCount: 34, position: 5, coverKey: "deuteronomy",
-  overview: Object.fromEntries(langs.map(language => [language, { title: names[language], description: descriptions[language], author: authors[language], date: "c. 1405", nameOrigin: origins[language], context: descriptions[language], themes: themes[language], characters: characters[language], principles: principles[language] }])) as JourneyBook["overview"],
+  overview: Object.fromEntries(langs.map(language => [language, { title: names[language], description: descriptions[language], author: authors[language], date: "c. 1406", nameOrigin: origins[language], context: descriptions[language], themes: themes[language], characters: characters[language], principles: principles[language] }])) as JourneyBook["overview"],
   sections,
   chapters: buildDeuteronomyChapters(),
 };

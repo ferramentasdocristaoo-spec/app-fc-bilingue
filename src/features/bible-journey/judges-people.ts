@@ -17,6 +17,8 @@ export const judgesPeople: Record<string, Record<JourneyLanguage, string>> = {
   eglon: p("Eglom", "Eglon", "Eglón", "Églôn", "Eglon", "Eglon"),
   deborah: p("Débora", "Deborah", "Débora", "Débora", "Debora", "Debora"),
   barak: p("Baraque", "Barak", "Barac", "Baraq", "Barak", "Barak"),
+  // Jabim de Jz 4, rei de Canaã em Hazor; não é o Jabim de Js 11 (morto em Js 11:10).
+  "jabin-canaan": p("Jabim", "Jabin", "Jabín", "Jabîn", "Iabin", "Jabin"),
   sisera: p("Sísera", "Sisera", "Sísara", "Sisera", "Sìsara", "Sisera"),
   jael: p("Jael", "Jael", "Jael", "Yaël", "Giaele", "Jaël"),
   gideon: p("Gideão", "Gideon", "Gedeón", "Gédéon", "Gedeone", "Gideon"),
