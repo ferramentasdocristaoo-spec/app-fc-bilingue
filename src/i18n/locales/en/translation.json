@@ -719,7 +719,10 @@
     "nextBookLeviticus": "Numbers",
     "timeDeuteronomy": "Speeches on the plains of Moab",
     "timeNoteDeuteronomy": "Approximate dates from the traditional chronology (exodus around 1446 BC, based on 1 Kgs 6:1). Moses' speeches take place in the 40th year (Deut 1:3). Many scholars propose later dates.",
-    "nextBookDeuteronomy": "Joshua"
+    "nextBookDeuteronomy": "Joshua",
+    "timeJudges": "The time of the judges",
+    "timeNoteJudges": "Approximate dates from the traditional chronology (exodus around 1446 BC; Judg 11:26 gives about 300 years between the conquest and Jephthah). Some judges may have served in different regions at the same time, and chapters 17–21 seem to belong to the early part of the period (Judg 18:30; 20:28).",
+    "nextBookJudges": "Ruth"
   },
   "tools": {
     "youGet": "What you will get",

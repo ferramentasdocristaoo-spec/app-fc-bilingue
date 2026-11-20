@@ -2,6 +2,7 @@ import type { JourneyLanguage } from "./types";
 import type { BibleRef } from "./references";
 import { numbersPeople } from "./numbers-people";
 import { joshuaPeople } from "./joshua-people";
+import { judgesPeople } from "./judges-people";
 
 /**
  * Camada interativa de Génesis: paragens no mapa, ponto de paragem (quiz),
@@ -102,7 +103,7 @@ export const basePeople: Record<string, L> = {
 };
 
 // Números e Josué (19/11/2026, pendente de revisão humana): pessoas próprias em arquivos separados.
-export const journeyPeople: Record<string, L> = { ...basePeople, ...numbersPeople, ...joshuaPeople };
+export const journeyPeople: Record<string, L> = { ...basePeople, ...numbersPeople, ...joshuaPeople, ...judgesPeople };
 
 
 export const genesisInteractive: Record<string, JourneyInteractiveSection> = {

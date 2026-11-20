@@ -719,7 +719,10 @@
     "nextBookLeviticus": "Numeri",
     "timeDeuteronomy": "Reden in den Steppen Moabs",
     "timeNoteDeuteronomy": "Ungefähre Daten nach der traditionellen Chronologie (Auszug um 1446 v. Chr., nach 1. Kön 6,1). Moses Reden fallen ins 40. Jahr (5. Mose 1,3). Viele Forscher setzen spätere Daten an.",
-    "nextBookDeuteronomy": "Josua"
+    "nextBookDeuteronomy": "Josua",
+    "timeJudges": "Die Zeit der Richter",
+    "timeNoteJudges": "Ungefähre Daten nach der traditionellen Chronologie (Auszug aus Ägypten um 1446 v. Chr.; Ri 11,26 nennt etwa 300 Jahre zwischen der Landnahme und Jeftah). Manche Richter wirkten wohl gleichzeitig in verschiedenen Gegenden, und Kapitel 17–21 scheinen an den Anfang der Zeit zu gehören (Ri 18,30; 20,28).",
+    "nextBookJudges": "Rut"
   },
   "tools": {
     "youGet": "Was Sie erhalten",

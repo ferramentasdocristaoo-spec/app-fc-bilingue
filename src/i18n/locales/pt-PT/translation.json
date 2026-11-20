@@ -719,7 +719,10 @@
     "nextBookLeviticus": "Números",
     "timeDeuteronomy": "Os discursos nas planícies de Moabe",
     "timeNoteDeuteronomy": "Datas aproximadas segundo a cronologia tradicional (saída do Egito por volta de 1446 a.C., segundo 1 Rs 6:1). Os discursos de Moisés acontecem no 40.º ano (Dt 1:3). Muitos estudiosos propõem datas mais tardias.",
-    "nextBookDeuteronomy": "Josué"
+    "nextBookDeuteronomy": "Josué",
+    "timeJudges": "O tempo dos juízes",
+    "timeNoteJudges": "Datas aproximadas pela cronologia tradicional (saída do Egito por volta de 1446 a.C.; Jz 11:26 indica cerca de 300 anos entre a conquista e Jefté). Os juízes podem ter atuado em regiões diferentes ao mesmo tempo, e os capítulos 17–21 parecem ser do começo do período (Jz 18:30; 20:28).",
+    "nextBookJudges": "Rute"
   },
   "tools": {
     "youGet": "O que vais receber",

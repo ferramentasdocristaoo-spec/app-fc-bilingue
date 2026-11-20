@@ -719,7 +719,10 @@
     "nextBookLeviticus": "Nombres",
     "timeDeuteronomy": "Discours dans les plaines de Moab",
     "timeNoteDeuteronomy": "Dates approximatives selon la chronologie traditionnelle (sortie d'Égypte vers 1446 av. J.-C., d'après 1 R 6,1). Les discours de Moïse ont lieu la 40e année (Dt 1,3). Beaucoup de spécialistes proposent des dates plus tardives.",
-    "nextBookDeuteronomy": "Josué"
+    "nextBookDeuteronomy": "Josué",
+    "timeJudges": "Le temps des juges",
+    "timeNoteJudges": "Dates approximatives selon la chronologie traditionnelle (sortie d'Égypte vers 1446 av. J.-C. ; Jg 11,26 indique environ 300 ans entre la conquête et Jephté). Certains juges ont pu agir dans des régions différentes en même temps, et les chapitres 17–21 semblent appartenir au début de la période (Jg 18,30 ; 20,28).",
+    "nextBookJudges": "Ruth"
   },
   "tools": {
     "youGet": "Ce que vous recevrez",

@@ -1,7 +1,7 @@
 import type { JourneyLanguage } from "./types";
 
 /** Referência bíblica: capítulo e versículos (opcionalmente até outro capítulo). */
-export type BibleBookKey = "genesis" | "exodus" | "leviticus" | "numbers" | "deuteronomy" | "joshua";
+export type BibleBookKey = "genesis" | "exodus" | "leviticus" | "numbers" | "deuteronomy" | "joshua" | "judges";
 export interface BibleRef { book?: BibleBookKey; chapter: number; verse?: number; endVerse?: number; endChapter?: number }
 
 const bookAbbrev: Record<BibleBookKey, Record<JourneyLanguage, string>> = {
@@ -11,6 +11,7 @@ const bookAbbrev: Record<BibleBookKey, Record<JourneyLanguage, string>> = {
   numbers: { "pt-PT": "Nm", en: "Num", es: "Nm", fr: "Nb", it: "Nm", de: "4. Mose" },
   deuteronomy: { "pt-PT": "Dt", en: "Deut", es: "Dt", fr: "Dt", it: "Dt", de: "5. Mose" },
   joshua: { "pt-PT": "Js", en: "Josh", es: "Jos", fr: "Jos", it: "Gs", de: "Jos" },
+  judges: { "pt-PT": "Jz", en: "Judg", es: "Jue", fr: "Jg", it: "Gdc", de: "Ri" },
 };
 // pt-PT e en usam dois-pontos; es também (Gn 12:7); fr, it e de usam vírgula (Gn 12,7).
 const separator: Record<JourneyLanguage, string> = { "pt-PT": ":", en: ":", es: ":", fr: ",", it: ",", de: "," };

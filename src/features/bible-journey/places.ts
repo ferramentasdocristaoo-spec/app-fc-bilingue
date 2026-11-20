@@ -2,6 +2,7 @@ import type { JourneyLanguage } from "./types";
 import { numbersPlaces } from "./numbers-places";
 import { joshuaPlaces } from "./joshua-places";
 import { deuteronomyPlaces } from "./deuteronomy-places";
+import { judgesPlaces } from "./judges-places";
 
 /**
  * Gazetteer da Jornada.
@@ -75,5 +76,5 @@ export const journeyPlace = (id: string) => journeyPlaces[id];
 
 // Números e Josué (19/11/2026, pendente de revisão humana): lugares próprios em arquivos separados.
 // shittim e jordan existem nos dois, com os mesmos dados.
-// Deuteronômio (20/11/2026, pendente de revisão humana).
-export const journeyPlaces: Record<string, JourneyPlace> = { ...basePlaces, ...numbersPlaces, ...joshuaPlaces, ...deuteronomyPlaces };
+// Deuteronômio e Juízes (20/11/2026, pendente de revisão humana). bethlehem existe em Juízes e Rute, com os mesmos dados.
+export const journeyPlaces: Record<string, JourneyPlace> = { ...basePlaces, ...numbersPlaces, ...joshuaPlaces, ...deuteronomyPlaces, ...judgesPlaces };
