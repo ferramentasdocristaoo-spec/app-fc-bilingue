@@ -9,10 +9,10 @@ import { fetchBibleChapter } from "@/lib/content-api";
 import { dailyVerseVersion, fetchVerse } from "@/lib/daily-verse";
 
 /** Lista do FC Brasil (fc-sermon/src/pages/BibliaPage.tsx), na mesma ordem. */
-const LISTA_FC_BRASIL = ["ACF11", "ARA", "ARC09", "ALM21", "KJA", "NAA", "NBV07", "NTLH", "NVIPT", "NVT", "TB10", "VFL", "MENS", "CNBB", "OL", "NTJud"];
+const LISTA_FC_BRASIL = ["ACF11", "ARA", "ARC09", "ALM21", "KJA", "NAA", "NBV07", "NTLH", "NVT", "TB10", "VFL", "MENS", "CNBB", "OL", "NTJud"];
 
 describe("versões brasileiras da Bíblia (pt-BR)", () => {
-  it("pt-BR tem as 16 versões do FC Brasil, na mesma ordem, com nome e sigla", () => {
+  it("pt-BR tem as 15 versões do FC Brasil (NVI saiu em 21/11: editora proibiu o texto no bolls.life), na mesma ordem, com nome e sigla", () => {
     const ids = VERSIONS_BY_LANG["pt-BR"].map((v) => v.id);
     expect(ids).toEqual(LISTA_FC_BRASIL);
     for (const v of VERSIONS_BY_LANG["pt-BR"]) {
@@ -29,7 +29,7 @@ describe("versões brasileiras da Bíblia (pt-BR)", () => {
 
   it("pt-PT continua com a lista europeia e o padrão OL", () => {
     expect(DEFAULT_VERSION_BY_LANG["pt-PT"]).toBe("OL");
-    expect(VERSIONS_BY_LANG["pt-PT"].map((v) => v.id)).toEqual(["OL", "NVIPT"]);
+    expect(VERSIONS_BY_LANG["pt-PT"].map((v) => v.id)).toEqual(["OL"]);
   });
 
   it("todo idioma com lista tem um padrão que está na própria lista", () => {

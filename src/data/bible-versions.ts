@@ -11,7 +11,6 @@ export const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = 
     { id: "NAA", name: "NAA - Nova Almeida Atualizada" },
     { id: "NBV07", name: "NBV - Nova Bíblia Viva" },
     { id: "NTLH", name: "NTLH - Nova Tradução Ling. de Hoje" },
-    { id: "NVIPT", name: "NVI - Nova Versão Internacional" },
     { id: "NVT", name: "NVT - Nova Versão Transformadora" },
     { id: "TB10", name: "TB - Tradução Brasileira" },
     { id: "VFL", name: "VFL - Versão Fácil de Ler" },
@@ -22,12 +21,10 @@ export const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = 
   ],
   "pt-PT": [
     { id: "OL", name: "OL - O Livro (Português Europeu)" },
-    { id: "NVIPT", name: "NVI-PT - Nova Versão Internacional" },
   ],
   "en": [
     { id: "KJV", name: "KJV - King James Version" },
     { id: "NKJV", name: "NKJV - New King James Version" },
-    { id: "NIV2011", name: "NIV - New International Version" },
     { id: "ESV", name: "ESV - English Standard Version" },
     { id: "NLT", name: "NLT - New Living Translation" },
     { id: "WEB", name: "WEB - World English Bible" },
@@ -38,7 +35,6 @@ export const VERSIONS_BY_LANG: Record<string, { id: string; name: string }[]> = 
   "es": [
     { id: "RV1960", name: "RVR60 - Reina-Valera 1960" },
     { id: "RV2004", name: "RVG - Reina Valera Gómez 2004" },
-    { id: "NVI", name: "NVI - Nueva Versión Internacional" },
     { id: "BTX3", name: "BTX3 - Biblia Textual 3ª Edición" },
     { id: "NTV", name: "NTV - Nueva Traducción Viviente" },
     { id: "PDT", name: "PDT - Palabra de Dios para Todos" },
