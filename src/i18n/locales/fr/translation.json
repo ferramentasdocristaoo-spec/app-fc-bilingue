@@ -40,7 +40,9 @@
     "passwordTooShort": "Mot de passe trop court (min. 6).",
     "passwordMismatch": "Les mots de passe ne correspondent pas.",
     "passwordChanged": "Mot de passe modifié avec succès!",
-    "livraria": "Librairie"
+    "livraria": "Librairie",
+    "open": "Admin",
+    "openDescription": "Panneau de contrôle de l'app"
   },
   "sidebar": {
     "modules": "Modules",
@@ -780,5 +782,25 @@
     "lockedTitle": "Langues supplémentaires",
     "lockedBody": "Ajoutez-les à votre abonnement pour utiliser {{language}}.",
     "lockedAction": "Activer les langues"
+  },
+  "push": {
+    "bell": "Notifications",
+    "inviteTitle": "Activez les notifications",
+    "inviteText": "Recevez les alertes sur les nouveaux contenus, les méditations et les nouveautés de l'app.",
+    "activate": "Activer les notifications",
+    "notNow": "Plus tard",
+    "working": "Activation…",
+    "activeTitle": "Notifications activées",
+    "activeText": "Vous recevrez les alertes des Outils du Chrétien sur cet appareil.",
+    "deactivate": "Désactiver sur cet appareil",
+    "deniedTitle": "Notifications bloquées",
+    "deniedText": "Pour les autoriser, ouvrez les réglages du navigateur (ou du téléphone), cherchez Outils du Chrétien et autorisez les notifications.",
+    "iosInstallTitle": "D'abord, installez l'app",
+    "iosInstallText": "Sur iPhone, les notifications ne fonctionnent qu'avec l'app sur l'écran d'accueil. Dans Safari, touchez Partager puis « Sur l'écran d'accueil ». Ouvrez-la ensuite depuis l'icône et activez-les ici.",
+    "iosOld": "Cet iPhone a besoin d'iOS 16.4 ou plus récent pour recevoir des notifications.",
+    "unsupported": "Ce navigateur ne reçoit pas de notifications. Ouvrez l'app dans Chrome (Android ou ordinateur) ou Safari (iPhone).",
+    "error": "Impossible de les activer pour l'instant. Réessayez dans un moment.",
+    "offTitle": "Notifications désactivées",
+    "offText": "Activez-les pour recevoir les alertes sur cet appareil."
   }
 }

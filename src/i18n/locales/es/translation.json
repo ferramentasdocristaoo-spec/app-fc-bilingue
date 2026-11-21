@@ -40,7 +40,9 @@
     "passwordTooShort": "Contraseña demasiado corta (mín. 6).",
     "passwordMismatch": "Las contraseñas no coinciden.",
     "passwordChanged": "¡Contraseña cambiar con éxito!",
-    "livraria": "Librería"
+    "livraria": "Librería",
+    "open": "Admin",
+    "openDescription": "Panel de control de la app"
   },
   "sidebar": {
     "modules": "Módulos",
@@ -780,5 +782,25 @@
     "lockedTitle": "Idiomas adicionales",
     "lockedBody": "Actívalos en tu suscripción para usar {{language}}.",
     "lockedAction": "Activar idiomas"
+  },
+  "push": {
+    "bell": "Notificaciones",
+    "inviteTitle": "Activa las notificaciones",
+    "inviteText": "Recibe avisos de contenidos nuevos, devocionales y novedades de la app.",
+    "activate": "Activar notificaciones",
+    "notNow": "Ahora no",
+    "working": "Activando…",
+    "activeTitle": "Notificaciones activadas",
+    "activeText": "Recibirás los avisos de Herramientas del Cristiano en este dispositivo.",
+    "deactivate": "Desactivar en este dispositivo",
+    "deniedTitle": "Notificaciones bloqueadas",
+    "deniedText": "Para permitirlas, abre los ajustes del navegador (o del móvil), busca Herramientas del Cristiano y permite las notificaciones.",
+    "iosInstallTitle": "Primero, instala la app",
+    "iosInstallText": "En el iPhone, las notificaciones solo funcionan con la app en la pantalla de inicio. En Safari, toca Compartir y luego \"Añadir a pantalla de inicio\". Después ábrela desde el icono y actívalas aquí.",
+    "iosOld": "Este iPhone necesita iOS 16.4 o posterior para recibir notificaciones.",
+    "unsupported": "Este navegador no recibe notificaciones. Abre la app en Chrome (Android u ordenador) o en Safari (iPhone).",
+    "error": "No se pudieron activar ahora. Inténtalo de nuevo en un momento.",
+    "offTitle": "Notificaciones desactivadas",
+    "offText": "Actívalas para recibir avisos en este dispositivo."
   }
 }

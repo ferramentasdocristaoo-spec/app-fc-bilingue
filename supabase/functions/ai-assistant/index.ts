@@ -189,7 +189,17 @@ serve(async (req) => {
         _email: adminCredentials?._admin_email || "",
         _password: adminCredentials?._admin_password || "",
       });
-      if (adminError || !isAdmin) throw { status: 401, message: "Apenas o administrador pode gerar conteúdo da Jornada." };
+      // 21/11: o admin logado no app (sessão Supabase, e-mail confirmado em admin_users) também pode,
+      // sem senha. O cliente `sb` usa a service_role, então a sessão é conferida com o JWT do próprio pedido.
+      let isSessionAdmin = false;
+      const authHeader = req.headers.get("Authorization") ?? "";
+      const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+      if (!isAdmin && authHeader.startsWith("Bearer ") && anonKey) {
+        const userClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } });
+        const { data: sessionAdmin } = await userClient.rpc("is_session_admin");
+        isSessionAdmin = sessionAdmin === true;
+      }
+      if (!isSessionAdmin && (adminError || !isAdmin)) throw { status: 401, message: "Apenas o administrador pode gerar conteúdo da Jornada." };
     }
 
     const journeyDailyLimit = 50;

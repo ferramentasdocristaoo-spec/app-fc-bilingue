@@ -3,6 +3,8 @@ import i18n from "i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { setLanguageManually } from "@/i18n";
 import { idiomasLiberados, matchAppLanguage, setPlanoAtual, type PlanoAcesso } from "@/i18n/app-languages";
+import { esquecerPushAoSair } from "@/lib/push";
+import { lembrarAdmin } from "@/hooks/use-is-admin";
 
 type AccessStatus = "ok" | "notApproved" | "blocked" | "expired" | "unavailable";
 /** Motivos que levam à tela de acesso encerrado (AccessDeniedPage). */
@@ -213,6 +215,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = () => {
+    // O aparelho para de receber as mensagens desta conta e o atalho Admin some.
+    void esquecerPushAoSair().catch(() => {});
+    lembrarAdmin(null);
     localStorage.removeItem(AUTH_KEY);
     setPlanoAtual(null);
     setEmail(null);

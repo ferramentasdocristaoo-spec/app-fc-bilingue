@@ -15,6 +15,7 @@ import { FontSizeStepper } from "@/components/FontSizeStepper";
 import { useFontSize } from "@/hooks/use-font-size";
 import { appLogo } from "@/lib/branding";
 import { parentPath } from "@/lib/parent-path";
+import { PushBell, PushInvite, usePushBoot } from "@/components/PushCentral";
 
 /** Hambúrguer do topo no celular: abre a mesma folha de cartõezinhos (MenuSheet) da aba Menu da barra inferior. */
 const MenuButton = ({ open, onOpen }: { open: boolean; onOpen: () => void }) => {
@@ -40,6 +41,7 @@ const DashboardLayout = () => {
   const { fontSizeClass } = useFontSize();
   const { theme, toggleTheme } = useTheme();
   usePageTracking();
+  usePushBoot();
   const { pathname, hash } = useLocation();
   const parent = parentPath(pathname);
   const mainRef = useRef<HTMLElement>(null);
@@ -83,6 +85,7 @@ const DashboardLayout = () => {
             <div className="flex shrink-0 items-center md:justify-self-end md:gap-2">
               {/* Celular: ajustes no topo. Desktop: ficam no ícone Ajustes do Dock. */}
               <div className="flex items-center md:hidden">
+                <PushBell />
                 <InstallButton />
                 <FontSizeSelector />
                 {/* Celular: só a bandeira atual, redonda; tocar abre a folha com as 6. */}
@@ -90,6 +93,7 @@ const DashboardLayout = () => {
               </div>
               {/* Computador e tablet: A−/A+ sempre à vista, ao lado do tema (o dono não quer o tamanho escondido nos Ajustes). */}
               <FontSizeStepper className="hidden md:inline-flex" />
+              <span className="hidden md:inline-flex"><PushBell /></span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -105,7 +109,7 @@ const DashboardLayout = () => {
           {/* "relative": sem isto, os textos só para leitor de tela (sr-only, posição absoluta) tomam a janela como
               referência e fazem a página inteira rolar atrás do <main>. */}
           <main ref={mainRef} className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
-            <div className={`${fontSizeClass} bnav-spacer`}><Outlet /></div>
+            <div className={`${fontSizeClass} bnav-spacer`}><PushInvite /><Outlet /></div>
           </main>
           <BottomNav menuOpen={menuOpen} onMenuOpenChange={setMenuOpen} />
           {!isMobile && <Dock />}

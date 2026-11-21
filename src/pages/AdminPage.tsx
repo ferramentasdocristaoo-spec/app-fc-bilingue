@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import i18n from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Loader2, LogIn, LogOut, KeyRound, Shield, LayoutDashboard, Users, Brain, ScrollText, Menu, BarChart3, Library, BookMarked } from "lucide-react";
+import { Loader2, LogIn, LogOut, KeyRound, Shield, LayoutDashboard, Users, Brain, ScrollText, Menu, BarChart3, Library, BookMarked, BellRing, ArrowLeft } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import logo from "@/assets/logo-pt.png";
 import DashboardSection from "@/components/admin/DashboardSection";
@@ -16,16 +17,22 @@ import SermonsSection from "@/components/admin/SermonsSection";
 import AnalyticsSection from "@/components/admin/AnalyticsSection";
 import LibrarySection from "@/components/admin/LibrarySection";
 import JourneyEditorialSection from "@/components/admin/JourneyEditorialSection";
+import NotificationsSection from "@/components/admin/NotificationsSection";
+import { emailAdminDaSessao, lembrarAdmin } from "@/hooks/use-is-admin";
 
 const SS_EMAIL = "fc-admin-email";
 const SS_PASS = "fc-admin-pass";
 
-type Tab = "dashboard" | "analytics" | "users" | "sermons" | "cache" | "livraria" | "jornada";
+type Tab = "dashboard" | "analytics" | "users" | "sermons" | "cache" | "livraria" | "jornada" | "notificacoes";
 
 const AdminPage = () => {
   // O painel admin é sempre exibido em português, independente do idioma do app.
   const t = i18n.getFixedT("pt-PT");
+  const navigate = useNavigate();
   const [authed, setAuthed] = useState(false);
+  // Admin pela sessão do app (e-mail confirmado em admin_users): entra direto, sem senha.
+  const [sessaoEmail, setSessaoEmail] = useState<string | null>(null);
+  const [conferindoSessao, setConferindoSessao] = useState(true);
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPass, setAdminPass] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,19 +51,26 @@ const AdminPage = () => {
     { id: "users", label: t("admin.users"), icon: Users },
     { id: "livraria", label: t("admin.livraria"), icon: Library },
     { id: "jornada", label: "Jornada Bíblica", icon: BookMarked },
+    { id: "notificacoes", label: "Notificações", icon: BellRing },
     { id: "sermons", label: t("admin.sermons"), icon: ScrollText },
     { id: "cache", label: t("admin.cache"), icon: Brain },
   ];
 
-  const creds = {
-    _admin_email: sessionStorage.getItem(SS_EMAIL) || "",
-    _admin_password: sessionStorage.getItem(SS_PASS) || "",
-  };
+  // Na sessão, as RPCs admin_* recebem o e-mail da sessão e senha vazia (verify_admin aceita a sessão).
+  const creds = sessaoEmail
+    ? { _admin_email: sessaoEmail, _admin_password: "" }
+    : { _admin_email: sessionStorage.getItem(SS_EMAIL) || "", _admin_password: sessionStorage.getItem(SS_PASS) || "" };
 
   useEffect(() => {
+    let ativo = true;
     const e = sessionStorage.getItem(SS_EMAIL);
     const p = sessionStorage.getItem(SS_PASS);
     if (e && p) setAuthed(true);
+    emailAdminDaSessao()
+      .then((email) => { if (ativo && email) { setSessaoEmail(email); setAuthed(true); } })
+      .catch(() => { /* sem sessão: login antigo */ })
+      .finally(() => { if (ativo) setConferindoSessao(false); });
+    return () => { ativo = false; };
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -74,11 +88,15 @@ const AdminPage = () => {
     }
     sessionStorage.setItem(SS_EMAIL, adminEmail.trim().toLowerCase());
     sessionStorage.setItem(SS_PASS, adminPass);
+    // Atalho "Admin" no app deste aparelho (só aparece se o app estiver com este mesmo e-mail).
+    lembrarAdmin(adminEmail.trim().toLowerCase());
     setAuthed(true);
     setAdminPass("");
   };
 
   const handleLogout = () => {
+    // Na sessão do app, "sair do painel" é só voltar ao app (a conta continua logada).
+    if (sessaoEmail) { navigate("/"); return; }
     sessionStorage.removeItem(SS_EMAIL);
     sessionStorage.removeItem(SS_PASS);
     setAuthed(false);
@@ -95,6 +113,14 @@ const AdminPage = () => {
     setNewPw2("");
     setPwOpen(false);
   };
+
+  if (!authed && conferindoSessao) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" aria-label="Conferindo acesso" />
+      </div>
+    );
+  }
 
   if (!authed) {
     return (
@@ -117,6 +143,9 @@ const AdminPage = () => {
               </Button>
             </form>
           </div>
+          <Link to="/" className="inline-flex min-h-12 items-center gap-2 rounded-lg px-4 text-[0.9375rem] text-muted-foreground hover:bg-muted hover:text-foreground">
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />Voltar ao app
+          </Link>
         </div>
       </div>
     );
@@ -129,6 +158,7 @@ const AdminPage = () => {
       case "users": return <UsersSection creds={creds} onUnauthorized={handleLogout} />;
       case "livraria": return <LibrarySection creds={creds} onUnauthorized={handleLogout} />;
       case "jornada": return <JourneyEditorialSection credentials={creds} />;
+      case "notificacoes": return <NotificationsSection creds={creds} onUnauthorized={handleLogout} />;
       case "sermons": return <SermonsSection />;
       case "cache": return <CacheSection creds={creds} />;
     }
@@ -179,20 +209,28 @@ const AdminPage = () => {
         </nav>
 
         <div className="p-3 border-t border-border space-y-1">
-          <button
+          <Link
+            to="/"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-primary hover:bg-muted transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Voltar ao app
+          </Link>
+          {sessaoEmail && <p className="px-3 py-1 text-sm text-muted-foreground break-all">Entrou pela conta {sessaoEmail}</p>}
+          {!sessaoEmail && <button
             onClick={() => setPwOpen(true)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition"
           >
             <KeyRound className="w-4 h-4" />
             {t("admin.changePassword")}
-          </button>
-          <button
+          </button>}
+          {!sessaoEmail && <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition"
           >
             <LogOut className="w-4 h-4" />
             {t("admin.logout")}
-          </button>
+          </button>}
         </div>
       </aside>
 
@@ -204,6 +242,9 @@ const AdminPage = () => {
           </Button>
           <currentNav.icon className="w-5 h-5 text-primary" />
           <h2 className="font-display text-lg font-bold text-primary">{currentNav.label}</h2>
+          <Link to="/" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground">
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" /><span className="hidden sm:inline">Voltar ao app</span><span className="sm:hidden">App</span>
+          </Link>
         </header>
 
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">

@@ -24,6 +24,9 @@ export default defineConfig(() => ({
       includeAssets: ["favicon.ico", "pwa-icon-192.png", "pwa-icon-512.png"],
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
+        // Notificações push (21/11/2026): o sw.js do PWA importa os eventos push/notificationclick.
+        // Cache e atualização automática continuam iguais (ver public/push-sw.js).
+        importScripts: ["/push-sw.js"],
         // Fontes auto-hospedadas (só latin/latin-ext) entram no precache para uso offline
         globPatterns: ["**/*.{js,wasm,css,html}", "**/*latin*.woff2"],
         // Gravuras da Jornada (domínio público): ficam no aparelho depois da primeira visita.

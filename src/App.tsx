@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -35,7 +35,9 @@ const queryClient = new QueryClient();
 
 const ProtectedRoutes = () => {
   const { email, loading, denied, clearDenied } = useAuth();
-  const isAdminRoute = typeof window !== "undefined" && window.location.pathname.startsWith("/fc-control-panel");
+  // useLocation (e não window.location): o botão Admin troca de rota sem recarregar e esta tela precisa reagir.
+  const { pathname } = useLocation();
+  const isAdminRoute = pathname.startsWith("/fc-control-panel");
 
   if (isAdminRoute) {
     return (

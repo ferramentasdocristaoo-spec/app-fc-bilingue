@@ -2,7 +2,7 @@ import { forwardRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, u
 import type { CSSProperties, FocusEvent, KeyboardEvent, MouseEvent, PointerEvent, ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Home, Mic, LogOut, Library, Map, SlidersHorizontal, Sun, Moon } from "lucide-react";
+import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Home, Mic, LogOut, Library, Map, SlidersHorizontal, Sun, Moon, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
@@ -10,6 +10,7 @@ import { FONT_SIZE_OPTIONS, useFontSize } from "@/hooks/use-font-size";
 import { setLanguageManually } from "@/i18n";
 import type { AppLanguage } from "@/i18n/geo-language";
 import InstallButton from "@/components/InstallButton";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { APP_LANGUAGES, idiomasLiberados, matchAppLanguage, usePlanoAtual } from "@/i18n/app-languages";
 import { VERSIONS_BY_LANG, normalizeBibleLanguage } from "@/data/bible-versions";
 import { getLastRead, libraryProducts } from "@/data/library";
@@ -93,6 +94,9 @@ export function Dock() {
   const language = i18n.resolvedLanguage || i18n.language;
   const { pathname } = useLocation();
   const spot = useJourneySpot(pathname);
+  // Ícone Admin só para admin (admin_users via sessão, ou painel já aberto com senha neste aparelho).
+  const { email } = useAuth();
+  const isAdmin = useIsAdmin(email);
 
   // Estado guardado no aparelho (Oficina, esboços, Livraria): relido a cada troca de página.
   const [stored, setStored] = useState(() => readStored());
@@ -156,9 +160,12 @@ export function Dock() {
         { id: "mural", path: "/mural", icon: MessageCircle, title: t("sidebar.mural.title"), description: t("sidebar.mural.description") },
         { id: "voz", path: "/voz-de-deus", icon: Mic, title: t("sidebar.voz.title"), description: t("sidebar.voz.description") },
       ],
-      [{ id: "settings", path: "", icon: SlidersHorizontal, title: t("dock.settings"), description: t("dock.settingsDescription"), kind: "settings" }],
+      [
+        ...(isAdmin ? [{ id: "admin", path: "/fc-control-panel", icon: Shield, title: t("admin.open"), description: t("admin.openDescription") }] : []),
+        { id: "settings", path: "", icon: SlidersHorizontal, title: t("dock.settings"), description: t("dock.settingsDescription"), kind: "settings" as const },
+      ],
     ];
-  }, [t, language, spot, stored]);
+  }, [t, language, spot, stored, isAdmin]);
 
   const items = useMemo(() => groups.flat(), [groups]);
   const isActive = (item: DockItem) =>

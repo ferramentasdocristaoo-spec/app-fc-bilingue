@@ -40,7 +40,9 @@
     "passwordTooShort": "Password too short (min. 6).",
     "passwordMismatch": "Passwords do not match.",
     "passwordChanged": "Password changed successfully!",
-    "livraria": "Library"
+    "livraria": "Library",
+    "open": "Admin",
+    "openDescription": "App control panel"
   },
   "sidebar": {
     "modules": "Modules",
@@ -780,5 +782,25 @@
     "lockedTitle": "Additional languages",
     "lockedBody": "Add them to your subscription to use {{language}}.",
     "lockedAction": "Unlock languages"
+  },
+  "push": {
+    "bell": "Notifications",
+    "inviteTitle": "Turn on notifications",
+    "inviteText": "Get alerts about new content, devotionals and app news.",
+    "activate": "Turn on notifications",
+    "notNow": "Not now",
+    "working": "Turning on…",
+    "activeTitle": "Notifications are on",
+    "activeText": "You will receive Christian Tools alerts on this device.",
+    "deactivate": "Turn off on this device",
+    "deniedTitle": "Notifications are blocked",
+    "deniedText": "To allow them, open your browser (or phone) settings, find Christian Tools and allow notifications.",
+    "iosInstallTitle": "First, install the app",
+    "iosInstallText": "On iPhone, notifications only work with the app on the Home Screen. In Safari, tap Share and then \"Add to Home Screen\". Then open it from the icon and turn them on here.",
+    "iosOld": "This iPhone needs iOS 16.4 or newer to receive notifications.",
+    "unsupported": "This browser cannot receive notifications. Open the app in Chrome (Android or computer) or Safari (iPhone).",
+    "error": "Could not turn them on right now. Please try again in a moment.",
+    "offTitle": "Notifications are off",
+    "offText": "Turn them on to get alerts on this device."
   }
 }

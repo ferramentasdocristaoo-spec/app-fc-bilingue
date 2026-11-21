@@ -40,7 +40,9 @@
     "passwordTooShort": "Passwort zu kurz (min. 6).",
     "passwordMismatch": "Die Passwörter stimmen nicht überein.",
     "passwordChanged": "Passwort erfolgreich geändert!",
-    "livraria": "Bibliothek"
+    "livraria": "Bibliothek",
+    "open": "Admin",
+    "openDescription": "Steuerzentrale der App"
   },
   "sidebar": {
     "modules": "Module",
@@ -780,5 +782,25 @@
     "lockedTitle": "Zusätzliche Sprachen",
     "lockedBody": "Schalte sie in deinem Abo frei, um {{language}} zu nutzen.",
     "lockedAction": "Sprachen freischalten"
+  },
+  "push": {
+    "bell": "Benachrichtigungen",
+    "inviteTitle": "Benachrichtigungen einschalten",
+    "inviteText": "Erhalte Hinweise auf neue Inhalte, Andachten und Neuigkeiten der App.",
+    "activate": "Benachrichtigungen einschalten",
+    "notNow": "Nicht jetzt",
+    "working": "Wird eingeschaltet…",
+    "activeTitle": "Benachrichtigungen sind an",
+    "activeText": "Du erhältst die Hinweise der Werkzeuge des Christen auf diesem Gerät.",
+    "deactivate": "Auf diesem Gerät ausschalten",
+    "deniedTitle": "Benachrichtigungen blockiert",
+    "deniedText": "Zum Erlauben öffne die Einstellungen des Browsers (oder Handys), suche Werkzeuge des Christen und erlaube Benachrichtigungen.",
+    "iosInstallTitle": "Zuerst die App installieren",
+    "iosInstallText": "Auf dem iPhone funktionieren Benachrichtigungen nur mit der App auf dem Home-Bildschirm. Tippe in Safari auf Teilen und dann auf „Zum Home-Bildschirm“. Öffne sie danach über das Symbol und schalte sie hier ein.",
+    "iosOld": "Dieses iPhone braucht iOS 16.4 oder neuer für Benachrichtigungen.",
+    "unsupported": "Dieser Browser empfängt keine Benachrichtigungen. Öffne die App in Chrome (Android oder Computer) oder in Safari (iPhone).",
+    "error": "Das Einschalten hat gerade nicht geklappt. Bitte gleich noch einmal versuchen.",
+    "offTitle": "Benachrichtigungen sind aus",
+    "offText": "Schalte sie ein, um Hinweise auf diesem Gerät zu erhalten."
   }
 }

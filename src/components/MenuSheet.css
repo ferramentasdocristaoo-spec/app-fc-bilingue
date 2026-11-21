@@ -102,6 +102,27 @@
   cursor: pointer;
 }
 .msheet-logout svg { width: 16px; height: 16px; color: hsl(var(--gold-ink)); }
+/* Atalho do painel admin (só para admin): faixa própria sob o cabeçalho, para não apertar o nome. */
+.msheet-admin {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  margin: 10px 16px 0;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1.5px solid hsl(var(--gold));
+  background: hsl(var(--card));
+  color: hsl(var(--ink));
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.msheet-admin svg { width: 20px; height: 20px; flex: none; color: hsl(var(--gold-ink)); }
+.msheet-admin-desc { margin-left: auto; font-size: 15px; font-weight: 400; color: hsl(var(--ink-2)); text-align: right; }
+.msheet-admin:hover { background: hsl(var(--accent)); }
+.msheet-admin:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
 .msheet-x {
   flex: none;
   display: grid;

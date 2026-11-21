@@ -40,7 +40,9 @@
     "passwordTooShort": "Password troppo breve (min. 6).",
     "passwordMismatch": "Le password non corrispondono.",
     "passwordChanged": "Password modificata con successo!",
-    "livraria": "Libreria"
+    "livraria": "Libreria",
+    "open": "Admin",
+    "openDescription": "Pannello di controllo dell'app"
   },
   "sidebar": {
     "modules": "Moduli",
@@ -780,5 +782,25 @@
     "lockedTitle": "Lingue aggiuntive",
     "lockedBody": "Attivale nel tuo abbonamento per usare {{language}}.",
     "lockedAction": "Attiva le lingue"
+  },
+  "push": {
+    "bell": "Notifiche",
+    "inviteTitle": "Attiva le notifiche",
+    "inviteText": "Ricevi avvisi su nuovi contenuti, devozionali e novità dell'app.",
+    "activate": "Attiva le notifiche",
+    "notNow": "Non ora",
+    "working": "Attivazione…",
+    "activeTitle": "Notifiche attive",
+    "activeText": "Riceverai gli avvisi di Strumenti del Cristiano su questo dispositivo.",
+    "deactivate": "Disattiva su questo dispositivo",
+    "deniedTitle": "Notifiche bloccate",
+    "deniedText": "Per consentirle, apri le impostazioni del browser (o del telefono), cerca Strumenti del Cristiano e consenti le notifiche.",
+    "iosInstallTitle": "Prima, installa l'app",
+    "iosInstallText": "Su iPhone le notifiche funzionano solo con l'app nella schermata Home. In Safari tocca Condividi e poi \"Aggiungi alla schermata Home\". Poi aprila dall'icona e attivale qui.",
+    "iosOld": "Questo iPhone richiede iOS 16.4 o successivo per ricevere notifiche.",
+    "unsupported": "Questo browser non riceve notifiche. Apri l'app in Chrome (Android o computer) o in Safari (iPhone).",
+    "error": "Non è stato possibile attivarle ora. Riprova tra poco.",
+    "offTitle": "Notifiche disattivate",
+    "offText": "Attivale per ricevere gli avvisi su questo dispositivo."
   }
 }

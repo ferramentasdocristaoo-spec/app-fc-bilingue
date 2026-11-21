@@ -2,9 +2,10 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { Drawer as DrawerPrimitive } from "vaul";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Mic, Library, Map, LogOut, Sun, Moon, X } from "lucide-react";
+import { BookOpen, FolderOpen, Search, Heart, Sparkles, MessageCircle, Users, Zap, Mic, Library, Map, LogOut, Sun, Moon, X, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useTheme } from "@/hooks/use-theme";
 import { useFontSize } from "@/hooks/use-font-size";
 import { APP_LANGUAGES, matchAppLanguage } from "@/i18n/app-languages";
@@ -58,6 +59,7 @@ export function MenuSheet({ open, onOpenChange }: MenuSheetProps) {
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
   const { email, signOut } = useAuth();
+  const isAdmin = useIsAdmin(email);
   const { theme, toggleTheme } = useTheme();
   const { fontSize } = useFontSize();
   const language = i18n.resolvedLanguage || i18n.language || "pt-PT";
@@ -153,6 +155,15 @@ export function MenuSheet({ open, onOpenChange }: MenuSheetProps) {
               <X aria-hidden="true" />
             </DrawerPrimitive.Close>
           </header>
+
+          {/* Só para quem está em admin_users (sessão confirmada) ou já entrou no painel neste aparelho. */}
+          {isAdmin && (
+            <Link to="/fc-control-panel" className="msheet-admin" onClick={() => onOpenChange(false)}>
+              <Shield aria-hidden="true" />
+              <span>{t("admin.open")}</span>
+              <span className="msheet-admin-desc">{t("admin.openDescription")}</span>
+            </Link>
+          )}
 
           <div ref={setBody} className="msheet-body" data-cols={cols}>
             {groups.map((group) => (
