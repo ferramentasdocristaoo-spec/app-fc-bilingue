@@ -159,7 +159,22 @@
     "themeShort": "Tema",
     "durationMinutes": "Duración (minutos)",
     "buildOutline": "Armar el bosquejo",
-    "closeEditor": "Cerrar y empezar otro"
+    "closeEditor": "Cerrar y empezar otro",
+    "noteLabel": "Anotación",
+    "addNote": "＋ Anotación",
+    "notePlaceholder": "Escribe tu anotación…",
+    "removeNote": "Quitar anotación",
+    "editPart": "Editar esta parte",
+    "donePart": "Listo",
+    "partTitle": "Título del punto",
+    "partText": "Texto de la parte",
+    "partVerses": "Versículos (separados por comas)",
+    "editInSheet": "Editar en la hoja",
+    "sheetHint": "Toca “Editar esta parte” para cambiar el texto o “＋ Anotación” para escribir tus observaciones. Todo va al PDF.",
+    "pdfPreparing": "Preparando el PDF…",
+    "pdfReady": "PDF listo",
+    "pdfSaved": "El archivo se ha descargado.",
+    "pdfFailed": "No se pudo crear el PDF. Abrimos la impresión del navegador en su lugar."
   },
   "esbocos": {
     "description": "Administra todos tus esquemas guardados. Edita, comparte o elimina según sea necesario.",
@@ -181,7 +196,16 @@
     "statusDraft": "Borrador",
     "statusFinal": "Finalizado",
     "deleteTitle": "¿Eliminar este bosquejo?",
-    "deleteHint": "No podrás recuperarlo después."
+    "deleteHint": "No podrás recuperarlo después.",
+    "backupTitle": "Copia de seguridad",
+    "backupHint": "Tus bosquejos se guardan en este dispositivo, no en internet. Haz una copia de vez en cuando y guarda el archivo en Drive, en tu correo o en la computadora.",
+    "backupButton": "Hacer copia de seguridad",
+    "restoreButton": "Restaurar copia",
+    "backupDone": "Copia guardada con {{count}} bosquejos.",
+    "restoreDone": "Copia restaurada: {{novos}} nuevos, {{atualizados}} actualizados, {{iguais}} ya estaban aquí.",
+    "restoreInvalid": "Este archivo no es una copia de bosquejos de la app.",
+    "backupEmpty": "Todavía no hay bosquejos para copiar.",
+    "notesCount": "anotaciones: {{count}}"
   },
   "raioX": {
     "description": "Analiza versículos bíblicos en profundidad con comparación de versiones, etimología y contexto histórico.",

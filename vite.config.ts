@@ -34,6 +34,11 @@ export default defineConfig(() => ({
           urlPattern: ({ url }) => url.pathname.startsWith("/jornada/") && url.pathname.endsWith(".webp"),
           handler: "CacheFirst",
           options: { cacheName: "jornada-gravuras", expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 180 } },
+        }, {
+          // Fontes .woff do PDF do sermão (o pdf-lib não lê woff2 com subconjunto): ficam no aparelho no 1º PDF.
+          urlPattern: ({ url }) => url.pathname.startsWith("/assets/") && url.pathname.endsWith(".woff"),
+          handler: "CacheFirst",
+          options: { cacheName: "pdf-fontes", expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 } },
         }],
       },
       manifest: {

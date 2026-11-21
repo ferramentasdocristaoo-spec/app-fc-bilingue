@@ -159,7 +159,22 @@
     "themeShort": "Tema",
     "durationMinutes": "Duração (minutos)",
     "buildOutline": "Montar o esboço",
-    "closeEditor": "Fechar e começar outro"
+    "closeEditor": "Fechar e começar outro",
+    "noteLabel": "Anotação",
+    "addNote": "＋ Anotação",
+    "notePlaceholder": "Escreva a sua anotação…",
+    "removeNote": "Remover anotação",
+    "editPart": "Editar esta parte",
+    "donePart": "Concluir",
+    "partTitle": "Título do tópico",
+    "partText": "Texto da parte",
+    "partVerses": "Versículos (separados por vírgula)",
+    "editInSheet": "Editar na folha",
+    "sheetHint": "Toque em “Editar esta parte” para mudar o texto ou em “＋ Anotação” para escrever as suas observações. Tudo vai para o PDF.",
+    "pdfPreparing": "A preparar o PDF…",
+    "pdfReady": "PDF pronto",
+    "pdfSaved": "O ficheiro foi descarregado.",
+    "pdfFailed": "Não foi possível montar o PDF. Abrimos a impressão do navegador em alternativa."
   },
   "esbocos": {
     "description": "Gere todos os teus esboços guardados. Edita, partilha ou elimina conforme necessário.",
@@ -181,7 +196,16 @@
     "statusDraft": "Rascunho",
     "statusFinal": "Finalizado",
     "deleteTitle": "Eliminar este esboço?",
-    "deleteHint": "Não será possível recuperá-lo depois."
+    "deleteHint": "Não será possível recuperá-lo depois.",
+    "backupTitle": "Cópia de segurança",
+    "backupHint": "Os seus esboços ficam guardados neste dispositivo, não na internet. Faça uma cópia de vez em quando e guarde o ficheiro no Drive, no e-mail ou no computador.",
+    "backupButton": "Fazer cópia de segurança",
+    "restoreButton": "Restaurar cópia",
+    "backupDone": "Cópia guardada com {{count}} esboços.",
+    "restoreDone": "Cópia restaurada: {{novos}} novos, {{atualizados}} atualizados, {{iguais}} já estavam cá.",
+    "restoreInvalid": "Este ficheiro não é uma cópia de esboços da aplicação.",
+    "backupEmpty": "Ainda não há esboços para copiar.",
+    "notesCount": "anotações: {{count}}"
   },
   "raioX": {
     "description": "Analisa versículos bíblicos em profundidade com comparação de versões, etimologia e contexto histórico.",
