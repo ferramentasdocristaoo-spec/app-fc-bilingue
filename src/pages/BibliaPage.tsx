@@ -18,6 +18,7 @@ import {
   Library,
   X,
 } from "lucide-react";
+import { escolherVoz, carregarVozes } from "@/lib/speech-voice";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToolError } from "@/components/ToolKit";
 import { toast } from "@/hooks/use-toast";
@@ -283,6 +284,8 @@ const BibliaPage = () => {
   }, [modo, fetchChapter]);
 
   // Controle de áudio por voz
+  useEffect(() => { if (window.speechSynthesis) void carregarVozes(window.speechSynthesis); }, []);
+
   const pararLeitura = useCallback(() => {
     window.speechSynthesis?.cancel();
     setLendo(false);
@@ -295,8 +298,7 @@ const BibliaPage = () => {
     if (!synth || verses.length === 0) return;
     synth.cancel();
 
-    const voices = synth.getVoices();
-    const voice = voices.find((v) => v.lang === speechLang);
+    const voice = escolherVoz(synth.getVoices(), speechLang);
 
     const inicio = selectedVerse ? verses.findIndex((v) => v.verse === selectedVerse) : 0;
     const fila = verses.slice(Math.max(0, inicio));

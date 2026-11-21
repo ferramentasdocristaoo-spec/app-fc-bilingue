@@ -1,4 +1,5 @@
 import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { escolherVoz, carregarVozes } from "@/lib/speech-voice";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowRight, List, Pause, Play, Square, Volume2, X } from "lucide-react";
@@ -142,6 +143,8 @@ export default function LeitorPage() {
     scrollRef.current?.scrollTo({ top: 0 });
   }, [cap]);
 
+  useEffect(() => { if (window.speechSynthesis) void carregarVozes(window.speechSynthesis); }, []);
+
   const pararLeitura = useCallback(() => {
     window.speechSynthesis?.cancel();
     setLendo(false);
@@ -158,8 +161,7 @@ export default function LeitorPage() {
     }
     synth.cancel();
     const speechLang = SPEECH_LANG[libraryLanguage(i18n.resolvedLanguage || i18n.language)] ?? "pt-BR";
-    const voices = synth.getVoices().filter((v) => v.lang.replace("_", "-").toLowerCase().startsWith(speechLang.slice(0, 2)));
-    const voice = voices.find((v) => v.lang.replace("_", "-").toLowerCase() === speechLang.toLowerCase()) ?? voices[0];
+    const voice = escolherVoz(synth.getVoices(), speechLang);
     const textos = [chapter.title, ...chapter.lines];
     textos.forEach((texto, idx) => {
       const fala = new SpeechSynthesisUtterance(texto);
