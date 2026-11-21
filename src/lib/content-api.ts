@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { offlineBible } from "@/lib/bible-offline/manager";
 
 /**
  * Ponto único de acesso ao conteúdo pesado do app (Bíblia, biblioteca, imagens do mural).
@@ -59,6 +60,14 @@ export async function fetchBibleChapter(
   const key = bibleCacheKey(request);
   const cached = bibleCache.get(key);
   if (cached) return cached;
+  // Versão guardada no aparelho (Bíblia offline): lê dele, sem internet.
+  const stored = await offlineBible().readChapter(request.version, request.bookId, request.chapter);
+  if (init.signal?.aborted) throw new DOMException("aborted", "AbortError");
+  if (stored) {
+    if (bibleCache.size >= BIBLE_CACHE_MAX) bibleCache.delete(bibleCache.keys().next().value as string);
+    bibleCache.set(key, stored);
+    return stored;
+  }
   const { url, headers } = bibleChapterRequest(request);
   const delays = init.retryDelaysMs ?? BIBLE_RETRY_DELAYS_MS;
   for (let attempt = 0; ; attempt++) {

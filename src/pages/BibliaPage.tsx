@@ -17,9 +17,11 @@ import {
   BookOpen,
   Library,
   X,
+  WifiOff,
 } from "lucide-react";
 import { escolherVoz, carregarVozes, AUDIO_LEITURA } from "@/lib/speech-voice";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BibleVersionSheet } from "@/components/BibleVersionSheet";
+import { useOfflineBible, useOnline } from "@/hooks/use-offline-bible";
 import { ToolError } from "@/components/ToolKit";
 import { toast } from "@/hooks/use-toast";
 import { fetchBibleChapter } from "@/lib/content-api";
@@ -42,6 +44,23 @@ function lerSalvos(): VersiculoSalvo[] {
   } catch {
     return [];
   }
+}
+
+const VERSAO_KEY = "fc-biblia-versao";
+/** Última versão escolhida, por idioma da lista ({"pt-BR": "NAA", "en": "KJV"}). */
+function lerVersaoGuardada(lang: string): string | null {
+  try {
+    const mapa = JSON.parse(localStorage.getItem(VERSAO_KEY) || "{}");
+    return typeof mapa?.[lang] === "string" ? mapa[lang] : null;
+  } catch {
+    return null;
+  }
+}
+function guardarVersao(lang: string, version: string) {
+  try {
+    const mapa = JSON.parse(localStorage.getItem(VERSAO_KEY) || "{}");
+    localStorage.setItem(VERSAO_KEY, JSON.stringify({ ...(mapa && typeof mapa === "object" ? mapa : {}), [lang]: version }));
+  } catch { /* vazio */ }
 }
 
 const SPEECH_LANG: Record<string, string> = {
@@ -173,14 +192,21 @@ const BibliaPage = () => {
   const [version, setVersion] = useState<string>(() => {
     const v = searchParams.get("version");
     if (v && versions.some((item) => item.id === v)) return v;
+    // Última versão escolhida (Bíblia offline: reabrir sem internet volta na versão que está no celular).
+    const ultima = lerVersaoGuardada(lang);
+    if (ultima && versions.some((item) => item.id === ultima)) return ultima;
     return DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "ol";
   });
+  useEffect(() => {
+    if (versions.some((item) => item.id === version)) guardarVersao(lang, version);
+  }, [lang, version, versions]);
 
   // Trocou o idioma com a página aberta (Dock ou detecção por país)? Se a versão atual não existe na
   // lista nova (ex.: OL ao ir de pt-PT para pt-BR), volta para a padrão do idioma (ARA).
   useEffect(() => {
     if (!versions.some((item) => item.id === version)) {
-      setVersion(DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "OL");
+      const ultima = lerVersaoGuardada(lang);
+      setVersion(ultima && versions.some((item) => item.id === ultima) ? ultima : DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "OL");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
@@ -189,6 +215,12 @@ const BibliaPage = () => {
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Sem internet e a versão escolhida ainda não está no celular.
+  const [offlineMissing, setOfflineMissing] = useState(false);
+  const [versionSheetOpen, setVersionSheetOpen] = useState(false);
+  const { manager: offline, snapshot: offlineSnapshot } = useOfflineBible();
+  const online = useOnline();
+  const versionReady = offlineSnapshot.versions[version]?.status === "ready";
 
   // Busca e modal de capítulos na estante
   const [buscaEstante, setBuscaEstante] = useState("");
@@ -253,6 +285,7 @@ const BibliaPage = () => {
     chapterAbort.current = controller;
     setLoading(true);
     setFailed(false);
+    setOfflineMissing(false);
     try {
       const data = await fetchBibleChapter({ version, bookId, chapter }, { signal: controller.signal });
       if (requestId !== chapterRequestId.current) return;
@@ -267,21 +300,46 @@ const BibliaPage = () => {
         setVerses([]);
         setFailed(true);
       }
-    } catch {
+    } catch (e) {
       if (requestId !== chapterRequestId.current) return;
       // Sem isto, a tela continuava mostrando o capítulo anterior (ou a outra versão) com o título novo.
       setVerses([]);
       setFailed(true);
+      // Falha de rede (fetch rejeita com TypeError) ou aparelho sem internet: aviso próprio da Bíblia offline.
+      const semRede = (typeof navigator !== "undefined" && navigator.onLine === false) || e instanceof TypeError;
+      if (semRede && offline.getSnapshot().versions[version]?.status !== "ready") setOfflineMissing(true);
     } finally {
       if (requestId === chapterRequestId.current) setLoading(false);
     }
-  }, [bookId, chapter, version]);
+  }, [bookId, chapter, version, offline]);
 
   useEffect(() => {
     if (modo === "leitor") {
       fetchChapter();
     }
   }, [modo, fetchChapter]);
+
+  // Bíblia offline: a versão que a pessoa está lendo é guardada inteira no celular (sem botão "baixar").
+  // Sem internet não faz nada; quando a conexão volta, continua.
+  useEffect(() => {
+    if (modo === "leitor") void offline.ensureVersion(version, { auto: true });
+  }, [modo, version, online, offline]);
+
+  // Voltou a internet com o aviso de "sem internet" na tela: tenta o capítulo de novo.
+  useEffect(() => {
+    if (online && offlineMissing && modo === "leitor") fetchChapter();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [online]);
+
+  // Versões deste idioma que abrem sem internet (para o aviso).
+  const versoesNoCelular = versions.filter((v) => v.id !== version && offlineSnapshot.versions[v.id]?.status === "ready");
+  const nomeVersao = (id: string) => versions.find((v) => v.id === id)?.name ?? id;
+  const escolherVersao = (id: string) => {
+    setVersion(id);
+    setSelectedVerse(null);
+    setVersionSheetOpen(false);
+    void offline.ensureVersion(id);
+  };
 
   // Controle de áudio por voz
   useEffect(() => { if (window.speechSynthesis) void carregarVozes(window.speechSynthesis); }, []);
@@ -625,25 +683,26 @@ const BibliaPage = () => {
               <ChevronDown size={16} />
             </button>
 
-            <Select
-              value={version}
-              onValueChange={(v) => {
-                setVersion(v);
-                setSelectedVerse(null);
-              }}
+            <button
+              type="button"
+              className="biblia-pill-btn biblia-version-pill"
+              onClick={() => setVersionSheetOpen(true)}
+              aria-haspopup="dialog"
+              aria-label={`${t("biblia.versionLabel")}: ${nomeVersao(version)}`}
             >
-              <SelectTrigger className="biblia-pill-btn w-auto border-[1.5px] border-[#b9a77f] rounded-full px-4 h-[46px]">
-                <SelectValue placeholder={t("biblia.versionLabel")} />
-              </SelectTrigger>
-              <SelectContent>
-                {versions.map((v) => (
-                  <SelectItem key={v.id} value={v.id}>
-                    {v.name} ({v.id.toUpperCase()})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <span>{nomeVersao(version).split(" - ")[0]}</span>
+              {versionReady && <span className="biblia-version-saved" aria-hidden="true">✓</span>}
+              <ChevronDown size={16} aria-hidden="true" />
+            </button>
           </div>
+
+          <BibleVersionSheet
+            open={versionSheetOpen}
+            onOpenChange={setVersionSheetOpen}
+            versions={versions}
+            current={version}
+            onChoose={escolherVersao}
+          />
 
           {/* Título grande serifado */}
           <h2 className="biblia-chapter-title">
@@ -676,6 +735,31 @@ const BibliaPage = () => {
                   </p>
                 );
               })}
+            </div>
+          ) : offlineMissing ? (
+            <div className="biblia-offline-aviso" role="alert">
+              <WifiOff size={28} aria-hidden="true" />
+              <h3>{t("biblia.offline.offlineTitle")}</h3>
+              <p>
+                {offline.canDownload(version)
+                  ? t("biblia.offline.offlineMissing", { name: nomeVersao(version) })
+                  : t("biblia.offline.offlineOnlineOnly", { name: nomeVersao(version) })}
+              </p>
+              {versoesNoCelular.length > 0 ? (
+                <>
+                  <p className="biblia-offline-sub">{t("biblia.offline.offlineChoose")}</p>
+                  <div className="biblia-offline-opcoes">
+                    {versoesNoCelular.map((v) => (
+                      <button key={v.id} type="button" className="bv-btn bv-btn-primary" onClick={() => escolherVersao(v.id)}>
+                        {t("biblia.offline.readIn", { name: v.name.split(" - ")[0] })}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <p className="biblia-offline-sub">{t("biblia.offline.offlineNone")}</p>
+              )}
+              <button type="button" className="bv-btn" onClick={fetchChapter}>{t("common.retry")}</button>
             </div>
           ) : failed ? (
             <ToolError onRetry={fetchChapter}>{t("biblia.errorMessage")}</ToolError>

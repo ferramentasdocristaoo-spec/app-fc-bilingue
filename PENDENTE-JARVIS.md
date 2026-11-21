@@ -1,5 +1,35 @@
 # Pendente para o Jarvis — App FC (wt-final, branch `app-novo`)
 
+## 2026-11-21 · Bíblia offline por versão (Noé, Tecnologia)
+Branch **`biblia-offline`** (worktree `wt-offline`, a partir do `icone-azul` 51cdf94), commits `65ee1b2` + `c2f6c7b`. **Sem push, sem deploy, sem SQL, sem secret.** Nada novo no servidor: o arquivo da Bíblia vem direto do bolls.life (CORS liberado), sem proxy nosso.
+
+**Como funciona**
+- Na leitura, o botão da versão (ex.: "ARA ▾") abre a **lista de versões**. Tocar numa versão troca a leitura **e já guarda a versão inteira no celular** (sem botão "baixar"). Abrir a leitura também guarda sozinha a versão que está sendo lida.
+- Na linha da versão: "Baixando… 45%" com barrinha, depois **"No celular ✓ · 5,0 MB"**; lixeira para **tirar do celular** (com confirmação) e total no rodapé ("2 versões no celular · 10,4 MB"). A leitura começa na hora pela internet enquanto baixa.
+- Leitura **primeiro do aparelho** (IndexedDB `fc-biblia-offline`), só vai à internet se a versão não estiver guardada. Mesmo texto limpo de hoje (`cleanBibleText`). O versículo do dia também passa a ler do aparelho.
+- **Sem internet:** versão guardada abre normal (até recarregando o app: o service worker continua igual). Versão não guardada: aviso "Você está sem internet… ainda não está salva no celular" com botões "Ler na NAA" etc.
+- O app agora **lembra a última versão escolhida** por idioma (antes voltava sempre na padrão).
+- Pede `navigator.storage.persist()` no primeiro download. Versão que a pessoa tirou **não volta sozinha** (só tocando nela); com "economia de dados" ligada só baixa com toque. Gratuito: sem cobrança nem propaganda.
+- Textos nos 7 idiomas. Lista de versões **não mudou**.
+
+**Quanto ocupa (medido nos arquivos reais do bolls.life, 21/11)** — download (ZIP) / espaço no celular:
+- pt-BR: ACF 1,6/5,3 · ARA 1,6/5,0 · ARC 2,1/5,1 · AS21 1,6/5,0 · KJA 1,9/5,7 · NAA 1,9/5,4 · NBV 1,9/5,6 · NTLH 1,7/5,4 · NVT 1,8/5,2 · TB 2,3/5,0 · VFL 1,8/5,4 · MENS 1,7/4,8 · CNBB 1,7/4,9 · OL 1,8/5,2 · NTJ (só NT) 0,4/1,2 MB
+- en: KJV 2,6/9,4 · NKJV 2,4/5,3 · ESV 2,4/5,1 · NLT 1,8/5,2 · WEB 1,9/5,1 · ASV 2,2/9,0 · YLT 1,6/5,2 · MSG 1,8/5,1
+- es: RVR60 1,7/5,1 · RVG 1,6/5,0 · BTX3 1,9/5,0 · NTV 1,9/5,5 · PDT 1,9/5,4 · LBLA 2,0/5,4
+- fr: LSG 1,7/5,4 · NBS 4,5/5,4 · PDV 2,0/5,7 · BDS 2,3/5,9 · DBY 1,7/5,4 · it: NR06 1,7/5,2 · de: LUT 1,7/5,2 · SCH2000 2,0/5,5 · HFA 2,0/5,7 · ELB 1,8/5,8
+- (KJV e ASV ocupam mais porque o texto traz marcações de Strong, que o app já esconde.) Com 2 versões + o app, o Chrome mediu ~28 MB de uso total.
+
+**Qualidade:** `npm test` **342/342** (+18 da Bíblia offline: ZIP, montagem, fila, remoção, rede parada, banco que não abre, leitura do aparelho, tela sem internet e lista). `npm run build` ok, `tsc` só com os 10 erros antigos. Chrome real (`scripts/teste-biblia-offline.mjs`, Supabase simulado, texto e ZIP reais do bolls.life): **24 conferências** em 390×844 e 1440×900 — progresso na linha, ARA guardada sozinha, NAA ao tocar, sem internet João 4 do aparelho sem pedir à rede, **recarregar o app sem internet abre a Bíblia**, trocar de versão sem internet, aviso da versão não guardada, remover, nenhum texto < 14 px nem toque < 48 px, nenhum erro de página. Prints: `direcoes-identidade/prints/biblia-offline/` (14). Revisado pelo **code-reviewer**; achados corrigidos (conexão do IndexedDB perdida no iOS, download parado, remoção que se desfazia, memória no iPhone, erro de cota, foco/leitor de tela).
+
+**Não testado:** iPhone de verdade (Safari 16.4+ necessário para descompactar; iPhone mais antigo continua lendo pela internet, sem quebrar) e memória num iPhone antigo com a versão maior.
+
+**Decisões / pendências do dono**
+1. **NVI fora do ar no bolls.life (já hoje, em produção):** as versões **NVI pt-BR/pt-PT (NVIPT), NIV inglês (NIV2011) e NVI espanhol (NVI)** não trazem mais o texto bíblico — em todos os versículos vem um aviso do bolls.life dizendo que a Biblica proibiu o uso. Quem escolhe NVI no app hoje lê esse aviso. No offline elas ficam marcadas "Só com internet" (não baixamos 50 MB de aviso). **Decidir: tirar essas 3 da lista** (pedido dizia não mexer na lista, então não tirei) ou trocar por outra fonte licenciada.
+2. **Direitos autorais (uso offline):** o texto vem do bolls.life, que distribui versões com direitos de editoras. **Domínio público** (sem problema guardar no aparelho): KJV, ASV, YLT, WEB, Luther 1912, Louis Segond 1910, Darby, TB 1917, ARC 1909 (com ressalvas de edição). **Com direitos** (ARA, NAA, ACF, AS21, KJA, NBV, NTLH, NVT, VFL, A Mensagem, CNBB, O Livro, NTJ, NKJV, ESV, NLT, MSG, RVR60, RVG, BTX3, NTV, PDT, LBLA, NBS, PDV, BDS, NR06, Schlachter 2000, HFA, Elberfelder): o app já exibe essas versões online pelo bolls.life sem licença própria; guardar a versão inteira no aparelho é uma cópia completa e aumenta a exposição. Recomendo o dono decidir se libera o offline só para as de domínio público (1 linha no código: lista `ONLINE_ONLY_VERSIONS`) ou para todas, e, idealmente, buscar licença (SBB para ARA/NAA/NTLH etc.).
+3. Se quiser não depender do bolls.life para o arquivo, dá para servir o ZIP pelo nosso Worker (`VITE_BIBLE_OFFLINE_BASE`, já previsto no código; precisa de rota nova e deploy).
+4. Publicar: merge de `biblia-offline` (junto com `icone-azul`/`admin-push`), push e deploy só com o ok do dono. Não precisa de SQL nem secret.
+
+---
 
 ## 2026-11-21 · Admin novo no padrão do app (Aoliabe, Criação)
 Branch **`admin-push`**, commits `089a954` + `a256fbe` + `9957b44`. **Sem push, sem deploy, sem SQL, sem secret, nenhuma notificação enviada.** Só a apresentação mudou: login antigo, sessão, RPCs e o fluxo de envio/tradução continuam iguais.
