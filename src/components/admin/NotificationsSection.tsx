@@ -9,13 +9,18 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { BellRing, CheckCircle2, Loader2, RefreshCw, Send, TriangleAlert } from "lucide-react";
+import { BellRing, CheckCircle2, Languages, Loader2, RefreshCw, Send, TriangleAlert } from "lucide-react";
 import { firebaseConfigurado } from "@/lib/firebase-config";
-import { IDIOMAS_PUSH, LIMITES, PLANOS_PUSH, validarMensagem, type GrupoPlano, type Publico } from "../../../supabase/functions/push-send/publico";
+import { IDIOMAS_PUSH, LIMITES, PLANOS_PUSH, rotuloPublico, validarMensagem, type GrupoPlano, type Publico } from "../../../supabase/functions/push-send/publico";
+import { chaveCache, IDIOMA_ORIGEM, type Traducoes, type Versao } from "../../../supabase/functions/push-send/traducao";
+import { chaveDoItem, chaveOrigem, erroDoItem, idiomasTraduzidos, NOME_IDIOMA, OUTROS, planoDeEnvio, type ItemEnvio } from "./notificacoes-idiomas";
 
 /* Central de mensagens (21/11/2026), no modelo da Fome Livre: título, mensagem, link do app, público
-   (todos / plano / idioma / um e-mail de teste), prévia iPhone e Android, contagem, confirmação com o
-   número de pessoas e histórico. Quem envia é a função push-send (FCM HTTP v1). */
+   (todos / plano / um e-mail de teste), prévia iPhone e Android, contagem, confirmação com o
+   número de pessoas e histórico. Quem envia é a função push-send (FCM HTTP v1).
+   Idiomas (21/11, pedido do dono): escreve em pt-BR, marca os idiomas de saída, "Traduzir" (Claude Haiku
+   no servidor, ação traduzir do push-send) gera versões editáveis; um envio por idioma, cada pessoa recebe
+   no idioma do app. pt-BR sai como foi escrito. Ver notificacoes-idiomas.ts. */
 
 interface Props {
   creds: { _admin_email: string; _admin_password: string };
@@ -51,6 +56,13 @@ const ERROS: Record<string, string> = {
   titulo_vazio: "Escreva o título.", texto_vazio: "Escreva a mensagem.",
   titulo_longo: `Título com mais de ${LIMITES.titulo} letras.`, texto_longo: `Mensagem com mais de ${LIMITES.texto} letras.`,
   publico_invalido: "Escolha o público (e um e-mail válido no teste).",
+  sem_idiomas: "Marque pelo menos um idioma além do português para traduzir.",
+  traducao_sem_chave: "A tradução ainda não está ligada (falta o secret ANTHROPIC_API_KEY na função push-send).",
+  traducao_falhou: "A tradução não respondeu.",
+  traducao_ocupada: "O serviço de tradução está ocupado agora.",
+  traducao_vazia: "A tradução voltou vazia.", traducao_invalida: "A tradução voltou num formato inesperado.",
+  traducao_incompleta: "A tradução voltou faltando algum idioma.", traducao_recusada: "O serviço de tradução recusou este texto.",
+  traducao_cortada: "A tradução veio cortada.",
   funcao_indisponivel: "A função push-send ainda não está publicada no Supabase (ou a migração não foi rodada).",
 };
 
@@ -88,24 +100,44 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
   const [linkOutro, setLinkOutro] = useState("");
   const [tipo, setTipo] = useState<"todos" | "plano" | "email">("email");
   const [plano, setPlano] = useState<GrupoPlano>("br");
-  const [idiomas, setIdiomas] = useState<string[]>([]);
   const [emailTeste, setEmailTeste] = useState(creds._admin_email);
 
-  const [contagem, setContagem] = useState<Contagem | null>(null);
+  // Idiomas de saída: o dono escreve em pt-BR e marca para quem vai. Cada idioma é um envio separado.
+  const [marcados, setMarcados] = useState<string[]>([IDIOMA_ORIGEM]);
+  const [outrosEmPt, setOutrosEmPt] = useState(false);
+  const [versoes, setVersoes] = useState<Record<string, Versao>>({});
+  const [traduzidoDe, setTraduzidoDe] = useState<string | null>(null);
+  const [traduzindo, setTraduzindo] = useState(false);
+  const [erroTraducao, setErroTraducao] = useState<string | null>(null);
+  const cacheTraducao = useRef(new Map<string, Traducoes>());
+  const [previa, setPrevia] = useState<string>(IDIOMA_ORIGEM);
+  const [testeIdioma, setTesteIdioma] = useState<string>(IDIOMA_ORIGEM);
+
+  const [contagens, setContagens] = useState<Record<string, Contagem> | null>(null);
   const [contando, setContando] = useState(false);
+  const [recontar, setRecontar] = useState(0);
   const [confirmar, setConfirmar] = useState(false);
   const [enviando, setEnviando] = useState(false);
   // Uma chave por confirmação: o servidor recusa a mesma chave duas vezes (duas abas, clique repetido).
   const chaveRef = useRef<string>("");
 
   const link = linkSel === "outro" ? linkOutro.trim() : linkSel;
-  const publico: Publico = useMemo(() => {
-    if (tipo === "email") return { tipo: "email", email: emailTeste.trim().toLowerCase() };
-    const extra = idiomas.length ? { idiomas } : {};
-    return tipo === "plano" ? { tipo: "plano", plano, ...extra } : { tipo: "todos", ...extra };
-  }, [tipo, plano, idiomas, emailTeste]);
-  const validacao = validarMensagem({ titulo, texto, link });
-  const erroValidacao = validacao.ok ? null : (validacao as { erro: string }).erro;
+  const origem: Versao = useMemo(() => ({ titulo, texto }), [titulo, texto]);
+  const paraTraduzir = idiomasTraduzidos(marcados);
+  const desatualizada = traduzidoDe !== null && traduzidoDe !== chaveOrigem(origem) && paraTraduzir.some((l) => versoes[l]);
+  const validacaoOrigem = validarMensagem({ titulo, texto, link });
+  const erroOrigem = validacaoOrigem.ok ? null : (validacaoOrigem as { erro: string }).erro;
+
+  // Itens do envio: no teste, uma versão só (a escolhida) para o e-mail; senão, um por idioma.
+  const itens: ItemEnvio[] = useMemo(() => {
+    if (tipo === "email") {
+      const v = testeIdioma === IDIOMA_ORIGEM ? origem : versoes[testeIdioma] ?? { titulo: "", texto: "" };
+      return [{ id: testeIdioma, rotulo: NOME_IDIOMA[testeIdioma] ?? testeIdioma, publico: { tipo: "email", email: emailTeste.trim().toLowerCase() }, titulo: v.titulo, texto: v.texto }];
+    }
+    return planoDeEnvio({ tipo, plano, marcados, outrosEmPt, origem, versoes });
+  }, [tipo, plano, marcados, outrosEmPt, origem, versoes, testeIdioma, emailTeste]);
+  // Chave só do público (sem o texto): a contagem não refaz a cada letra digitada.
+  const chavePublicos = JSON.stringify(itens.map((i) => [i.id, i.publico]));
 
   const credsRef = useRef(creds);
   credsRef.current = creds;
@@ -126,48 +158,95 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
 
   useEffect(() => { void carregar(); }, [carregar]);
 
-  // Contagem automática ao mudar o público (meio segundo depois da última mudança).
+  // Contagem automática por idioma ao mudar o público (meio segundo depois da última mudança).
   useEffect(() => {
     if (statusErro) return;
-    if (publico.tipo === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(publico.email)) { setContagem(null); return; }
+    const publicos = JSON.parse(chavePublicos) as [string, Publico][];
+    if (!publicos.length) { setContagens({}); return; }
+    const p0 = publicos[0][1];
+    if (p0.tipo === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p0.email)) { setContagens(null); return; }
     let ativo = true;
     setContando(true);
     const id = window.setTimeout(async () => {
-      const r = await chamar<Contagem>(base("contar", { publico }));
+      const rs = await Promise.all(publicos.map(([, publico]) => chamar<Contagem>(base("contar", { publico }))));
       if (!ativo) return;
       setContando(false);
-      setContagem(r.ok ? r.data : null);
+      setContagens(rs.every((r) => r.ok) ? Object.fromEntries(publicos.map(([idItem], i) => [idItem, rs[i].data as Contagem])) : null);
     }, 500);
     return () => { ativo = false; window.clearTimeout(id); };
-  }, [publico, base, statusErro]);
+  }, [chavePublicos, base, statusErro, recontar]);
 
-  const enviar = async () => {
-    if (!validacao.ok || !contagem) return;
-    setEnviando(true);
-    const r = await chamar<{ envio: number; enviados: number; falhas: number; removidos: number; status: string }>(
-      base("enviar", { publico, titulo, texto, link, confirmar: contagem.pessoas, chave: chaveRef.current }),
-    );
-    setEnviando(false);
-    setConfirmar(false);
+  const total = useMemo(() => {
+    if (!contagens) return null;
+    return itens.reduce((t, i) => ({ pessoas: t.pessoas + (contagens[i.id]?.pessoas ?? 0), aparelhos: t.aparelhos + (contagens[i.id]?.aparelhos ?? 0) }), { pessoas: 0, aparelhos: 0 });
+  }, [contagens, itens]);
+  // Só entram no lote os idiomas com alguém inscrito; os outros ficam de fora sem erro.
+  const lote = itens.filter((i) => (contagens?.[i.id]?.aparelhos ?? 0) > 0);
+  const errosDoLote = lote.map((i) => ({ item: i, erro: erroDoItem(i, link) })).filter((x) => x.erro);
+
+  const traduzir = async () => {
+    if (!validacaoOrigem.ok || !paraTraduzir.length) return;
+    const t = titulo.trim(), x = texto.trim();
+    const chave = chaveCache(t, x, paraTraduzir);
+    setErroTraducao(null);
+    const guardada = cacheTraducao.current.get(chave);
+    if (guardada) { setVersoes((v) => ({ ...v, ...guardada })); setTraduzidoDe(chaveOrigem(origem)); return; }
+    setTraduzindo(true);
+    const r = await chamar<{ traducoes: Traducoes; cache: boolean }>(base("traduzir", { titulo: t, texto: x, idiomas: paraTraduzir }));
+    setTraduzindo(false);
     if (!r.ok) {
-      if (r.erro === "confirmacao_diferente" && r.extra) {
-        const pessoas = Number(r.extra.pessoas) || 0;
-        setContagem((c) => (c ? { ...c, pessoas, aparelhos: Number(r.extra?.aparelhos) || 0 } : c));
-        toast.warning(`O público mudou: agora são ${pessoas} pessoas. Confira e confirme de novo.`);
-        return;
-      }
-      tratarErro(r.erro);
-      void carregar();
+      if (r.erro === "nao_autorizado") { tratarErro(r.erro); return; }
+      // Falhou: campos vazios para o dono escrever à mão. Nada é enviado sem texto em cada idioma.
+      setErroTraducao(ERROS[r.erro] ?? ERROS.traducao_falhou);
+      setVersoes((v) => ({ ...v, ...Object.fromEntries(paraTraduzir.map((l) => [l, { titulo: "", texto: "" }])) }));
+      setTraduzidoDe(chaveOrigem(origem));
       return;
     }
-    toast.success(`Enviado: ${r.data.enviados} aparelho(s)${r.data.falhas ? `, ${r.data.falhas} falha(s)` : ""}${r.data.removidos ? `, ${r.data.removidos} removido(s)` : ""}.`);
-    if (publico.tipo !== "email") { setTitulo(""); setTexto(""); }
+    cacheTraducao.current.set(chave, r.data.traducoes);
+    setVersoes((v) => ({ ...v, ...r.data.traducoes }));
+    setTraduzidoDe(chaveOrigem(origem));
+    toast.success(r.data.cache ? "Tradução reaproveitada (mesmo texto de antes)." : `Traduzido para ${paraTraduzir.length} idioma(s). Confira antes de enviar.`);
+  };
+
+  const editarVersao = (l: string, campo: keyof Versao, valor: string) =>
+    setVersoes((v) => ({ ...v, [l]: { ...(v[l] ?? { titulo: "", texto: "" }), [campo]: valor } }));
+
+  const enviar = async () => {
+    if (!contagens || !lote.length || errosDoLote.length) return;
+    setEnviando(true);
+    const feitos: string[] = [];
+    let parou: string | null = null;
+    for (const item of lote) {
+      const r = await chamar<{ envio: number; enviados: number; falhas: number; removidos: number; status: string }>(
+        base("enviar", { publico: item.publico, titulo: item.titulo, texto: item.texto, link, confirmar: contagens[item.id].pessoas, chave: chaveDoItem(chaveRef.current, item.id) }),
+      );
+      if (r.ok) { feitos.push(`${item.rotulo}: ${r.data.enviados} aparelho(s)${r.data.falhas ? `, ${r.data.falhas} falha(s)` : ""}`); continue; }
+      if (r.erro === "nao_autorizado") { setEnviando(false); setConfirmar(false); tratarErro(r.erro); return; }
+      parou = r.erro === "confirmacao_diferente"
+        ? `${item.rotulo}: o público mudou (agora ${Number(r.extra?.pessoas) || 0} pessoas). Confira e confirme de novo.`
+        : `${item.rotulo}: ${ERROS[r.erro] ?? "não deu certo."}`;
+      break;
+    }
+    setEnviando(false);
+    setConfirmar(false);
+    if (feitos.length) toast.success(`Enviado. ${feitos.join(" · ")}`);
+    if (parou) { toast.error(feitos.length ? `Parou no meio. ${parou} Os idiomas acima já foram.` : parou); setRecontar((n) => n + 1); }
+    if (!parou && tipo !== "email") { setTitulo(""); setTexto(""); setVersoes({}); setTraduzidoDe(null); }
     void carregar();
   };
 
-  const alternarIdioma = (l: string) => setIdiomas((xs) => (xs.includes(l) ? xs.filter((x) => x !== l) : [...xs, l]));
+  // Idioma do teste desmarcado: volta para o pt-BR.
+  useEffect(() => {
+    if (testeIdioma !== IDIOMA_ORIGEM && !paraTraduzir.includes(testeIdioma)) setTesteIdioma(IDIOMA_ORIGEM);
+  }, [testeIdioma, paraTraduzir]);
+
+  const alternarIdioma = (l: string) => setMarcados((xs) => (xs.includes(l) ? xs.filter((x) => x !== l) : [...xs, l]));
   const frontPronto = firebaseConfigurado();
-  const podeEnviar = validacao.ok && !!contagem && contagem.aparelhos > 0 && !contando && !!status?.configurado;
+  const podeEnviar = !!contagens && lote.length > 0 && !errosDoLote.length && !desatualizada && !traduzindo && !contando && !!status?.configurado;
+  const rotuloBase = tipo === "email" ? rotuloPublico({ tipo: "email", email: emailTeste.trim().toLowerCase() })
+    : rotuloPublico(tipo === "plano" ? { tipo: "plano", plano } : { tipo: "todos" });
+  const opcoesPrevia = tipo === "email" ? [testeIdioma] : itens.map((i) => i.id);
+  const itemPrevia = itens.find((i) => i.id === previa) ?? itens[0];
 
   return (
     <div className="space-y-6">
@@ -199,23 +278,76 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
         {/* Escrever */}
         <section className="rounded-xl border border-border bg-card p-4 md:p-5 space-y-5">
           <h3 className="font-display text-lg font-bold text-primary">Nova mensagem</h3>
+          <p className="text-sm text-muted-foreground">Escreva em português. Quem usa o app em outro idioma recebe a tradução do idioma dele.</p>
           <div className="space-y-1.5">
-            <Label htmlFor="push-titulo">Título</Label>
-            <Input id="push-titulo" value={titulo} maxLength={LIMITES.titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex.: Novo livro na Jornada" />
+            <Label htmlFor="push-titulo">Título em português</Label>
+            <Input id="push-titulo" className="h-12 text-base" value={titulo} maxLength={LIMITES.titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex.: Novo livro na Jornada" />
             <p className="text-sm text-muted-foreground">{titulo.trim().length}/{LIMITES.titulo}</p>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="push-texto">Mensagem</Label>
-            <Textarea id="push-texto" value={texto} maxLength={LIMITES.texto} rows={3} onChange={(e) => setTexto(e.target.value)} placeholder="Ex.: Rute já está no mapa interativo. Toque para abrir." />
+            <Label htmlFor="push-texto">Mensagem em português</Label>
+            <Textarea id="push-texto" className="text-base" value={texto} maxLength={LIMITES.texto} rows={3} onChange={(e) => setTexto(e.target.value)} placeholder="Ex.: Rute já está no mapa interativo. Toque para abrir." />
             <p className="text-sm text-muted-foreground">{texto.trim().length}/{LIMITES.texto}</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="push-link">Ao tocar, abre</Label>
-            <select id="push-link" className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm" value={linkSel} onChange={(e) => setLinkSel(e.target.value)}>
+            <select id="push-link" className="h-12 w-full rounded-md border border-input bg-background px-3 text-base" value={linkSel} onChange={(e) => setLinkSel(e.target.value)}>
               {LINKS.map((l) => <option key={l.valor} value={l.valor}>{l.rotulo}{l.valor !== "outro" ? ` (${l.valor})` : ""}</option>)}
             </select>
-            {linkSel === "outro" && <Input aria-label="Caminho do app" value={linkOutro} onChange={(e) => setLinkOutro(e.target.value)} placeholder="/jornada/rute" />}
+            {linkSel === "outro" && <Input aria-label="Caminho do app" className="h-12 text-base" value={linkOutro} onChange={(e) => setLinkOutro(e.target.value)} placeholder="/jornada/rute" />}
           </div>
+
+          <fieldset className="space-y-3" data-testid="push-idiomas">
+            <legend className="text-sm font-medium">Idiomas de saída</legend>
+            <p className="text-sm text-muted-foreground">Cada pessoa recebe no idioma do app dela. Idioma não marcado não recebe.</p>
+            <div className="flex flex-wrap gap-2">
+              {IDIOMAS_PUSH.map((l) => (
+                <label key={l} className={`inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm ${marcados.includes(l) ? "border-primary bg-primary/10 font-medium" : "border-border"}`}>
+                  <input type="checkbox" checked={marcados.includes(l)} onChange={() => alternarIdioma(l)} className="h-5 w-5 accent-primary" />
+                  {NOME_IDIOMA[l] ?? l}
+                </label>
+              ))}
+            </div>
+            <label className="flex min-h-12 items-center gap-3 text-sm">
+              <input type="checkbox" checked={outrosEmPt} onChange={(e) => setOutrosEmPt(e.target.checked)} className="h-5 w-5 accent-primary" />
+              Enviar em português para quem usa os outros idiomas
+            </label>
+            <Button type="button" variant="secondary" className="h-12 w-full gap-2 text-base" disabled={!validacaoOrigem.ok || !paraTraduzir.length || traduzindo} onClick={() => void traduzir()}>
+              {traduzindo ? <Loader2 className="h-5 w-5 animate-spin" /> : <Languages className="h-5 w-5" />}
+              {traduzindo ? "Traduzindo…" : paraTraduzir.length ? `Traduzir para ${paraTraduzir.length} idioma(s)` : "Traduzir (marque um idioma além do pt-BR)"}
+            </Button>
+            {erroTraducao && (
+              <p role="alert" className="flex items-start gap-2 text-sm text-destructive"><TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />{erroTraducao} Escreva as versões à mão nos campos abaixo, ou tente de novo.</p>
+            )}
+            {desatualizada && (
+              <div role="alert" className="space-y-2 rounded-lg border border-amber-500/60 bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+                <p>Você mudou o texto em português depois de traduzir. Traduza de novo ou confirme que as versões abaixo continuam certas.</p>
+                <Button type="button" variant="outline" className="h-12 text-base" onClick={() => setTraduzidoDe(chaveOrigem(origem))}>As versões continuam certas</Button>
+              </div>
+            )}
+          </fieldset>
+
+          {paraTraduzir.length > 0 && (
+            <div className="space-y-4" data-testid="push-versoes">
+              {paraTraduzir.map((l) => {
+                const v = versoes[l];
+                return (
+                  <div key={l} className="space-y-2 rounded-lg border border-border p-3">
+                    <p className="text-sm font-semibold">{NOME_IDIOMA[l] ?? l} <span className="font-normal text-muted-foreground">({l})</span></p>
+                    {!v ? (
+                      <p className="text-sm text-muted-foreground">Ainda sem tradução. Toque em Traduzir.</p>
+                    ) : (
+                      <>
+                        <Input aria-label={`Título em ${NOME_IDIOMA[l] ?? l}`} className="h-12 text-base" value={v.titulo} maxLength={LIMITES.titulo} onChange={(e) => editarVersao(l, "titulo", e.target.value)} placeholder="Título" />
+                        <Textarea aria-label={`Mensagem em ${NOME_IDIOMA[l] ?? l}`} className="text-base" rows={3} value={v.texto} maxLength={LIMITES.texto} onChange={(e) => editarVersao(l, "texto", e.target.value)} placeholder="Mensagem" />
+                        <p className="text-sm text-muted-foreground">{v.titulo.trim().length}/{LIMITES.titulo} · {v.texto.trim().length}/{LIMITES.texto}</p>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <fieldset className="space-y-3">
             <legend className="text-sm font-medium">Público</legend>
@@ -224,52 +356,73 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
               ["todos", "Todos com acesso"],
               ["plano", "Por plano"],
             ] as const).map(([v, r]) => (
-              <label key={v} className="flex min-h-11 items-center gap-3 text-sm">
+              <label key={v} className="flex min-h-12 items-center gap-3 text-sm">
                 <input type="radio" name="push-publico" value={v} checked={tipo === v} onChange={() => setTipo(v)} className="h-5 w-5 accent-primary" />{r}
               </label>
             ))}
-            {tipo === "email" && <Input type="email" aria-label="E-mail de teste" value={emailTeste} onChange={(e) => setEmailTeste(e.target.value)} placeholder="email@exemplo.com" />}
+            {tipo === "email" && (
+              <>
+                <Input type="email" aria-label="E-mail de teste" className="h-12 text-base" value={emailTeste} onChange={(e) => setEmailTeste(e.target.value)} placeholder="email@exemplo.com" />
+                <Label htmlFor="push-teste-idioma">Versão do teste</Label>
+                <select id="push-teste-idioma" className="h-12 w-full rounded-md border border-input bg-background px-3 text-base" value={testeIdioma} onChange={(e) => { setTesteIdioma(e.target.value); setPrevia(e.target.value); }}>
+                  {[IDIOMA_ORIGEM, ...paraTraduzir].map((l) => <option key={l} value={l}>{NOME_IDIOMA[l] ?? l}</option>)}
+                </select>
+              </>
+            )}
             {tipo === "plano" && (
-              <select aria-label="Plano" className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm" value={plano} onChange={(e) => setPlano(e.target.value as GrupoPlano)}>
+              <select aria-label="Plano" className="h-12 w-full rounded-md border border-input bg-background px-3 text-base" value={plano} onChange={(e) => setPlano(e.target.value as GrupoPlano)}>
                 {(Object.keys(PLANOS_PUSH) as GrupoPlano[]).map((k) => <option key={k} value={k}>{PLANOS_PUSH[k]}</option>)}
               </select>
             )}
-            {tipo !== "email" && (
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Idioma do app (nenhum marcado = todos):</p>
-                <div className="flex flex-wrap gap-2">
-                  {IDIOMAS_PUSH.map((l) => (
-                    <label key={l} className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border px-3 text-sm ${idiomas.includes(l) ? "border-primary bg-primary/10" : "border-border"}`}>
-                      <input type="checkbox" checked={idiomas.includes(l)} onChange={() => alternarIdioma(l)} className="h-4 w-4 accent-primary" />{l}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
           </fieldset>
 
-          <p className="rounded-lg bg-muted p-3 text-sm" aria-live="polite" data-testid="push-contagem">
-            {contando ? "Contando…" : contagem ? <>Vai para <strong>{contagem.pessoas} pessoa(s)</strong> ({contagem.aparelhos} aparelho(s)) · {contagem.rotulo}</> : "Escolha o público para ver quantas pessoas recebem."}
-          </p>
-          {erroValidacao && (titulo || texto || linkSel === "outro") && <p className="text-sm text-destructive">{ERROS[erroValidacao]}</p>}
+          <div className="rounded-lg bg-muted p-3 text-sm" aria-live="polite" data-testid="push-contagem">
+            {contando ? "Contando…" : contagens && total ? (
+              <>
+                <p>Vai para <strong>{total.pessoas} pessoa(s)</strong> ({total.aparelhos} aparelho(s)){tipo !== "email" && itens.length > 1 ? ` em ${lote.length} idioma(s)` : ""}.</p>
+                {tipo !== "email" && (
+                  <ul className="mt-1 space-y-0.5">
+                    {itens.map((i) => <li key={i.id}>{i.rotulo}: {contagens[i.id]?.pessoas ?? 0} pessoa(s)</li>)}
+                  </ul>
+                )}
+              </>
+            ) : itens.length ? "Escolha o público para ver quantas pessoas recebem." : "Marque pelo menos um idioma de saída."}
+          </div>
+          {erroOrigem && (titulo || texto || linkSel === "outro") && <p className="text-sm text-destructive">{ERROS[erroOrigem]}</p>}
+          {!erroOrigem && errosDoLote.length > 0 && (
+            <ul className="space-y-1 text-sm text-destructive" data-testid="push-erros-lote">
+              {errosDoLote.map(({ item, erro }) => <li key={item.id}>{item.rotulo}: {ERROS[erro!] ?? erro}</li>)}
+            </ul>
+          )}
 
           <Button className="h-12 w-full gap-2 text-base" disabled={!podeEnviar || enviando} onClick={() => { chaveRef.current = crypto.randomUUID(); setConfirmar(true); }}>
             {enviando ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-            {publico.tipo === "email" ? "Enviar teste" : "Enviar"}
+            {tipo === "email" ? "Enviar teste" : "Enviar"}
           </Button>
         </section>
 
         {/* Prévia */}
         <section className="space-y-4" aria-label="Prévia da notificação">
           <h3 className="font-display text-lg font-bold text-primary">Prévia</h3>
+          {opcoesPrevia.length > 1 && (
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Idioma da prévia">
+              {opcoesPrevia.map((id) => (
+                <button key={id} type="button" aria-pressed={itemPrevia?.id === id} onClick={() => setPrevia(id)}
+                  className={`min-h-12 rounded-full border px-4 text-sm ${itemPrevia?.id === id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"}`}>
+                  {id === OUTROS ? "Outros" : id}
+                </button>
+              ))}
+            </div>
+          )}
+          <p className="text-sm text-muted-foreground">{itemPrevia ? itemPrevia.rotulo : "—"}</p>
           <div>
             <p className="mb-1 text-sm text-muted-foreground">iPhone</p>
             <div className="rounded-[1.25rem] bg-zinc-200/90 p-3 text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-50">
               <div className="flex gap-3">
                 <img src="/pwa-icon-192.png" alt="" className="h-10 w-10 rounded-[0.6rem]" />
                 <div className="min-w-0 flex-1">
-                  <div className="flex justify-between gap-2"><p className="truncate text-sm font-semibold">{titulo.trim() || "Título"}</p><span className="shrink-0 text-sm opacity-60">agora</span></div>
-                  <p className="line-clamp-4 text-sm">{texto.trim() || "Mensagem"}</p>
+                  <div className="flex justify-between gap-2"><p className="truncate text-sm font-semibold">{itemPrevia?.titulo.trim() || "Título"}</p><span className="shrink-0 text-sm opacity-60">agora</span></div>
+                  <p className="line-clamp-4 text-sm">{itemPrevia?.texto.trim() || "Mensagem"}</p>
                 </div>
               </div>
             </div>
@@ -280,8 +433,8 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
               <p className="mb-1 flex items-center gap-2 text-sm opacity-70"><BellRing className="h-3.5 w-3.5" />Ferramentas do Cristão · app.ferramentasdocristao.com</p>
               <div className="flex gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">{titulo.trim() || "Título"}</p>
-                  <p className="line-clamp-3 text-sm opacity-80">{texto.trim() || "Mensagem"}</p>
+                  <p className="truncate text-sm font-semibold">{itemPrevia?.titulo.trim() || "Título"}</p>
+                  <p className="line-clamp-3 text-sm opacity-80">{itemPrevia?.texto.trim() || "Mensagem"}</p>
                 </div>
                 <img src="/pwa-icon-192.png" alt="" className="h-10 w-10 rounded-full" />
               </div>
@@ -330,15 +483,20 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
       <AlertDialog open={confirmar} onOpenChange={setConfirmar}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Tem certeza? Vai para {contagem?.pessoas ?? 0} pessoa(s).</AlertDialogTitle>
-            <AlertDialogDescription>
-              {contagem?.rotulo}. São {contagem?.aparelhos ?? 0} aparelho(s). Notificação enviada não tem volta: não dá para apagar do celular das pessoas.
+            <AlertDialogTitle>Tem certeza? Vai para {total?.pessoas ?? 0} pessoa(s).</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm">
+                <ul className="max-h-[40vh] space-y-1 overflow-y-auto text-left">
+                  {lote.map((i) => <li key={i.id}><strong>{i.rotulo}</strong>: {contagens?.[i.id]?.pessoas ?? 0} pessoa(s) · “{i.titulo.trim()}”</li>)}
+                </ul>
+                <p>{rotuloBase}. São {total?.aparelhos ?? 0} aparelho(s){lote.length > 1 ? `, em ${lote.length} envios (um por idioma)` : ""}. Notificação enviada não tem volta: não dá para apagar do celular das pessoas.</p>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={enviando}>Cancelar</AlertDialogCancel>
             <AlertDialogAction disabled={enviando} onClick={(e) => { e.preventDefault(); void enviar(); }}>
-              {enviando ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}Sim, enviar para {contagem?.pessoas ?? 0}
+              {enviando ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}Sim, enviar para {total?.pessoas ?? 0}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

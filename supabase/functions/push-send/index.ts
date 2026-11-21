@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { emLotes, enviarFcm, lerContaServico, tokenAcesso, type ResultadoFcm } from "./fcm.ts";
+import { chaveCache, idiomasParaTraduzir, lerRespostaTraducao, pedidoAnthropic, type Traducoes } from "./traducao.ts";
 import { filtrarPublico, lerPublico, rotuloPublico, validarMensagem, type Acesso, type Inscricao, type Publico } from "./publico.ts";
 
 // Central de mensagens do FC (21/11/2026, Noé). Modelo da Fome Livre (FCM HTTP v1, um projeto Firebase por produto).
@@ -9,9 +10,10 @@ import { filtrarPublico, lerPublico, rotuloPublico, validarMensagem, type Acesso
 //   contar    { publico }                        admin: quantas pessoas/aparelhos vão receber
 //   enviar    { publico, titulo, texto, link, confirmar }   admin: confirmar = nº de pessoas mostrado ao admin
 //   historico {}                                 admin: últimos 30 envios
+//   traduzir  { titulo, texto, idiomas }         admin: versões traduzidas do pt-BR (Claude Haiku, cache no ai_cache)
 // Admin = sessão Supabase com e-mail confirmado em admin_users (RPC session_admin_email) OU login antigo do painel
 // (creds { _admin_email, _admin_password } → verify_admin). verify_jwt = false (config.toml): a própria função confere.
-// Secrets: FCM_SERVICE_ACCOUNT (JSON da conta de serviço, base64 ou puro). Opcionais: APP_URL, FCM_TESTE (FCM falso local).
+// Secrets: FCM_SERVICE_ACCOUNT (JSON da conta de serviço, base64 ou puro); ANTHROPIC_API_KEY (tradução). Opcionais: APP_URL, FCM_TESTE (FCM falso local).
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -78,6 +80,48 @@ async function quemRecebe(sb: SupabaseClient, publico: Publico) {
   return filtrarPublico(inscricoes, acessos, publico);
 }
 
+const CACHE_ACAO = "push-traducao";
+const CACHE_DIAS = 30;
+
+/** Traduz título/texto pt-BR para os idiomas pedidos. Mesmo texto + mesmos idiomas sai do ai_cache, sem nova chamada. */
+async function traduzir(sb: SupabaseClient, titulo: string, texto: string, idiomas: string[]) {
+  const chave = chaveCache(titulo, texto, idiomas);
+  const { data: guardado } = await sb.from("ai_cache").select("result").eq("action", CACHE_ACAO).eq("cache_key", chave)
+    .gte("expires_at", new Date().toISOString()).maybeSingle();
+  if (guardado?.result) return { ok: true as const, traducoes: guardado.result as Traducoes, cache: true };
+
+  const key = Deno.env.get("ANTHROPIC_API_KEY");
+  if (!key) return { ok: false as const, erro: "traducao_sem_chave" };
+  let resp: Response;
+  try {
+    resp = await fetch(Deno.env.get("ANTHROPIC_URL") ?? "https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
+      body: JSON.stringify(pedidoAnthropic(titulo, texto, idiomas)),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (e) {
+    console.error("[push-send] tradução sem resposta:", (e as Error).name);
+    return { ok: false as const, erro: "traducao_falhou" };
+  }
+  if (!resp.ok) {
+    console.error("[push-send] tradução:", resp.status, (await resp.text()).slice(0, 300));
+    return { ok: false as const, erro: resp.status === 429 || resp.status === 529 ? "traducao_ocupada" : "traducao_falhou" };
+  }
+  const dados = await resp.json();
+  const lida = lerRespostaTraducao(dados, idiomas);
+  const u = dados?.usage ?? {};
+  console.log(`[push-send] tradução ${idiomas.join(",")}: entrada ${u.input_tokens ?? "?"}, saída ${u.output_tokens ?? "?"} tokens${lida.ok ? "" : ` (${lida.erro})`}`);
+  if (!lida.ok) return { ok: false as const, erro: lida.erro };
+  const expira = new Date(Date.now() + CACHE_DIAS * 86_400_000).toISOString();
+  const { error } = await sb.from("ai_cache").upsert(
+    { action: CACHE_ACAO, cache_key: chave, result: lida.traducoes, expires_at: expira, created_at: new Date().toISOString() },
+    { onConflict: "action,cache_key" },
+  );
+  if (error) console.warn("[push-send] cache da tradução:", error.message);
+  return { ok: true as const, traducoes: lida.traducoes, cache: false };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return json({ ok: false, error: "metodo" }, 405);
@@ -109,6 +153,15 @@ Deno.serve(async (req) => {
         .order("criado_em", { ascending: false }).limit(30);
       if (error) throw new Error(`historico_${error.code ?? "erro"}`);
       return json({ ok: true, envios: data ?? [] });
+    }
+
+    if (body.acao === "traduzir") {
+      const idiomas = idiomasParaTraduzir(body.idiomas);
+      if (!idiomas.length) return json({ ok: false, error: "sem_idiomas" }, 400);
+      const v = validarMensagem({ titulo: body.titulo, texto: body.texto, link: "/" });
+      if (!v.ok) return json({ ok: false, error: v.erro }, 400);
+      const r = await traduzir(sb, v.msg.titulo, v.msg.texto, idiomas);
+      return r.ok ? json({ ok: true, traducoes: r.traducoes, cache: r.cache }) : json({ ok: false, error: r.erro }, 502);
     }
 
     const publico = lerPublico(body.publico);

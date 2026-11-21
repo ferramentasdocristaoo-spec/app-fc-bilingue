@@ -35,3 +35,6 @@ supabase/.temp/
 
 # Config web do Firebase do FC (pública, mas fora do git a pedido da trava de segredos; lida no build)
 firebase-ferramentas-do-cristao.json
+
+# Prints de teste (locais)
+prints/

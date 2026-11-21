@@ -15,9 +15,11 @@ export const PLANOS_PUSH = {
 } as const;
 export type GrupoPlano = keyof typeof PLANOS_PUSH;
 
+/** idiomas = só quem usa o app nesses idiomas. foraIdiomas = só quem NÃO usa nenhum deles (inclui idioma
+ *  desconhecido): é o "enviar em português para os outros idiomas" da tradução. Os dois juntos não valem. */
 export type Publico =
-  | { tipo: "todos"; idiomas?: string[] }
-  | { tipo: "plano"; plano: GrupoPlano; idiomas?: string[] }
+  | { tipo: "todos"; idiomas?: string[]; foraIdiomas?: string[] }
+  | { tipo: "plano"; plano: GrupoPlano; idiomas?: string[]; foraIdiomas?: string[] }
   | { tipo: "email"; email: string };
 
 export type Inscricao = { email: string; token: string; lang: string | null };
@@ -29,10 +31,13 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function lerPublico(v: unknown): Publico | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Record<string, unknown>;
-  const idiomas = Array.isArray(o.idiomas)
-    ? [...new Set(o.idiomas.filter((x): x is string => typeof x === "string" && (IDIOMAS_PUSH as readonly string[]).includes(x)))]
+  const lista = (v: unknown) => Array.isArray(v)
+    ? [...new Set(v.filter((x): x is string => typeof x === "string" && (IDIOMAS_PUSH as readonly string[]).includes(x)))]
     : [];
-  const comIdiomas = idiomas.length ? { idiomas } : {};
+  const idiomas = lista(o.idiomas);
+  const fora = lista(o.foraIdiomas);
+  if (idiomas.length && fora.length) return null;
+  const comIdiomas = idiomas.length ? { idiomas } : fora.length ? { foraIdiomas: fora } : {};
   if (o.tipo === "todos") return { tipo: "todos", ...comIdiomas };
   if (o.tipo === "plano" && typeof o.plano === "string" && o.plano in PLANOS_PUSH) return { tipo: "plano", plano: o.plano as GrupoPlano, ...comIdiomas };
   if (o.tipo === "email" && typeof o.email === "string") {
@@ -45,7 +50,8 @@ export function lerPublico(v: unknown): Publico | null {
 export function rotuloPublico(p: Publico): string {
   if (p.tipo === "email") return `Só um e-mail (teste): ${p.email}`;
   const base = p.tipo === "todos" ? "Todos com acesso" : PLANOS_PUSH[p.plano];
-  return p.idiomas?.length ? `${base} · idioma ${p.idiomas.join(", ")}` : base;
+  if (p.idiomas?.length) return `${base} · idioma ${p.idiomas.join(", ")}`;
+  return p.foraIdiomas?.length ? `${base} · outros idiomas (fora ${p.foraIdiomas.join(", ")})` : base;
 }
 
 function vencido(a: Acesso, agora: number) {
@@ -72,6 +78,7 @@ export function filtrarPublico(inscricoes: Inscricao[], acessos: Map<string, Ace
     const email = i.email.toLowerCase();
     if (p.tipo === "email") return email === p.email && !acessos.get(email)?.bloqueado;
     if (p.idiomas?.length && !p.idiomas.includes(i.lang ?? "")) return false;
+    if (p.foraIdiomas?.length && p.foraIdiomas.includes(i.lang ?? "")) return false;
     return entraNoPlano(acessos.get(email), p.tipo === "plano" ? p.plano : null, agora);
   });
   return {

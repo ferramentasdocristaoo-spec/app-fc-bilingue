@@ -165,7 +165,7 @@ try {
     await print(page, "07-computador-notificacoes-previa.png", true);
     ok("computador: prévia iPhone/Android e contagem");
     await page.getByLabel("Todos com acesso").check();
-    await page.getByTestId("push-contagem").getByText("31 pessoa(s)").waitFor();
+    await page.getByTestId("push-contagem").getByText("Vai para 31 pessoa(s)").waitFor(); // total; abaixo vem a lista por idioma
     ok("computador: contagem muda com o público (31 pessoas)");
     await page.getByLabel("Só um e-mail (teste)").check();
     await page.getByTestId("push-contagem").getByText("1 pessoa(s)").waitFor();
