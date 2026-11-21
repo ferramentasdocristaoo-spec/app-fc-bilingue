@@ -113,7 +113,7 @@ async function conferir(page) {
     }
     // Algo passando da borda direita (nem sempre gera rolagem: o body pode cortar).
     const vazando = [...document.querySelectorAll(".adm-main button")].filter((b) => vis(b) && b.scrollWidth > b.clientWidth + 2).map((b) => `BUTTON "${b.textContent.trim().slice(0, 30)}"`);
-    const fora = [...document.querySelectorAll(".adm-main *")].filter((el) => !el.closest(".adm-wm, .overflow-x-auto, .overflow-auto") && vis(el) && el.getBoundingClientRect().right > window.innerWidth + 1);
+    const fora = [...document.querySelectorAll(".adm-main *")].filter((el) => !el.closest(".adm-wm, .overflow-x-auto, .overflow-auto, thead") && vis(el) && el.getBoundingClientRect().right > window.innerWidth + 1);
     const lateral = document.documentElement.scrollWidth > window.innerWidth + 1 || fora.length || vazando.length ? [...vazando, ...fora.slice(0, 3).map((el) => `${el.tagName}.${String(el.className).slice(0, 40)}`)] : false;
     return { pequenos: [...new Set(pequenos)].slice(0, 8), toques: [...new Set(toques)].slice(0, 8), lateral };
   });

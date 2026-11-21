@@ -88,7 +88,7 @@ const CacheSection = ({ creds }: Props) => {
         </div>
         <div className="rounded-xl border border-border bg-card p-5">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Economia estimada</p>
-          <p className="font-display text-3xl font-bold mt-2 text-primary">~${estimatedSaved.toFixed(2)}</p>
+          <p className="font-display text-3xl font-bold mt-2 text-primary">≈ US$ {estimatedSaved.toFixed(2).replace(".", ",")}</p>
           <p className="text-xs text-muted-foreground mt-1">detalhes em Análises</p>
         </div>
         <div className="col-span-2 md:col-span-1 rounded-xl border border-border bg-card p-5">
@@ -108,7 +108,7 @@ const CacheSection = ({ creds }: Props) => {
         <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-[240px]">
           <div className="relative flex-1">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input type="search" aria-label="Buscar no cache" placeholder="Buscar por tipo ou chave…" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="pl-10" />
+            <Input type="search" aria-label="Buscar no cache" placeholder="Buscar no cache…" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="pl-10" />
           </div>
           <Button type="submit" variant="outline">Buscar</Button>
         </form>

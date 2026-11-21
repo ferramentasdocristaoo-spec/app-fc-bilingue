@@ -11,6 +11,7 @@
   --adm-r: 22px;
   --adm-side: 272px;
   position: relative;
+  isolation: isolate;
   min-height: 100dvh;
   background: hsl(var(--background));
   color: hsl(var(--ink));
@@ -47,7 +48,7 @@
   padding: 10px 14px;
   font-size: 1.0625rem;
 }
-.adm-main input.pl-10 { padding-left: 2.75rem; }
+.adm-main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"])).pl-10 { padding-left: 2.75rem; }
 .adm-main textarea { min-height: 120px; }
 .adm-main :is(input, textarea, select):focus-visible { outline: 2px solid hsl(var(--gold-ink)); outline-offset: 1px; box-shadow: none; }
 /* Botões do shadcn com o canto do app. */
@@ -78,9 +79,8 @@ body.adm-on [role="alertdialog"] [id^="radix-"][id$="-description"] { color: hsl
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 64px;
-  padding: 0 10px 0 14px;
-  padding-top: env(safe-area-inset-top, 0px);
+  min-height: calc(64px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 10px 0 14px;
   background: hsl(var(--background) / 0.92);
   border-bottom: 1px solid hsl(var(--rule-soft));
   -webkit-backdrop-filter: saturate(1.2) blur(10px);
@@ -268,8 +268,10 @@ button.adm-kpi:hover { border-color: hsl(var(--gold)); }
 
 /* ---------- Tabelas que viram cartões no celular ---------- */
 @media (max-width: 767px) {
-  .adm-table thead { display: none; }
+  /* Cabeçalho só para leitor de tela (cada célula já traz o rótulo). */
+  .adm-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .adm-table, .adm-table tbody { display: block; }
+  .adm-table { position: relative; overflow: hidden; }
   .adm-table tbody tr {
     display: grid;
     grid-template-columns: minmax(0, 1fr);

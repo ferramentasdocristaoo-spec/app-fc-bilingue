@@ -232,7 +232,7 @@ const AnalyticsSection = ({ creds }: Props) => {
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
                 <p className="text-xs text-muted-foreground">Economia total estimada</p>
-                <p className="font-display text-3xl font-bold text-primary mt-1">≈ US$ {totalSaved.toFixed(2)}</p>
+                <p className="font-display text-3xl font-bold text-primary mt-1">≈ US$ {totalSaved.toFixed(2).replace(".", ",")}</p>
               </div>
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">{fmt(totalHits)} respostas reaproveitadas</p>

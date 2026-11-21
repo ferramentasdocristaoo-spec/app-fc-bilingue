@@ -70,7 +70,9 @@ const AdminPage = () => {
   const [tab, setTabState] = useState<Tab>(tabDaUrl);
   const [buscarAssinante, setBuscarAssinante] = useState(0);
   const [maisOpen, setMaisOpen] = useState(false);
-  const mainRef = useRef<HTMLElement>(null);
+  const maisBtnRef = useRef<HTMLButtonElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const [pwOpen, setPwOpen] = useState(false);
   const [newPw, setNewPw] = useState("");
@@ -79,11 +81,12 @@ const AdminPage = () => {
   const ir = useCallback((id: Tab, opts?: { buscar?: boolean }) => {
     setTabState(id);
     setMaisOpen(false);
-    if (opts?.buscar) setBuscarAssinante((n) => n + 1);
+    // Só o atalho "Buscar assinante" põe o cursor na busca (abrir a aba pela barra não abre o teclado).
+    setBuscarAssinante((n) => (opts?.buscar ? n + 1 : 0));
     // A aba fica no endereço (#notificacoes): recarregar o PWA volta no mesmo lugar.
-    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${id}`);
+    navigate({ search: window.location.search, hash: id }, { replace: true });
     window.scrollTo(0, 0);
-  }, []);
+  }, [navigate]);
 
   // Na sessão, as RPCs admin_* recebem o e-mail da sessão e senha vazia (verify_admin aceita a sessão).
   const creds = sessaoEmail
@@ -110,18 +113,58 @@ const AdminPage = () => {
 
   // Link direto para uma aba (ex.: /fc-control-panel#notificacoes) com a página já aberta.
   useEffect(() => {
-    const onHash = () => setTabState(tabDaUrl());
+    const onHash = () => { setTabState(tabDaUrl()); setMaisOpen(false); };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
-  // Folha "Mais": Esc fecha.
+  // Folha "Mais" como diálogo modal: Esc fecha, Tab fica dentro, o fundo não rola e o foco volta ao botão "Mais".
+  // Se a janela crescer até ao computador (lateral à vista), a folha fecha.
   useEffect(() => {
     if (!maisOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMaisOpen(false); };
+    const botao = maisBtnRef.current;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setMaisOpen(false); return; }
+      if (e.key !== "Tab" || !sheetRef.current) return;
+      const focaveis = sheetRef.current.querySelectorAll<HTMLElement>("button, a[href]");
+      if (!focaveis.length) return;
+      const primeiro = focaveis[0], ultimo = focaveis[focaveis.length - 1];
+      if (e.shiftKey && document.activeElement === primeiro) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primeiro.focus(); }
+    };
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onMq = () => { if (mq.matches) setMaisOpen(false); };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    mq.addEventListener("change", onMq);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      mq.removeEventListener("change", onMq);
+      document.body.style.overflow = overflow;
+      botao?.focus();
+    };
   }, [maisOpen]);
+
+  // Tabelas que viram cartões no celular (CSS display:grid) perdem os papéis de tabela no Safari/VoiceOver:
+  // os papéis vão explícitos em toda .adm-table do painel.
+  useEffect(() => {
+    const raiz = rootRef.current;
+    if (!raiz) return;
+    const marcar = () => {
+      raiz.querySelectorAll("table.adm-table").forEach((t) => {
+        if (!t.getAttribute("role")) t.setAttribute("role", "table");
+        t.querySelectorAll("thead, tbody").forEach((g) => !g.getAttribute("role") && g.setAttribute("role", "rowgroup"));
+        t.querySelectorAll("tr").forEach((r) => !r.getAttribute("role") && r.setAttribute("role", "row"));
+        t.querySelectorAll("th").forEach((c) => !c.getAttribute("role") && c.setAttribute("role", "columnheader"));
+        t.querySelectorAll("td").forEach((c) => !c.getAttribute("role") && c.setAttribute("role", "cell"));
+      });
+    };
+    marcar();
+    const obs = new MutationObserver(marcar);
+    obs.observe(raiz, { childList: true, subtree: true });
+    return () => obs.disconnect();
+  });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -242,7 +285,7 @@ const AdminPage = () => {
   const mais = NAV.filter((n) => !BARRA.includes(n.id));
 
   return (
-    <div className="adm-root">
+    <div className="adm-root" ref={rootRef}>
       {/* Computador: lateral azul-noite, com a marca discreta no topo e "Voltar ao app" sempre à vista. */}
       <aside className="adm-side" aria-label="Menu do painel">
         <Link to="/" className="adm-brand" aria-label="Ferramentas do Cristão: voltar ao app">
@@ -281,7 +324,7 @@ const AdminPage = () => {
           <Link to="/" className="adm-back" aria-label="Voltar ao app"><ArrowLeft className="h-5 w-5" aria-hidden="true" />App</Link>
         </header>
 
-        <main ref={mainRef} className="adm-main" id="adm-conteudo">
+        <main className="adm-main" id="adm-conteudo">
           <img className="adm-wm" src={logo} alt="" aria-hidden="true" />
           {tab !== "dashboard" && <SectionHead title={atual.titulo} lede={atual.lede || undefined} />}
           {renderSection()}
@@ -299,7 +342,7 @@ const AdminPage = () => {
               </button>
             );
           })}
-          <button type="button" className="adm-bnav-tab" aria-haspopup="dialog" aria-expanded={maisOpen}
+          <button ref={maisBtnRef} type="button" className="adm-bnav-tab" aria-haspopup="dialog" aria-expanded={maisOpen}
             aria-current={mais.some((m) => m.id === tab) ? "page" : undefined} onClick={() => setMaisOpen(true)}>
             <span className="adm-bnav-pill"><LayoutGrid aria-hidden="true" /></span><span>Mais</span>
           </button>
@@ -309,7 +352,7 @@ const AdminPage = () => {
       {maisOpen && (
         <>
           <div className="adm-sheet-overlay" onClick={() => setMaisOpen(false)} aria-hidden="true" />
-          <div className="adm-sheet" role="dialog" aria-modal="true" aria-labelledby="adm-mais-titulo">
+          <div ref={sheetRef} className="adm-sheet" role="dialog" aria-modal="true" aria-labelledby="adm-mais-titulo">
             <div className="adm-sheet-grab" aria-hidden="true" />
             <div className="adm-sheet-head">
               <h2 id="adm-mais-titulo">Mais do painel</h2>
