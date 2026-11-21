@@ -191,29 +191,50 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
   }, [contagens, lote]);
   const errosDoLote = lote.map((i) => ({ item: i, erro: erroDoItem(i, link) })).filter((x) => x.erro);
 
-  const traduzir = async () => {
-    if (!validacaoOrigem.ok || !paraTraduzir.length) return;
+  // idiomas: só os que faltam (tradução automática) ou todos os marcados (botão). auto = sem aviso de sucesso.
+  const traduzir = async (idiomas: string[] = paraTraduzir, auto = false) => {
+    if (!validacaoOrigem.ok || !idiomas.length) return;
     const t = titulo.trim(), x = texto.trim();
-    const chave = chaveCache(t, x, paraTraduzir);
+    const chave = chaveCache(t, x, idiomas);
     setErroTraducao(null);
     const guardada = cacheTraducao.current.get(chave);
     if (guardada) { setVersoes((v) => ({ ...v, ...guardada })); setTraduzidoDe(chaveOrigem(origem)); return; }
     setTraduzindo(true);
-    const r = await chamar<{ traducoes: Traducoes; cache: boolean }>(base("traduzir", { titulo: t, texto: x, idiomas: paraTraduzir }));
+    const r = await chamar<{ traducoes: Traducoes; cache: boolean }>(base("traduzir", { titulo: t, texto: x, idiomas }));
     setTraduzindo(false);
     if (!r.ok) {
-      if (r.erro === "nao_autorizado") { tratarErro(r.erro); return; }
+      if (r.erro === "nao_autorizado") { if (auto) autoRecusada.current = chaveCache(t, x, idiomas); tratarErro(r.erro); return; }
       // Falhou: campos vazios para o dono escrever à mão. Nada é enviado sem texto em cada idioma.
       setErroTraducao(ERROS[r.erro] ?? ERROS.traducao_falhou);
-      setVersoes((v) => ({ ...v, ...Object.fromEntries(paraTraduzir.map((l) => [l, { titulo: "", texto: "" }])) }));
+      setVersoes((v) => ({ ...v, ...Object.fromEntries(idiomas.map((l) => [l, { titulo: "", texto: "" }])) }));
       setTraduzidoDe(chaveOrigem(origem));
       return;
     }
     cacheTraducao.current.set(chave, r.data.traducoes);
     setVersoes((v) => ({ ...v, ...r.data.traducoes }));
     setTraduzidoDe(chaveOrigem(origem));
-    toast.success(r.data.cache ? "Tradução reaproveitada (mesmo texto de antes)." : `Traduzido para ${paraTraduzir.length} idioma(s). Confira antes de enviar.`);
+    if (!auto) toast.success(r.data.cache ? "Tradução reaproveitada (mesmo texto de antes)." : `Traduzido para ${idiomas.length} idioma(s). Confira antes de enviar.`);
   };
+
+  // Tradução automática (pedido do dono, 21/11): 1,5 s depois de parar de digitar ou de marcar um idioma.
+  // Texto em português mudou = traduz todos os marcados; só marcou idioma novo = traduz só o que falta
+  // (não apaga o que o dono corrigiu à mão). Falha deixa campos vazios e não tenta de novo sozinha.
+  const autoRecusada = useRef<string | null>(null); // mesma tradução recusada por acesso: não repete sozinha
+  const traduzirRef = useRef(traduzir);
+  traduzirRef.current = traduzir;
+  const origemAtual = chaveOrigem(origem);
+  const faltamTraduzir = !validacaoOrigem.ok ? [] : traduzidoDe !== origemAtual ? paraTraduzir : paraTraduzir.filter((l) => !versoes[l]);
+  const chaveAuto = traduzindo ? "" : JSON.stringify([origemAtual, faltamTraduzir]);
+  useEffect(() => {
+    const [, faltam] = chaveAuto ? (JSON.parse(chaveAuto) as [string, string[]]) : ["", []];
+    if (!faltam.length) return;
+    const id = window.setTimeout(() => {
+      if (autoRecusada.current === chaveCache(titulo.trim(), texto.trim(), faltam)) return;
+      void traduzirRef.current(faltam, true);
+    }, 1500);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chaveAuto já inclui o texto (origemAtual)
+  }, [chaveAuto]);
 
   const editarVersao = (l: string, campo: keyof Versao, valor: string) =>
     setVersoes((v) => ({ ...v, [l]: { ...(v[l] ?? { titulo: "", texto: "" }), [campo]: valor } }));
@@ -259,7 +280,12 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
     if (testeIdioma !== IDIOMA_ORIGEM && !paraTraduzir.includes(testeIdioma)) setTesteIdioma(IDIOMA_ORIGEM);
   }, [testeIdioma, paraTraduzir]);
 
-  const alternarIdioma = (l: string) => setMarcados((xs) => (xs.includes(l) ? xs.filter((x) => x !== l) : [...xs, l]));
+  // Desmarcou: a versão daquele idioma sai junto. Remarcado depois, ele é traduzido do texto atual
+  // (senão voltaria uma tradução de um português antigo e sairia no envio).
+  const alternarIdioma = (l: string) => {
+    if (marcados.includes(l)) setVersoes((v) => { const { [l]: _fora, ...resto } = v; return resto; });
+    setMarcados((xs) => (xs.includes(l) ? xs.filter((x) => x !== l) : [...xs, l]));
+  };
   const frontPronto = firebaseConfigurado();
   const podeEnviar = !!contagens && lote.length > 0 && !errosDoLote.length && !desatualizada && !traduzindo && !contando && !!status?.configurado;
   const rotuloBase = tipo === "email" ? rotuloPublico({ tipo: "email", email: emailTeste.trim().toLowerCase() })
@@ -297,7 +323,7 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
         {/* Escrever */}
         <section className="rounded-xl border border-border bg-card p-4 md:p-5 space-y-5">
           <h3 className="font-display text-lg font-bold text-primary">Nova mensagem</h3>
-          <p className="text-sm text-muted-foreground">Escreva em português. Quem usa o app em outro idioma recebe a tradução do idioma dele.</p>
+          <p className="text-sm text-muted-foreground">Escreva em português. A tradução para os idiomas marcados sai sozinha; confira antes de enviar.</p>
           <div className="space-y-1.5">
             <Label htmlFor="push-titulo">Título em português</Label>
             <Input id="push-titulo" className="h-12 text-base" value={titulo} maxLength={LIMITES.titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex.: Novo livro na Jornada" />
@@ -331,9 +357,9 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
               <input type="checkbox" checked={outrosEmPt} onChange={(e) => setOutrosEmPt(e.target.checked)} className="h-5 w-5 accent-primary" />
               Enviar em português para quem usa os outros idiomas
             </label>
-            <Button type="button" variant="secondary" className="h-12 w-full gap-2 text-base" disabled={!validacaoOrigem.ok || !paraTraduzir.length || traduzindo} onClick={() => void traduzir()}>
+            <Button type="button" variant="secondary" className="h-12 w-full gap-2 text-base" disabled={!validacaoOrigem.ok || !paraTraduzir.length || traduzindo} onClick={() => void traduzir(paraTraduzir)}>
               {traduzindo ? <Loader2 className="h-5 w-5 animate-spin" /> : <Languages className="h-5 w-5" />}
-              {traduzindo ? "Traduzindo…" : paraTraduzir.length ? `Traduzir para ${paraTraduzir.length} idioma(s)` : "Traduzir (marque um idioma além do pt-BR)"}
+              {traduzindo ? "Traduzindo…" : paraTraduzir.length ? `Traduzir de novo (${paraTraduzir.length} idioma(s))` : "Marque um idioma além do pt-BR para traduzir"}
             </Button>
             {erroTraducao && (
               <p role="alert" className="flex items-start gap-2 text-sm text-destructive"><TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />{erroTraducao} Escreva as versões à mão nos campos abaixo, ou tente de novo.</p>
@@ -354,11 +380,11 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
                   <div key={l} className="space-y-2 rounded-lg border border-border p-3">
                     <p className="text-sm font-semibold">{NOME_IDIOMA[l] ?? l} <span className="font-normal text-muted-foreground">({l})</span></p>
                     {!v ? (
-                      <p className="text-sm text-muted-foreground">Ainda sem tradução. Toque em Traduzir.</p>
+                      <p className="text-sm text-muted-foreground">{traduzindo ? "Traduzindo…" : "A tradução aparece aqui sozinha assim que você escrever o título e a mensagem."}</p>
                     ) : (
                       <>
-                        <Input aria-label={`Título em ${NOME_IDIOMA[l] ?? l}`} className="h-12 text-base" value={v.titulo} maxLength={LIMITES.titulo} onChange={(e) => editarVersao(l, "titulo", e.target.value)} placeholder="Título" />
-                        <Textarea aria-label={`Mensagem em ${NOME_IDIOMA[l] ?? l}`} className="text-base" rows={3} value={v.texto} maxLength={LIMITES.texto} onChange={(e) => editarVersao(l, "texto", e.target.value)} placeholder="Mensagem" />
+                        <Input aria-label={`Título em ${NOME_IDIOMA[l] ?? l}`} className="h-12 text-base" value={v.titulo} disabled={traduzindo} maxLength={LIMITES.titulo} onChange={(e) => editarVersao(l, "titulo", e.target.value)} placeholder="Título" />
+                        <Textarea aria-label={`Mensagem em ${NOME_IDIOMA[l] ?? l}`} className="text-base" rows={3} value={v.texto} disabled={traduzindo} maxLength={LIMITES.texto} onChange={(e) => editarVersao(l, "texto", e.target.value)} placeholder="Mensagem" />
                         <p className="text-sm text-muted-foreground">{v.titulo.trim().length}/{LIMITES.titulo} · {v.texto.trim().length}/{LIMITES.texto}</p>
                       </>
                     )}
@@ -441,10 +467,13 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
                 <img src="/pwa-icon-192.png" alt="" className="h-10 w-10 rounded-[0.6rem]" />
                 <div className="min-w-0 flex-1">
                   <div className="flex justify-between gap-2"><p className="truncate text-sm font-semibold">{itemPrevia?.titulo.trim() || "Título"}</p><span className="shrink-0 text-sm opacity-60">agora</span></div>
+                  {/* O iPhone sempre põe "from <nome do app>" em notificação de app da web; não dá para tirar. */}
+                  <p className="truncate text-sm font-semibold">from Ferramentas do Cristão</p>
                   <p className="line-clamp-4 text-sm">{itemPrevia?.texto.trim() || "Mensagem"}</p>
                 </div>
               </div>
             </div>
+            <p className="mt-1 text-sm text-muted-foreground">O iPhone mostra "from Ferramentas do Cristão" sozinho: não precisa pôr o nome do app no título.</p>
           </div>
           <div>
             <p className="mb-1 text-sm text-muted-foreground">Android</p>

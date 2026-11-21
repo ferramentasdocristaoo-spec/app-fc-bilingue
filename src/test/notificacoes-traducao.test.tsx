@@ -2,8 +2,10 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-li
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import NotificationsSection from "@/components/admin/NotificationsSection";
 
-/* Tela da Central de mensagens com tradução: escrever em pt-BR, marcar idiomas, Traduzir, editar,
-   e o envio sai um por idioma, cada um com o seu texto e a sua confirmação. */
+/* Tela da Central de mensagens com tradução: escrever em pt-BR, marcar idiomas, a tradução sai sozinha
+   (1,5 s depois), editar, e o envio sai um por idioma, cada um com o seu texto e a sua confirmação. */
+
+const ESPERA = { timeout: 4000 };
 
 type Corpo = Record<string, unknown> & { acao: string };
 const invoke = vi.fn();
@@ -64,10 +66,10 @@ describe("Central de mensagens · tradução", () => {
     await montar();
     fireEvent.click(screen.getByLabelText("Inglês"));
     fireEvent.click(screen.getByLabelText("Alemão"));
-    fireEvent.click(screen.getByRole("button", { name: /Traduzir para 2 idioma/ }));
 
-    const tituloEn = await screen.findByLabelText("Título em Inglês");
-    expect(tituloEn).toHaveValue("[en] Rute no mapa");
+    // Sem tocar em nada: a tradução automática faz uma chamada só para os dois idiomas.
+    await waitFor(() => expect(screen.getByLabelText("Título em Inglês")).toHaveValue("[en] Rute no mapa"), ESPERA);
+    const tituloEn = screen.getByLabelText("Título em Inglês");
     expect(chamadas("traduzir")).toHaveLength(1);
     expect(chamadas("traduzir")[0]).toMatchObject({ titulo: "Rute no mapa", idiomas: ["en", "de"] });
 
@@ -93,13 +95,11 @@ describe("Central de mensagens · tradução", () => {
     expect(new Set(envios.map((e) => e.chave)).size).toBe(3);
   });
 
-  it("mesmo texto + mesmos idiomas: não chama a tradução de novo", async () => {
+  it("mesmo texto + mesmos idiomas: 'Traduzir de novo' não chama a tradução outra vez", async () => {
     await montar();
     fireEvent.click(screen.getByLabelText("Inglês"));
-    const botao = screen.getByRole("button", { name: /Traduzir para 1 idioma/ });
-    fireEvent.click(botao);
-    await screen.findByLabelText("Título em Inglês");
-    fireEvent.click(botao);
+    await screen.findByLabelText("Título em Inglês", {}, ESPERA);
+    fireEvent.click(screen.getByRole("button", { name: /Traduzir de novo \(1 idioma/ }));
     await waitFor(() => expect(screen.getByLabelText("Título em Inglês")).toHaveValue("[en] Rute no mapa"));
     expect(chamadas("traduzir")).toHaveLength(1);
   });
@@ -108,8 +108,7 @@ describe("Central de mensagens · tradução", () => {
     falharTraducao = true;
     await montar();
     fireEvent.click(screen.getByLabelText("Inglês"));
-    fireEvent.click(screen.getByRole("button", { name: /Traduzir para 1 idioma/ }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("A tradução não respondeu.");
+    expect(await screen.findByRole("alert", {}, ESPERA)).toHaveTextContent("A tradução não respondeu.");
     expect(screen.getByLabelText("Título em Inglês")).toHaveValue("");
     await waitFor(() => expect(screen.getByTestId("push-erros-lote")).toHaveTextContent("Inglês: Escreva o título."));
     expect(screen.getByRole("button", { name: "Enviar" })).toBeDisabled();
@@ -132,17 +131,28 @@ describe("Central de mensagens · tradução", () => {
     expect(outros).toMatchObject({ titulo: "Rute no mapa", publico: { foraIdiomas: ["pt-BR"] }, confirmar: 3 });
   });
 
-  it("mudou o português depois de traduzir: pede para traduzir de novo antes de enviar", async () => {
+  it("mudou o português depois de traduzir: bloqueia o envio e traduz de novo sozinho", async () => {
     await montar();
     fireEvent.click(screen.getByLabelText("Inglês"));
-    fireEvent.click(screen.getByRole("button", { name: /Traduzir para 1 idioma/ }));
-    await screen.findByLabelText("Título em Inglês");
+    await screen.findByLabelText("Título em Inglês", {}, ESPERA);
     await waitFor(() => expect(screen.getByRole("button", { name: "Enviar" })).toBeEnabled());
     fireEvent.change(screen.getByLabelText("Título em português"), { target: { value: "Rute e Noemi" } });
     expect(await screen.findByText(/mudou o texto em português depois de traduzir/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Enviar" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "As versões continuam certas" }));
+    await waitFor(() => expect(screen.getByLabelText("Título em Inglês")).toHaveValue("[en] Rute e Noemi"), ESPERA);
     await waitFor(() => expect(screen.getByRole("button", { name: "Enviar" })).toBeEnabled());
+    expect(chamadas("traduzir")).toHaveLength(2);
+  });
+
+  it("marcou um idioma a mais: traduz só o novo e não apaga a correção feita à mão", async () => {
+    await montar();
+    fireEvent.click(screen.getByLabelText("Inglês"));
+    await screen.findByLabelText("Título em Inglês", {}, ESPERA);
+    fireEvent.change(screen.getByLabelText("Título em Inglês"), { target: { value: "Ruth is on the map" } });
+    fireEvent.click(screen.getByLabelText("Alemão"));
+    await waitFor(() => expect(screen.getByLabelText("Título em Alemão")).toHaveValue("[de] Rute no mapa"), ESPERA);
+    expect(screen.getByLabelText("Título em Inglês")).toHaveValue("Ruth is on the map");
+    expect(chamadas("traduzir")[1]).toMatchObject({ idiomas: ["de"] });
   });
 
   it("parou no meio: confirmar de novo manda só o idioma que faltou, com a mesma chave", async () => {
@@ -150,8 +160,7 @@ describe("Central de mensagens · tradução", () => {
     await montar();
     fireEvent.click(screen.getByLabelText("Inglês"));
     fireEvent.click(screen.getByLabelText("Alemão"));
-    fireEvent.click(screen.getByRole("button", { name: /Traduzir para 2 idioma/ }));
-    await screen.findByLabelText("Título em Alemão");
+    await screen.findByLabelText("Título em Alemão", {}, ESPERA);
     await waitFor(() => expect(screen.getByRole("button", { name: "Enviar" })).toBeEnabled());
     fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
     fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: /Sim, enviar/ }));
@@ -165,5 +174,17 @@ describe("Central de mensagens · tradução", () => {
     const envios = chamadas("enviar");
     expect((envios[3].publico as { idiomas: string[] }).idiomas).toEqual(["de"]);
     expect(envios[3].chave).toBe(envios[2].chave);
+  });
+
+  it("desmarcou, mudou o português e remarcou: o idioma é traduzido do texto novo, não volta o antigo", async () => {
+    await montar();
+    fireEvent.click(screen.getByLabelText("Inglês"));
+    fireEvent.click(screen.getByLabelText("Alemão"));
+    await waitFor(() => expect(screen.getByLabelText("Título em Alemão")).toHaveValue("[de] Rute no mapa"), ESPERA);
+    fireEvent.click(screen.getByLabelText("Alemão"));
+    fireEvent.change(screen.getByLabelText("Título em português"), { target: { value: "Rute e Noemi" } });
+    await waitFor(() => expect(screen.getByLabelText("Título em Inglês")).toHaveValue("[en] Rute e Noemi"), ESPERA);
+    fireEvent.click(screen.getByLabelText("Alemão"));
+    await waitFor(() => expect(screen.getByLabelText("Título em Alemão")).toHaveValue("[de] Rute e Noemi"), ESPERA);
   });
 });
