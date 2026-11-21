@@ -58,6 +58,8 @@ const TRADUCAO = [
   { pk: 10, translation: "ARA", book: 470, chapter: 16, verse: 17, text: "Número de livro errado" },
 ];
 
+const semRemovidas = () => { let lista = new Set<string>(); return { get: () => new Set(lista), set: (l: Set<string>) => { lista = new Set(l); } }; };
+
 const zipResponse = (bytes: Uint8Array) =>
   new Response(bytes, { status: 200, headers: { "Content-Length": String(bytes.length), "Content-Type": "application/zip" } });
 
@@ -94,7 +96,7 @@ describe("gerenciador da Bíblia offline", () => {
     const zip = makeZip("ARA.json", JSON.stringify(TRADUCAO));
     const fetchMock = vi.fn(async () => zipResponse(zip));
     const persist = vi.fn();
-    const m = createOfflineManager({ backend: () => backend, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist, url: bibleDownloadUrl });
+    const m = createOfflineManager({ backend: () => backend, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist, url: bibleDownloadUrl, removed: semRemovidas() });
     const estados: string[] = [];
     m.subscribe(() => estados.push(m.getSnapshot().versions.ARA?.status ?? "-"));
     await m.ensureVersion("ARA");
@@ -119,7 +121,7 @@ describe("gerenciador da Bíblia offline", () => {
       const v = url.split("/").pop()!.replace(".zip", "");
       return zipResponse(makeZip(`${v}.json`, JSON.stringify(TRADUCAO)));
     });
-    const m = createOfflineManager({ backend: () => backend, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl });
+    const m = createOfflineManager({ backend: () => backend, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() });
     await m.ensureVersion("ARA");
     await m.ensureVersion("NAA");
     expect(m.getSnapshot().versions.NAA?.status).toBe("queued");
@@ -131,7 +133,7 @@ describe("gerenciador da Bíblia offline", () => {
     const backend = createMemoryBackend();
     let online = false;
     const fetchMock = vi.fn(async () => new Response("x", { status: 503 }));
-    const m = createOfflineManager({ backend: () => backend, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => online, persist: () => {}, url: bibleDownloadUrl });
+    const m = createOfflineManager({ backend: () => backend, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => online, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() });
     await m.ensureVersion("ARA");
     expect(fetchMock).not.toHaveBeenCalled();
     expect(m.getSnapshot().versions.ARA).toBeUndefined();
@@ -145,7 +147,7 @@ describe("gerenciador da Bíblia offline", () => {
 
   it("versões que o bolls.life não serve mais (NVI) não são baixadas", async () => {
     const fetchMock = vi.fn();
-    const m = createOfflineManager({ backend: () => createMemoryBackend(), fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl });
+    const m = createOfflineManager({ backend: () => createMemoryBackend(), fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() });
     for (const v of ONLINE_ONLY_VERSIONS) await m.ensureVersion(v);
     expect(fetchMock).not.toHaveBeenCalled();
     expect(m.canDownload("NVIPT")).toBe(false);
@@ -154,7 +156,7 @@ describe("gerenciador da Bíblia offline", () => {
 
   it("remover tira a versão do aparelho (e cancela o download em andamento)", async () => {
     const backend = createMemoryBackend();
-    const m = createOfflineManager({ backend: () => backend, fetch: (async () => zipResponse(makeZip("ARA.json", JSON.stringify(TRADUCAO)))) as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl });
+    const m = createOfflineManager({ backend: () => backend, fetch: (async () => zipResponse(makeZip("ARA.json", JSON.stringify(TRADUCAO)))) as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() });
     await m.ensureVersion("ARA");
     await waitFor(() => expect(m.getSnapshot().versions.ARA?.status).toBe("ready"));
     await m.removeVersion("ARA");
@@ -167,7 +169,7 @@ describe("gerenciador da Bíblia offline", () => {
     const lento = createOfflineManager({
       backend: () => backend,
       fetch: (async () => { await new Promise<void>((r) => { liberar = r; }); return zipResponse(makeZip("NAA.json", JSON.stringify(TRADUCAO))); }) as unknown as typeof fetch,
-      supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl,
+      supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas(),
     });
     await lento.ensureVersion("NAA");
     await waitFor(() => expect(lento.getSnapshot().versions.NAA?.status).toBe("downloading"));
@@ -178,11 +180,54 @@ describe("gerenciador da Bíblia offline", () => {
     expect(backend.chapters.size).toBe(0);
   });
 
+  it("versão tirada do celular não volta sozinha; só com um toque nela", async () => {
+    const backend = createMemoryBackend();
+    const fetchMock = vi.fn(async () => zipResponse(makeZip("ARA.json", JSON.stringify(TRADUCAO))));
+    const m = createOfflineManager({ backend: () => backend, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() });
+    await m.ensureVersion("ARA", { auto: true });
+    await waitFor(() => expect(m.getSnapshot().versions.ARA?.status).toBe("ready"));
+    await m.removeVersion("ARA");
+    await m.ensureVersion("ARA", { auto: true });
+    expect(m.getSnapshot().versions.ARA).toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await m.ensureVersion("ARA");
+    await waitFor(() => expect(m.getSnapshot().versions.ARA?.status).toBe("ready"));
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("economia de dados ligada: não baixa sozinho, só com toque", async () => {
+    const fetchMock = vi.fn(async () => zipResponse(makeZip("ARA.json", JSON.stringify(TRADUCAO))));
+    const m = createOfflineManager({ backend: () => createMemoryBackend(), fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas(), saveData: () => true });
+    await m.ensureVersion("ARA", { auto: true });
+    expect(fetchMock).not.toHaveBeenCalled();
+    await m.ensureVersion("ARA");
+    await waitFor(() => expect(m.getSnapshot().versions.ARA?.status).toBe("ready"));
+  });
+
+  it("download parado (rede muda sem erro) vira erro e libera a fila", async () => {
+    const parado = () => new Response(new ReadableStream({ start(c) { c.enqueue(new Uint8Array([1, 2, 3])); } }), { status: 200, headers: { "Content-Length": "1000" } });
+    const fetchMock = vi.fn(async (url: string) => (url.endsWith("ARA.zip") ? parado() : zipResponse(makeZip("NAA.json", JSON.stringify(TRADUCAO)))));
+    const m = createOfflineManager({ backend: () => createMemoryBackend(), fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas(), stallMs: 40 });
+    await m.ensureVersion("ARA");
+    await m.ensureVersion("NAA");
+    await waitFor(() => expect(m.getSnapshot().versions.ARA).toEqual({ status: "error", reason: "network" }));
+    await waitFor(() => expect(m.getSnapshot().versions.NAA?.status).toBe("ready"));
+  });
+
+  it("banco que não abre (modo privado): não baixa nada nesta sessão", async () => {
+    const quebrado = { ...createMemoryBackend(), listVersions: () => Promise.reject(new Error("idb")) };
+    const fetchMock = vi.fn();
+    const m = createOfflineManager({ backend: () => quebrado, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() });
+    await m.ensureVersion("ARA");
+    expect(m.getSnapshot().supported).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("lista as versões já guardadas ao abrir o app de novo", async () => {
     const backend = createMemoryBackend();
     const built = buildTranslation("ARA", TRADUCAO);
     await backend.putVersion({ version: "ARA", bytes: built.bytes, downloadBytes: 10, chapters: 2, verses: 3, savedAt: "2026-11-21" }, built.chapters);
-    const m = createOfflineManager({ backend: () => backend, fetch: vi.fn() as unknown as typeof fetch, supported: () => true, isOnline: () => false, persist: () => {}, url: bibleDownloadUrl });
+    const m = createOfflineManager({ backend: () => backend, fetch: vi.fn() as unknown as typeof fetch, supported: () => true, isOnline: () => false, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() });
     await m.load();
     expect(m.getSnapshot().versions.ARA?.status).toBe("ready");
   });
@@ -199,7 +244,7 @@ describe("leitura: primeiro o aparelho, depois a internet", () => {
     const backend = createMemoryBackend();
     const built = buildTranslation("ARA", TRADUCAO);
     await backend.putVersion({ version: "ARA", bytes: built.bytes, downloadBytes: 10, chapters: 2, verses: 3, savedAt: "x" }, built.chapters);
-    setOfflineBibleManager(createOfflineManager({ backend: () => backend, fetch: vi.fn() as unknown as typeof fetch, supported: () => true, isOnline: () => false, persist: () => {}, url: bibleDownloadUrl }));
+    setOfflineBibleManager(createOfflineManager({ backend: () => backend, fetch: vi.fn() as unknown as typeof fetch, supported: () => true, isOnline: () => false, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() }));
     const fetchMock = vi.spyOn(globalThis, "fetch");
     const data = await fetchBibleChapter({ version: "ARA", bookId: 1, chapter: 1 });
     expect(data).toEqual([{ pk: 0, verse: 1, text: "No princípio criou Deus os céus e a terra." }, { pk: 1, verse: 2, text: "A terra era sem forma e vazia" }]);
@@ -207,7 +252,7 @@ describe("leitura: primeiro o aparelho, depois a internet", () => {
   });
 
   it("versão que não está no aparelho continua pela internet", async () => {
-    setOfflineBibleManager(createOfflineManager({ backend: () => createMemoryBackend(), fetch: vi.fn() as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl }));
+    setOfflineBibleManager(createOfflineManager({ backend: () => createMemoryBackend(), fetch: vi.fn() as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() }));
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify([{ verse: 1, text: "online" }]), { status: 200 }));
     const data = await fetchBibleChapter({ version: "NAA", bookId: 1, chapter: 1 });
     expect(data).toEqual([{ verse: 1, text: "online" }]);
@@ -243,7 +288,7 @@ describe("tela da Bíblia sem internet", () => {
     const backend = createMemoryBackend();
     const built = buildTranslation("NAA", TRADUCAO.map((r) => ({ ...r, translation: "NAA" })));
     await backend.putVersion({ version: "NAA", bytes: built.bytes, downloadBytes: 10, chapters: 2, verses: 3, savedAt: "x" }, built.chapters);
-    setOfflineBibleManager(createOfflineManager({ backend: () => backend, fetch: vi.fn() as unknown as typeof fetch, supported: () => true, isOnline: () => false, persist: () => {}, url: bibleDownloadUrl }));
+    setOfflineBibleManager(createOfflineManager({ backend: () => backend, fetch: vi.fn() as unknown as typeof fetch, supported: () => true, isOnline: () => false, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() }));
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("Failed to fetch"));
 
     renderPage("/biblia?bookId=1&chapter=1&version=ARA");
@@ -258,7 +303,7 @@ describe("tela da Bíblia sem internet", () => {
     const built = buildTranslation("ARA", TRADUCAO);
     await backend.putVersion({ version: "ARA", bytes: 4_428_733, downloadBytes: 1_624_504, chapters: 2, verses: 3, savedAt: "x" }, built.chapters);
     const fetchMock = vi.fn(async () => new Promise<Response>(() => {}));
-    setOfflineBibleManager(createOfflineManager({ backend: () => backend, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl }));
+    setOfflineBibleManager(createOfflineManager({ backend: () => backend, fetch: fetchMock as unknown as typeof fetch, supported: () => true, isOnline: () => true, persist: () => {}, url: bibleDownloadUrl, removed: semRemovidas() }));
 
     renderPage("/biblia?bookId=1&chapter=1&version=ARA");
     expect(await screen.findByText("No princípio criou Deus os céus e a terra.")).toBeInTheDocument();

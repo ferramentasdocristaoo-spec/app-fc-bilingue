@@ -440,7 +440,8 @@
       "offlineOnlineOnly": "{{name}} öffnet sich nur mit Internet.",
       "offlineChoose": "Diese Übersetzungen öffnen sich ohne Internet:",
       "offlineNone": "Noch keine Übersetzung gespeichert. Tippen Sie mit Internet auf eine Übersetzung, um sie auf dem Handy zu speichern.",
-      "readIn": "In {{name}} lesen"
+      "readIn": "In {{name}} lesen",
+      "removed": "{{name}} wurde vom Handy entfernt"
     }
   },
   "install": {

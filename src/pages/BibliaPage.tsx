@@ -204,7 +204,8 @@ const BibliaPage = () => {
   // lista nova (ex.: OL ao ir de pt-PT para pt-BR), volta para a padrão do idioma (ARA).
   useEffect(() => {
     if (!versions.some((item) => item.id === version)) {
-      setVersion(DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "OL");
+      const ultima = lerVersaoGuardada(lang);
+      setVersion(ultima && versions.some((item) => item.id === ultima) ? ultima : DEFAULT_VERSION_BY_LANG[lang] || versions[0]?.id || "OL");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
@@ -320,7 +321,7 @@ const BibliaPage = () => {
   // Bíblia offline: a versão que a pessoa está lendo é guardada inteira no celular (sem botão "baixar").
   // Sem internet não faz nada; quando a conexão volta, continua.
   useEffect(() => {
-    if (modo === "leitor") void offline.ensureVersion(version);
+    if (modo === "leitor") void offline.ensureVersion(version, { auto: true });
   }, [modo, version, online, offline]);
 
   // Voltou a internet com o aviso de "sem internet" na tela: tenta o capítulo de novo.

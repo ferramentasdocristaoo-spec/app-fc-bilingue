@@ -73,3 +73,14 @@ export async function extractFirstJson(bytes: Uint8Array): Promise<string> {
   else throw new Error("zip_metodo_desconhecido");
   return new TextDecoder().decode(raw);
 }
+
+/** Igual a extractFirstJson, mas já devolve o JSON lido (sem guardar o texto inteiro numa string à parte). */
+export async function parseFirstJson(bytes: Uint8Array): Promise<unknown> {
+  const entry = readZipEntries(bytes).find((e) => e.name.toLowerCase().endsWith(".json"));
+  if (!entry) throw new Error("zip_sem_json");
+  const data = bytes.subarray(entry.dataStart, entry.dataStart + entry.compressedSize);
+  if (entry.method === 0) return new Response(data).json();
+  if (entry.method !== 8) throw new Error("zip_metodo_desconhecido");
+  const source = new ReadableStream<Uint8Array>({ start(c) { c.enqueue(data); c.close(); } });
+  return new Response(source.pipeThrough(new DecompressionStream("deflate-raw" as CompressionFormat))).json();
+}

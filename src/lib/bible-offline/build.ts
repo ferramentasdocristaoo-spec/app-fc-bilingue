@@ -25,11 +25,12 @@ export function buildTranslation(version: string, rows: unknown): BuiltTranslati
     verses++;
   }
   if (verses === 0) throw new Error("traducao_vazia");
-  const encoder = new TextEncoder();
+  // Tamanho aproximado do que fica no aparelho (caracteres do JSON; acentos contam 1 em vez de 2 bytes,
+  // diferença de ~2%). Sem TextEncoder para não criar mais 5 MB de cópias no iPhone.
   let bytes = 0;
   chapters.forEach((list) => {
     list.sort((a, b) => a.verse - b.verse);
-    bytes += encoder.encode(JSON.stringify(list)).length;
+    bytes += JSON.stringify(list).length;
   });
   return { chapters, bytes, verses };
 }

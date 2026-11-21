@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { formatMegabytes, useOfflineBible, useOnline } from "@/hooks/use-offline-bible";
 import { ONLINE_ONLY_VERSIONS, type VersionState } from "@/lib/bible-offline/manager";
@@ -50,10 +51,23 @@ export function BibleVersionSheet({
     }
   };
 
-  const remove = async (v: Version) => {
+  const remove = async (v: Version, confirmed: boolean) => {
     setConfirmRemove(null);
     await manager.removeVersion(v.id);
+    if (confirmed) toast({ title: t("biblia.offline.removed", { name: v.name.split(" - ")[0] }) });
+    // Foco volta para a linha da versão (o botão da lixeira some).
+    requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(`[data-versao="${v.id}"]`)?.focus());
   };
+  const cancelRemove = (id: string) => {
+    setConfirmRemove(null);
+    requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(`[data-versao="${id}"]`)?.focus());
+  };
+  // Anúncio para leitor de tela só no começo e no fim (não a cada %).
+  const anuncio = versions
+    .map((v) => ({ v, s: snapshot.versions[v.id] }))
+    .filter(({ s }) => s?.status === "saving" || s?.status === "queued" || s?.status === "error")
+    .map(({ v, s }) => `${v.name.split(" - ")[0]}: ${statusText(v.id, s)}`)
+    .join(". ");
 
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next) setConfirmRemove(null); onOpenChange(next); }}>
@@ -76,8 +90,8 @@ export function BibleVersionSheet({
                 <li key={v.id} className="bv-row bv-row-confirm">
                   <p className="bv-confirm-text">{t("biblia.offline.removeQuestion", { name: v.name })}</p>
                   <div className="bv-confirm-actions">
-                    <button type="button" className="bv-btn bv-btn-danger" onClick={() => remove(v)}>{t("biblia.offline.removeYes")}</button>
-                    <button type="button" className="bv-btn" onClick={() => setConfirmRemove(null)}>{t("common.cancel")}</button>
+                    <button type="button" className="bv-btn bv-btn-danger" onClick={() => remove(v, true)}>{t("biblia.offline.removeYes")}</button>
+                    <button type="button" className="bv-btn" autoFocus onClick={() => cancelRemove(v.id)}>{t("common.cancel")}</button>
                   </div>
                 </li>
               );
@@ -87,6 +101,7 @@ export function BibleVersionSheet({
                 <button
                   type="button"
                   className="bv-choose"
+                  data-versao={v.id}
                   aria-current={isCurrent ? "true" : undefined}
                   onClick={() => onChoose(v.id)}
                 >
@@ -95,7 +110,7 @@ export function BibleVersionSheet({
                     {isCurrent && <span className="bv-current">{t("biblia.offline.readingNow")}</span>}
                   </span>
                   {status && (
-                    <span className={`bv-status bv-status-${state?.status ?? "none"}`} aria-live={busy ? "polite" : undefined}>
+                    <span className={`bv-status bv-status-${state?.status ?? "none"}`}>
                       {status}
                     </span>
                   )}
@@ -107,7 +122,7 @@ export function BibleVersionSheet({
                   <button
                     type="button"
                     className="bv-remove"
-                    onClick={() => (state?.status === "ready" ? setConfirmRemove(v.id) : remove(v))}
+                    onClick={() => (state?.status === "ready" ? setConfirmRemove(v.id) : remove(v, false))}
                     aria-label={state?.status === "ready" ? t("biblia.offline.remove", { name: v.name }) : t("biblia.offline.cancelDownload", { name: v.name })}
                     title={state?.status === "ready" ? t("biblia.offline.remove", { name: v.name }) : t("biblia.offline.cancelDownload", { name: v.name })}
                   >
@@ -119,6 +134,7 @@ export function BibleVersionSheet({
           })}
         </ul>
 
+        <p className="sr-only" aria-live="polite">{anuncio}</p>
         {snapshot.supported && (
           <p className="bv-total">
             {readyHere.length === 0

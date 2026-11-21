@@ -440,7 +440,8 @@
       "offlineOnlineOnly": "{{name}} only opens with internet.",
       "offlineChoose": "These versions open without internet:",
       "offlineNone": "No versions saved yet. With internet, tap a version to save it on your phone.",
-      "readIn": "Read in {{name}}"
+      "readIn": "Read in {{name}}",
+      "removed": "{{name}} was removed from your phone"
     }
   },
   "install": {

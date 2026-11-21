@@ -440,7 +440,8 @@
       "offlineOnlineOnly": "La versión {{name}} solo se abre con internet.",
       "offlineChoose": "Estas versiones se abren sin internet:",
       "offlineNone": "Todavía no hay versiones guardadas. Con internet, toque una versión para guardarla en el teléfono.",
-      "readIn": "Leer en {{name}}"
+      "readIn": "Leer en {{name}}",
+      "removed": "{{name}} se quitó del teléfono"
     }
   },
   "install": {

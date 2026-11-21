@@ -1,6 +1,6 @@
 import { buildTranslation } from "./build";
 import { getOfflineBackend, type OfflineBibleBackend, type OfflineVersionInfo, type RawVerse } from "./store";
-import { extractFirstJson, zipSupported } from "./zip";
+import { parseFirstJson, zipSupported } from "./zip";
 
 /**
  * Bíblia offline: ao tocar numa versão ela é baixada inteira (um ZIP do bolls.life, ~0,4–4,5 MB),
@@ -48,7 +48,14 @@ export type OfflineManagerDeps = {
   isOnline: () => boolean;
   persist: () => void;
   url: (version: string) => string;
+  /** Economia de dados ligada no aparelho (navigator.connection.saveData). */
+  saveData: () => boolean;
+  /** Versões que a pessoa tirou do celular: não voltam sozinhas, só com um toque nelas. */
+  removed: { get(): Set<string>; set(list: Set<string>): void };
+  stallMs: number;
 };
+
+const REMOVIDAS_KEY = "fc-biblia-offline-removidas";
 
 const defaultDeps = (): OfflineManagerDeps => ({
   backend: getOfflineBackend,
@@ -60,6 +67,21 @@ const defaultDeps = (): OfflineManagerDeps => ({
     try { void navigator.storage?.persist?.(); } catch { /* sem suporte */ }
   },
   url: (version) => bibleDownloadUrl(version),
+  saveData: () => !!(typeof navigator !== "undefined" && (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData),
+  removed: {
+    get() {
+      try {
+        const list = JSON.parse(localStorage.getItem(REMOVIDAS_KEY) || "[]");
+        return new Set(Array.isArray(list) ? list.filter((v) => typeof v === "string") : []);
+      } catch {
+        return new Set();
+      }
+    },
+    set(list) {
+      try { localStorage.setItem(REMOVIDAS_KEY, JSON.stringify([...list])); } catch { /* sem espaço */ }
+    },
+  },
+  stallMs: 30_000,
 });
 
 /** Leitura no IndexedDB não pode travar a Bíblia: passou disso, vai pela internet. */
@@ -99,7 +121,8 @@ export function createOfflineManager(overrides: Partial<OfflineManagerDeps> = {}
         emit();
       },
       () => {
-        snapshot = { ...snapshot, loaded: true };
+        // Banco que não abre (modo privado, Safari com problema): não adianta baixar nesta sessão.
+        snapshot = { ...snapshot, loaded: true, supported: false };
         emit();
       },
     );
@@ -113,46 +136,76 @@ export function createOfflineManager(overrides: Partial<OfflineManagerDeps> = {}
     // Removida no meio do caminho: nenhum estado novo volta para a tela.
     const set = (state: VersionState) => { if (!aborted()) setVersion(version, state); };
     set({ status: "downloading", progress: 0 });
-    // Sem cache HTTP: o arquivo já vai ficar no IndexedDB, não precisa de uma segunda cópia.
-    const res = await deps.fetch(deps.url(version), { signal: controller.signal, cache: "no-store" });
-    if (!res.ok) throw Object.assign(new Error(`http_${res.status}`), { reason: "network" as const });
-    const total = Number(res.headers.get("Content-Length")) || 0;
+    // Rede parada sem erro (3G/4G instável): 30 s sem receber nada → erro "network", libera a fila.
+    const net = new AbortController();
+    const onAbort = () => net.abort();
+    controller.signal.addEventListener("abort", onAbort, { once: true });
+    let stalled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const armStall = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { stalled = true; net.abort(); }, deps.stallMs);
+    };
+    const networkError = (msg: string) => Object.assign(new Error(msg), { reason: "network" as const });
     let bytes: Uint8Array;
-    if (res.body && typeof res.body.getReader === "function") {
-      const reader = res.body.getReader();
-      const chunks: Uint8Array[] = [];
-      let received = 0;
-      let lastPercent = -1;
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (aborted()) { void reader.cancel().catch(() => {}); throw new DOMException("aborted", "AbortError"); }
-        chunks.push(value);
-        received += value.length;
-        const percent = total ? Math.min(99, Math.floor((received / total) * 100)) : null;
-        if (percent !== lastPercent) {
-          lastPercent = percent ?? -1;
-          set({ status: "downloading", progress: percent });
+    try {
+      armStall();
+      // Sem cache HTTP: o arquivo já vai ficar no IndexedDB, não precisa de uma segunda cópia.
+      const res = await deps.fetch(deps.url(version), { signal: net.signal, cache: "no-store" });
+      if (!res.ok) throw networkError(`http_${res.status}`);
+      const total = Number(res.headers.get("Content-Length")) || 0;
+      if (res.body && typeof res.body.getReader === "function") {
+        const reader = res.body.getReader();
+        let chunks: Uint8Array[] = [];
+        let received = 0;
+        let lastStep = -1;
+        // Um leitor parado não acorda com o abort em todo navegador: a corrida garante a saída.
+        const parado = new Promise<never>((_, reject) => net.signal.addEventListener("abort", () => reject(networkError("parado")), { once: true }));
+        parado.catch(() => {});
+        for (;;) {
+          armStall();
+          const { done, value } = await Promise.race([reader.read(), parado]);
+          if (done) break;
+          if (aborted()) { void reader.cancel().catch(() => {}); throw new DOMException("aborted", "AbortError"); }
+          chunks.push(value);
+          received += value.length;
+          const percent = total ? Math.min(99, Math.floor((received / total) * 100)) : null;
+          // De 5 em 5% (cada aviso re-renderiza a lista).
+          const step = percent === null ? 0 : Math.floor(percent / 5);
+          if (step !== lastStep) {
+            lastStep = step;
+            set({ status: "downloading", progress: percent === null ? null : step * 5 });
+          }
         }
+        bytes = new Uint8Array(received);
+        let at = 0;
+        for (const c of chunks) { bytes.set(c, at); at += c.length; }
+        chunks = [];
+      } else {
+        bytes = new Uint8Array(await res.arrayBuffer());
       }
-      bytes = new Uint8Array(received);
-      let at = 0;
-      for (const c of chunks) { bytes.set(c, at); at += c.length; }
-    } else {
-      bytes = new Uint8Array(await res.arrayBuffer());
+    } catch (e) {
+      if (aborted()) throw new DOMException("aborted", "AbortError");
+      if (stalled || e instanceof TypeError || (e as { name?: string })?.name === "AbortError") throw networkError("rede");
+      throw e;
+    } finally {
+      clearTimeout(timer);
+      controller.signal.removeEventListener("abort", onAbort);
     }
     if (aborted()) throw new DOMException("aborted", "AbortError");
     set({ status: "saving" });
+    const downloadBytes = bytes.length;
     let built;
     try {
-      built = buildTranslation(version, JSON.parse(await extractFirstJson(bytes)));
+      built = buildTranslation(version, await parseFirstJson(bytes));
     } catch {
       throw Object.assign(new Error("invalido"), { reason: "invalid" as const });
     }
+    bytes = new Uint8Array(0); // solta o ZIP antes de gravar (memória do iPhone)
     const info: OfflineVersionInfo = {
       version,
       bytes: built.bytes,
-      downloadBytes: bytes.length,
+      downloadBytes,
       chapters: built.chapters.size,
       verses: built.verses,
       savedAt: new Date().toISOString(),
@@ -197,13 +250,22 @@ export function createOfflineManager(overrides: Partial<OfflineManagerDeps> = {}
 
     canDownload: (version: string) => snapshot.supported && !ONLINE_ONLY_VERSIONS.has(version),
 
-    /** Baixa a versão se ainda não está no aparelho (sem internet não faz nada). */
-    async ensureVersion(version: string) {
+    /**
+     * Baixa a versão se ainda não está no aparelho (sem internet não faz nada).
+     * `auto` = a leitura abriu sozinha nessa versão (não foi um toque): não baixa de novo uma versão
+     * que a pessoa tirou do celular, nem com economia de dados ligada, nem repete erro de falta de espaço.
+     */
+    async ensureVersion(version: string, opts: { auto?: boolean } = {}) {
       if (!snapshot.supported || ONLINE_ONLY_VERSIONS.has(version)) return;
+      const removed = deps.removed.get();
+      if (opts.auto && (removed.has(version) || deps.saveData())) return;
       await load();
+      if (!snapshot.supported) return;
       const state = snapshot.versions[version];
       if (state && state.status !== "error") return;
+      if (opts.auto && state?.status === "error" && state.reason === "quota") return;
       if (!deps.isOnline()) return;
+      if (removed.delete(version)) deps.removed.set(removed);
       if (!persistAsked) { persistAsked = true; deps.persist(); }
       queue.push(version);
       setVersion(version, { status: "queued" });
@@ -215,6 +277,9 @@ export function createOfflineManager(overrides: Partial<OfflineManagerDeps> = {}
       if (qi >= 0) queue.splice(qi, 1);
       if (running?.version === version) running.controller.abort();
       setVersion(version, null);
+      const removed = deps.removed.get();
+      removed.add(version);
+      deps.removed.set(removed);
       const backend = deps.backend();
       if (backend) await backend.deleteVersion(version).catch(() => {});
     },
