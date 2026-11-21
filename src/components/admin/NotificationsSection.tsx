@@ -357,7 +357,7 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
               <input type="checkbox" checked={outrosEmPt} onChange={(e) => setOutrosEmPt(e.target.checked)} className="h-5 w-5 accent-primary" />
               Enviar em português para quem usa os outros idiomas
             </label>
-            <Button type="button" variant="secondary" className="h-12 w-full gap-2 text-base" disabled={!validacaoOrigem.ok || !paraTraduzir.length || traduzindo} onClick={() => void traduzir(paraTraduzir)}>
+            <Button type="button" variant="secondary" className="h-auto min-h-12 w-full gap-2 whitespace-normal py-2 text-base" disabled={!validacaoOrigem.ok || !paraTraduzir.length || traduzindo} onClick={() => void traduzir(paraTraduzir)}>
               {traduzindo ? <Loader2 className="h-5 w-5 animate-spin" /> : <Languages className="h-5 w-5" />}
               {traduzindo ? "Traduzindo…" : paraTraduzir.length ? `Traduzir de novo (${paraTraduzir.length} idioma(s))` : "Marque um idioma além do pt-BR para traduzir"}
             </Button>

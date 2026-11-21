@@ -196,8 +196,8 @@ const JourneyEditorialSection = ({ credentials }: { credentials: AdminCredential
 
   return <div className="space-y-6">
     <div className="rounded-xl border border-primary/25 bg-primary/5 p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex gap-3"><Sparkles className="h-5 w-5 text-primary mt-0.5" /><div><h3 className="font-display text-lg font-bold">Produção editorial da Jornada</h3><p className="text-sm text-muted-foreground mt-1">Crie a fila, gere com base no texto bíblico e revise antes de publicar. Os rascunhos são sincronizados com segurança.</p></div></div>
+      <div className="flex flex-wrap-reverse items-start justify-between gap-3">
+        <div className="flex gap-3"><span className="adm-tile"><Sparkles aria-hidden="true" /></span><div><h3 className="font-display text-lg font-bold">Produção editorial da Jornada</h3><p className="text-sm text-muted-foreground mt-1">Crie a fila, gere com base no texto bíblico e revise antes de publicar. Os rascunhos são sincronizados com segurança.</p></div></div>
         <div className={`shrink-0 flex items-center gap-1.5 text-xs ${cloudStatus === "error" ? "text-destructive" : "text-muted-foreground"}`}>{cloudStatus === "synced" ? <CloudCog className="h-4 w-4" /> : <Cloud className="h-4 w-4" />}{cloudStatus === "loading" ? "Carregando" : cloudStatus === "saving" ? "Salvando" : cloudStatus === "synced" ? "Sincronizado" : "Falha na nuvem"}</div>
       </div>
     </div>

@@ -102,6 +102,12 @@ const AdminPage = () => {
     return () => { ativo = false; };
   }, []);
 
+  // Marca o <body> enquanto o painel está aberto (os diálogos abrem fora do .adm-root; ver AdminShell.css).
+  useEffect(() => {
+    document.body.classList.add("adm-on");
+    return () => document.body.classList.remove("adm-on");
+  }, []);
+
   // Link direto para uma aba (ex.: /fc-control-panel#notificacoes) com a página já aberta.
   useEffect(() => {
     const onHash = () => setTabState(tabDaUrl());

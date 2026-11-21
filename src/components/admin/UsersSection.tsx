@@ -182,14 +182,14 @@ const UsersSection = ({ creds, onUnauthorized, focarBusca = 0 }: Props) => {
                     <TableCell data-label="Validade" className="text-sm text-muted-foreground">
                       {r.expires_at ? fmtData(r.expires_at) : "sem vencimento"}
                     </TableCell>
-                    <TableCell data-label="Cadastro" className="text-sm text-muted-foreground">{fmtData(r.created_at)}</TableCell>
+                    <TableCell data-label="Cadastro" className="adm-td-hide text-sm text-muted-foreground">{fmtData(r.created_at)}</TableCell>
                     <TableCell className="adm-td-actions text-right">
                       <div className="flex justify-end gap-1">
                         <Button size="icon" variant="ghost" aria-label={`Editar ${r.email}`} title="Editar e-mail" onClick={() => { setEditing(r); setEditValue(r.email); }}><Pencil className="w-5 h-5" /></Button>
                         <Button size="icon" variant="ghost" aria-label={r.bloqueado ? `Desbloquear ${r.email}` : `Bloquear ${r.email}`} title={r.bloqueado ? "Desbloquear" : "Bloquear"} onClick={() => handleToggle(r)}>
                           {r.bloqueado ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
                         </Button>
-                        <Button size="icon" variant="ghost" aria-label={`Excluir ${r.email}`} title="Excluir" onClick={() => setConfirmDelete(r)} className="text-destructive hover:text-destructive"><Trash2 className="w-5 h-5" /></Button>
+                        <Button size="icon" variant="ghost" data-perigo="" aria-label={`Excluir ${r.email}`} title="Excluir" onClick={() => setConfirmDelete(r)} className="text-destructive hover:text-destructive"><Trash2 className="w-5 h-5" /></Button>
                       </div>
                     </TableCell>
                   </TableRow>
