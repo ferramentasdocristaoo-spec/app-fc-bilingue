@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { emLotes, enviarFcm, lerContaServico, tokenAcesso, type ResultadoFcm } from "./fcm.ts";
-import { chaveCache, idiomasParaTraduzir, lerRespostaTraducao, pedidoAnthropic, type Traducoes } from "./traducao.ts";
+import { chaveCache, idiomasParaTraduzir, lerRespostaTraducao, pedidoAnthropic, validarTraducoes } from "./traducao.ts";
 import { filtrarPublico, lerPublico, rotuloPublico, validarMensagem, type Acesso, type Inscricao, type Publico } from "./publico.ts";
 
 // Central de mensagens do FC (21/11/2026, Noé). Modelo da Fome Livre (FCM HTTP v1, um projeto Firebase por produto).
@@ -85,10 +85,14 @@ const CACHE_DIAS = 30;
 
 /** Traduz título/texto pt-BR para os idiomas pedidos. Mesmo texto + mesmos idiomas sai do ai_cache, sem nova chamada. */
 async function traduzir(sb: SupabaseClient, titulo: string, texto: string, idiomas: string[]) {
-  const chave = chaveCache(titulo, texto, idiomas);
+  // Hash da chave: o ai_cache não guarda o rascunho da notificação em texto puro.
+  const bruto = new TextEncoder().encode(chaveCache(titulo, texto, idiomas));
+  const chave = "push:" + [...new Uint8Array(await crypto.subtle.digest("SHA-256", bruto))].map((b) => b.toString(16).padStart(2, "0")).join("");
   const { data: guardado } = await sb.from("ai_cache").select("result").eq("action", CACHE_ACAO).eq("cache_key", chave)
     .gte("expires_at", new Date().toISOString()).maybeSingle();
-  if (guardado?.result) return { ok: true as const, traducoes: guardado.result as Traducoes, cache: true };
+  // O que vem do cache passa pela mesma conferência da resposta nova; se não passar, traduz de novo.
+  const doCache = guardado?.result ? validarTraducoes(guardado.result, idiomas) : null;
+  if (doCache?.ok) return { ok: true as const, traducoes: doCache.traducoes, cache: true };
 
   const key = Deno.env.get("ANTHROPIC_API_KEY");
   if (!key) return { ok: false as const, erro: "traducao_sem_chave" };

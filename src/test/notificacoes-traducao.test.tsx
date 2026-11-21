@@ -18,6 +18,7 @@ if (typeof globalThis.ResizeObserver === "undefined") {
 
 const PESSOAS: Record<string, number> = { "pt-BR": 5, en: 2, de: 1, outros: 3 };
 let falharTraducao = false;
+let deMudou = false; // 1ª vez que o alemão é enviado, o público mudou no meio (409)
 
 function servidor(_nome: string, b: Corpo) {
   const ok = (d: Record<string, unknown>) => Promise.resolve({ data: { ok: true, ...d }, error: null });
@@ -35,7 +36,12 @@ function servidor(_nome: string, b: Corpo) {
         cache: false,
         traducoes: Object.fromEntries((b.idiomas as string[]).map((l) => [l, { titulo: `[${l}] ${b.titulo}`, texto: `[${l}] ${b.texto}` }])),
       });
-    case "enviar": return ok({ envio: 1, enviados: b.confirmar, falhas: 0, removidos: 0, status: "enviado" });
+    case "enviar":
+      if (deMudou && (b.publico as { idiomas?: string[] }).idiomas?.[0] === "de") {
+        deMudou = false;
+        return Promise.resolve({ data: { ok: false, error: "confirmacao_diferente", pessoas: 1, aparelhos: 1 }, error: null });
+      }
+      return ok({ envio: 1, enviados: b.confirmar, falhas: 0, removidos: 0, status: "enviado" });
   }
   return Promise.resolve({ data: { ok: false, error: "acao_desconhecida" }, error: null });
 }
@@ -51,7 +57,7 @@ async function montar() {
 }
 
 describe("Central de mensagens · tradução", () => {
-  beforeEach(() => { invoke.mockReset(); invoke.mockImplementation(servidor); falharTraducao = false; });
+  beforeEach(() => { invoke.mockReset(); invoke.mockImplementation(servidor); falharTraducao = false; deMudou = false; });
   afterEach(cleanup);
 
   it("traduz numa chamada só, mostra campos editáveis e envia um por idioma no texto certo", async () => {
@@ -137,5 +143,27 @@ describe("Central de mensagens · tradução", () => {
     expect(screen.getByRole("button", { name: "Enviar" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "As versões continuam certas" }));
     await waitFor(() => expect(screen.getByRole("button", { name: "Enviar" })).toBeEnabled());
+  });
+
+  it("parou no meio: confirmar de novo manda só o idioma que faltou, com a mesma chave", async () => {
+    deMudou = true;
+    await montar();
+    fireEvent.click(screen.getByLabelText("Inglês"));
+    fireEvent.click(screen.getByLabelText("Alemão"));
+    fireEvent.click(screen.getByRole("button", { name: /Traduzir para 2 idioma/ }));
+    await screen.findByLabelText("Título em Alemão");
+    await waitFor(() => expect(screen.getByRole("button", { name: "Enviar" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+    fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: /Sim, enviar/ }));
+    await waitFor(() => expect(chamadas("enviar")).toHaveLength(3));
+    await waitFor(() => expect(screen.getByTestId("push-contagem")).toHaveTextContent("Inglês: já enviado"));
+    expect(screen.getByTestId("push-contagem")).toHaveTextContent("Vai para 1 pessoa(s)");
+
+    fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+    fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: /Sim, enviar para 1/ }));
+    await waitFor(() => expect(chamadas("enviar")).toHaveLength(4));
+    const envios = chamadas("enviar");
+    expect((envios[3].publico as { idiomas: string[] }).idiomas).toEqual(["de"]);
+    expect(envios[3].chave).toBe(envios[2].chave);
   });
 });

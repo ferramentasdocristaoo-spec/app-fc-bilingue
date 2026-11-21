@@ -119,7 +119,10 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
   const [confirmar, setConfirmar] = useState(false);
   const [enviando, setEnviando] = useState(false);
   // Uma chave por confirmação: o servidor recusa a mesma chave duas vezes (duas abas, clique repetido).
-  const chaveRef = useRef<string>("");
+  // A chave e a lista do que já saiu valem para ESTA mensagem (mesmos textos, públicos e link): se o envio
+  // para no meio, confirmar de novo manda só os idiomas que faltam, e o servidor recusa repetir a mesma chave.
+  const chaveRef = useRef<string>(crypto.randomUUID());
+  const [jaFoi, setJaFoi] = useState<string[]>([]);
 
   const link = linkSel === "outro" ? linkOutro.trim() : linkSel;
   const origem: Versao = useMemo(() => ({ titulo, texto }), [titulo, texto]);
@@ -162,9 +165,9 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
   useEffect(() => {
     if (statusErro) return;
     const publicos = JSON.parse(chavePublicos) as [string, Publico][];
-    if (!publicos.length) { setContagens({}); return; }
+    if (!publicos.length) { setContagens({}); setContando(false); return; }
     const p0 = publicos[0][1];
-    if (p0.tipo === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p0.email)) { setContagens(null); return; }
+    if (p0.tipo === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p0.email)) { setContagens(null); setContando(false); return; }
     let ativo = true;
     setContando(true);
     const id = window.setTimeout(async () => {
@@ -176,12 +179,16 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
     return () => { ativo = false; window.clearTimeout(id); };
   }, [chavePublicos, base, statusErro, recontar]);
 
+  // Assinatura da mensagem: mudou texto, público ou link = mensagem nova (chave nova, nada enviado ainda).
+  const assinatura = JSON.stringify([itens.map((i) => [i.id, i.publico, i.titulo.trim(), i.texto.trim()]), link]);
+  useEffect(() => { chaveRef.current = crypto.randomUUID(); setJaFoi([]); }, [assinatura]);
+
+  // Só entram no lote os idiomas com alguém inscrito e que ainda não saíram; os outros ficam de fora sem erro.
+  const lote = itens.filter((i) => (contagens?.[i.id]?.aparelhos ?? 0) > 0 && !jaFoi.includes(i.id));
   const total = useMemo(() => {
     if (!contagens) return null;
-    return itens.reduce((t, i) => ({ pessoas: t.pessoas + (contagens[i.id]?.pessoas ?? 0), aparelhos: t.aparelhos + (contagens[i.id]?.aparelhos ?? 0) }), { pessoas: 0, aparelhos: 0 });
-  }, [contagens, itens]);
-  // Só entram no lote os idiomas com alguém inscrito; os outros ficam de fora sem erro.
-  const lote = itens.filter((i) => (contagens?.[i.id]?.aparelhos ?? 0) > 0);
+    return lote.reduce((t, i) => ({ pessoas: t.pessoas + (contagens[i.id]?.pessoas ?? 0), aparelhos: t.aparelhos + (contagens[i.id]?.aparelhos ?? 0) }), { pessoas: 0, aparelhos: 0 });
+  }, [contagens, lote]);
   const errosDoLote = lote.map((i) => ({ item: i, erro: erroDoItem(i, link) })).filter((x) => x.erro);
 
   const traduzir = async () => {
@@ -215,12 +222,15 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
     if (!contagens || !lote.length || errosDoLote.length) return;
     setEnviando(true);
     const feitos: string[] = [];
+    const idsFeitos: string[] = [];
     let parou: string | null = null;
     for (const item of lote) {
       const r = await chamar<{ envio: number; enviados: number; falhas: number; removidos: number; status: string }>(
         base("enviar", { publico: item.publico, titulo: item.titulo, texto: item.texto, link, confirmar: contagens[item.id].pessoas, chave: chaveDoItem(chaveRef.current, item.id) }),
       );
-      if (r.ok) { feitos.push(`${item.rotulo}: ${r.data.enviados} aparelho(s)${r.data.falhas ? `, ${r.data.falhas} falha(s)` : ""}`); continue; }
+      if (r.ok) { idsFeitos.push(item.id); feitos.push(`${item.rotulo}: ${r.data.enviados} aparelho(s)${r.data.falhas ? `, ${r.data.falhas} falha(s)` : ""}`); continue; }
+      // Mesma chave (ou mesma mensagem há menos de 1 min) = esse idioma já saiu antes: segue para o próximo.
+      if (r.erro === "envio_repetido") { idsFeitos.push(item.id); feitos.push(`${item.rotulo}: já tinha saído`); continue; }
       if (r.erro === "nao_autorizado") { setEnviando(false); setConfirmar(false); tratarErro(r.erro); return; }
       parou = r.erro === "confirmacao_diferente"
         ? `${item.rotulo}: o público mudou (agora ${Number(r.extra?.pessoas) || 0} pessoas). Confira e confirme de novo.`
@@ -230,8 +240,17 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
     setEnviando(false);
     setConfirmar(false);
     if (feitos.length) toast.success(`Enviado. ${feitos.join(" · ")}`);
-    if (parou) { toast.error(feitos.length ? `Parou no meio. ${parou} Os idiomas acima já foram.` : parou); setRecontar((n) => n + 1); }
-    if (!parou && tipo !== "email") { setTitulo(""); setTexto(""); setVersoes({}); setTraduzidoDe(null); }
+    if (parou) {
+      // Guarda o que já saiu: a próxima confirmação manda só o que falta.
+      setJaFoi((xs) => [...xs, ...idsFeitos]);
+      toast.error(idsFeitos.length ? `Parou no meio. ${parou} Os idiomas que já foram não saem de novo.` : parou);
+      setRecontar((n) => n + 1);
+    } else {
+      // Tudo saiu: a próxima é uma mensagem nova (no teste por e-mail o texto fica para repetir).
+      chaveRef.current = crypto.randomUUID();
+      setJaFoi([]);
+      if (tipo !== "email") { setTitulo(""); setTexto(""); setVersoes({}); setTraduzidoDe(null); }
+    }
     void carregar();
   };
 
@@ -382,7 +401,7 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
                 <p>Vai para <strong>{total.pessoas} pessoa(s)</strong> ({total.aparelhos} aparelho(s)){tipo !== "email" && itens.length > 1 ? ` em ${lote.length} idioma(s)` : ""}.</p>
                 {tipo !== "email" && (
                   <ul className="mt-1 space-y-0.5">
-                    {itens.map((i) => <li key={i.id}>{i.rotulo}: {contagens[i.id]?.pessoas ?? 0} pessoa(s)</li>)}
+                    {itens.map((i) => <li key={i.id}>{i.rotulo}: {jaFoi.includes(i.id) ? "já enviado" : `${contagens[i.id]?.pessoas ?? 0} pessoa(s)`}</li>)}
                   </ul>
                 )}
               </>
@@ -395,7 +414,7 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
             </ul>
           )}
 
-          <Button className="h-12 w-full gap-2 text-base" disabled={!podeEnviar || enviando} onClick={() => { chaveRef.current = crypto.randomUUID(); setConfirmar(true); }}>
+          <Button className="h-12 w-full gap-2 text-base" disabled={!podeEnviar || enviando} onClick={() => setConfirmar(true)}>
             {enviando ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
             {tipo === "email" ? "Enviar teste" : "Enviar"}
           </Button>
