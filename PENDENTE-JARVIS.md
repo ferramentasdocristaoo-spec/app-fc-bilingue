@@ -1,5 +1,42 @@
 # Pendente para o Jarvis — App FC (wt-final, branch `app-novo`)
 
+## 2026-11-21 · Notificação escrita em português e traduzida na hora (painel → Notificações)
+Feito por **Noé** (Tecnologia), com revisão do code-reviewer, **em cima** do trabalho de Admin + push abaixo (mesmo branch **`admin-push`**). Commits `de979cc` + `fc86ec3`. **Sem push, sem deploy, sem secret, sem SQL, nenhuma notificação enviada.**
+
+**Como funciona agora**
+- O dono escreve **título e texto em português** → marca os **idiomas de saída** (pt-BR, pt-PT, en, es, fr, it, de; pt-BR vem marcado) → **Traduzir** → aparecem as versões de cada idioma em campos **editáveis**, com a prévia iPhone/Android **por idioma** (botões pt-BR / pt-PT / en…).
+- No envio, **um envio por idioma** (uma linha por idioma no histórico), cada um só para quem usa o app naquele idioma, com a mesma confirmação "Tem certeza? Vai para N pessoas" (agora com a lista por idioma e o título de cada um) e os mesmos limites do push-send.
+- Idioma não marcado **não recebe**, a menos que o dono marque **"Enviar em português para quem usa os outros idiomas"** (desmarcado por padrão).
+- **pt-BR sai exatamente como foi escrito** (nunca passa pelo modelo). pt-PT é adaptação leve (tu, ortografia de Portugal).
+- Tradução falhou → erro claro, campos vazios para escrever à mão; **não envia** enquanto algum idioma marcado estiver sem título/texto. Mudou o português depois de traduzir → pede para traduzir de novo (ou "As versões continuam certas").
+- Teste por e-mail: escolhe qual versão vai no teste.
+- Se o envio parar no meio (ex.: público mudou num idioma), confirmar de novo manda **só os idiomas que faltaram** (mesma chave de idempotência; achado da revisão).
+
+**Tradução (servidor):** ação `traduzir` dentro da função `push-send` (mesma checagem de admin; a chave nunca vai ao navegador). Modelo **`claude-haiku-5-5`**, **uma chamada** para todos os idiomas, resposta em JSON Schema `{idioma: {titulo, texto}}`, effort baixo, prompt com nomes bíblicos na forma de cada idioma, emojis/links mantidos, limites 60/180 e um **glossário dos nomes das seções do app** tirado das traduções do próprio app (Jornada → Journey / Voyage / Viaggio / Reise…). **Cache:** mesmo texto + mesmos idiomas sai do `ai_cache` (action `push-traducao`, chave SHA-256, 30 dias) e do cache da tela; não paga de novo. Lógica pura em `supabase/functions/push-send/traducao.ts`; plano de envio em `src/components/admin/notificacoes-idiomas.ts`.
+
+**Custo estimado (medido no teste real, 6 idiomas):** ~1.300–1.500 tokens de entrada e ~520–560 de saída por tradução → **≈ US$ 0,0004 por notificação** (Haiku 5.5: US$ 0,10/M entrada, US$ 0,50/M saída), ou seja ≈ US$ 0,45 a cada 1.000 notificações traduzidas. Repetir o mesmo texto custa zero (cache).
+
+**Qualidade:** `npm test` **319/319** (eram 299: +14 de unidade, sobre parse, limites, glossário, público "outros" e plano por idioma; +6 da tela). `npm run build` ok, `tsc` só com os 10 erros antigos, `deno check` da push-send ok. Chrome (`scripts/teste-admin-traducao.mjs`, Supabase simulado): **12 conferências** em 390×844 e 1440×900 (traduzir, uma chamada só, versões editáveis, prévia por idioma, contagem 41 em 7 idiomas, nenhum texto < 14 px, toques de 48 px, 7 envios um por idioma com pt-BR intacto e a correção do dono no inglês). O teste Chrome do Admin/push continua **20/20** (só o texto esperado da contagem mudou). **Teste real da tradução** com a chave do cofre (lida do Keychain, nunca impressa): 2 rodadas, HTTP 200 em 3–4 s, 6 idiomas válidos ("Já podes seguir… Toca para abrir", "Rut llegó a la Jornada", "Voyage" em francês como no app). Prints: `wt-final/prints/admin-traducao/` (8; a pasta `prints/` está no `.gitignore`).
+
+**Não testado:** a função publicada no Supabase (a ação `traduzir` foi testada pela mesma lógica chamando a API direto, não via Supabase local).
+
+### Passo a passo do dono (junto com os passos do Admin/push abaixo, cada um com "confirma")
+1. **Chave da Anthropic na função.** A `ai-assistant` já usa o secret `ANTHROPIC_API_KEY`, e os secrets do Supabase valem para todas as funções do projeto, então ele talvez já exista. Conferir só os nomes: `supabase secrets list --project-ref rwyyggtsjbwnwzsnlkgy`. Se não existir (ou se o dono quiser usar a chave `fc/anthropic/api-key` do cofre), mandar do Keychain sem aparecer na tela (rodar no Terminal):
+   ```sh
+   supabase secrets set --project-ref rwyyggtsjbwnwzsnlkgy --env-file <(printf 'ANTHROPIC_API_KEY=%s\n' "$(~/.local/share/kawai/bin/kawai-keys get fc/anthropic/api-key)")
+   ```
+   Atenção: isso troca a chave da `ai-assistant` também (mesmo nome de secret).
+2. **Deploy da `push-send`** (o mesmo do passo 5 abaixo; já leva a tradução): `supabase functions deploy push-send --project-ref rwyyggtsjbwnwzsnlkgy`.
+3. Merge, push e deploy do app como no passo 6 abaixo.
+4. Primeiro teste: público "Só um e-mail (teste)", escrever em português, marcar Inglês, Traduzir, escolher "Versão do teste: Inglês" e enviar para o próprio iPhone.
+
+**Decisão do dono / riscos:**
+- Quem tem aparelhos em dois idiomas diferentes recebe uma notificação em cada idioma (e conta duas vezes no total). Isso segue a regra "idioma do app".
+- **SQL sugerido (segurança, anterior a este trabalho):** a tabela `ai_cache` tem política de leitura e inserção para o papel público (migração `20260323220810`). As funções usam service role, então dá para fechar: `DROP POLICY "Anyone can read ai_cache" ON public.ai_cache; DROP POLICY "Service role can insert ai_cache" ON public.ai_cache;`. **Conferir antes** se o app lê o `ai_cache` direto do navegador (não achei leitura no `src/`, mas não rodei nada no banco). A tradução já se protege: chave em hash e resposta do cache conferida de novo.
+- A regra "não enviar sem tradução" fica na tela; a ação `enviar` aceita qualquer texto vindo de um admin (aceitável).
+
+---
+
 ## 2026-11-21 · Botão Admin no app + Central de mensagens (push Firebase)
 Feito por **Noé** (Tecnologia), com revisão do code-reviewer. Branch **`admin-push`** (a partir do `app-novo` 0f718e7), commits `fa25aed` + `46c8a9a` (+ este registro). **Sem push, sem deploy, sem SQL remoto, sem secret, nenhuma notificação enviada a cliente.**
 
