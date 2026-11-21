@@ -130,4 +130,4 @@ export const TEMAS_PDF: Record<TemaPdfId, TemaPdf> = {
   },
 };
 
-export const TEMA_PDF_PADRAO: TemaPdfId = "classica";
+export const TEMA_PDF_PADRAO: TemaPdfId = "editorial";

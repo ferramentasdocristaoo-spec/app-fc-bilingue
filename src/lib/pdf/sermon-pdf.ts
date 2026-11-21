@@ -62,6 +62,10 @@ const LIMITE_INFERIOR = 84;
 export const CORPO_PT = 12.5;
 const ENTRELINHA = 19.5;
 export const MENOR_TEXTO_PT = 10.5;
+/** Tema B: logo pequeno e suave no topo à esquerda, em todas as páginas (marca-d'água do fundo continua 0,045). */
+const LOGO_TOPO_H = 30;
+const LOGO_TOPO_OPACIDADE = 0.32;
+const NOME_TOPO_OPACIDADE = 0.55;
 
 type Fontes = Record<keyof FontesPdf, PDFFont>;
 
@@ -212,10 +216,10 @@ class Diagramador {
     return topo - entrelinha / 2 - size * 0.33;
   }
 
-  espacado(texto: string, x: number, y: number, font: PDFFont, size: number, espaco: number, color: RGB) {
+  espacado(texto: string, x: number, y: number, font: PDFFont, size: number, espaco: number, color: RGB, opacity = 1) {
     let cx = x;
     for (const ch of texto) {
-      this.page.drawText(ch, { x: cx, y, size, font, color });
+      this.page.drawText(ch, { x: cx, y, size, font, color, opacity });
       cx += font.widthOfTextAtSize(ch, size) + espaco;
     }
   }
@@ -671,12 +675,13 @@ class Diagramador {
     const vsF = this.f.textoNegrito;
     const data = this.limpo(d.data, this.f.textoItalico);
     if (t.cabecalho === "editorial") {
-      const h = 46;
+      // Logo tímido no canto superior esquerdo, como marca-d'água (um pouco mais escuro que a do fundo).
+      const h = LOGO_TOPO_H;
       const w = (h * this.logo.width) / this.logo.height;
-      this.page.drawImage(this.logo, { x: X0, y: this.y - h, width: w, height: h });
+      this.page.drawImage(this.logo, { x: X0, y: this.y - h, width: w, height: h, opacity: LOGO_TOPO_OPACIDADE });
       const nome = this.limpo(d.rotulos.appName.toLocaleUpperCase(), this.f.versalete);
-      const baseNome = this.y - h / 2 - 4;
-      this.espacado(nome, X0 + w + 12, baseNome, this.f.versalete, 11, 1.2, this.c(t.tinta2));
+      const baseNome = this.y - h / 2 - 3.5;
+      this.espacado(nome, X0 + w + 9, baseNome, this.f.versalete, MENOR_TEXTO_PT, 1.1, this.c(t.tinta2), NOME_TOPO_OPACIDADE);
       if (data) {
         const dw = this.f.textoItalico.widthOfTextAtSize(data, 12);
         this.page.drawText(data, { x: X1 - dw, y: baseNome, size: 12, font: this.f.textoItalico, color: this.c(t.tinta2) });
@@ -736,7 +741,8 @@ class Diagramador {
       if (i > 0) {
         const h = 24;
         const w = (h * this.logo.width) / this.logo.height;
-        page.drawImage(this.logo, { x: X0, y: ALTURA - 50 - h, width: w, height: h });
+        const suave = t.cabecalho === "editorial" ? { opacity: LOGO_TOPO_OPACIDADE } : {};
+        page.drawImage(this.logo, { x: X0, y: ALTURA - 50 - h, width: w, height: h, ...suave });
         let tt = tituloCurto;
         const max = LARG - w - 14;
         while (tt.length > 3 && this.f.tituloItalico.widthOfTextAtSize(tt, 14) > max) tt = `${tt.slice(0, -2).trimEnd()}…`;
