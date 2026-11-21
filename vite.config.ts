@@ -21,7 +21,7 @@ export default defineConfig(() => ({
       devOptions: {
         enabled: false,
       },
-      includeAssets: ["favicon.ico", "pwa-icon-192.png", "pwa-icon-512.png"],
+      includeAssets: ["favicon.ico", "pwa-icon-192.png", "pwa-icon-512.png", "pwa-icon-maskable-512.png", "apple-touch-icon.png", "logo-fc-claro-192.png", "logo-fc-claro-512.png"],
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
         // Notificações push (21/11/2026): o sw.js do PWA importa os eventos push/notificationclick.
@@ -48,7 +48,7 @@ export default defineConfig(() => ({
         icons: [
           { src: "/pwa-icon-192.png", sizes: "192x192", type: "image/png" },
           { src: "/pwa-icon-512.png", sizes: "512x512", type: "image/png" },
-          { src: "/pwa-icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+          { src: "/pwa-icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
         ],
         screenshots: [
           { src: "/screenshot-wide.jpg", sizes: "1280x720", type: "image/jpeg", form_factor: "wide" },
