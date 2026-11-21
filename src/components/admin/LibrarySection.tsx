@@ -7,8 +7,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, Search, Tag, BookKey } from "lucide-react";
+import { Plus, Trash2, Search, Tag, BookKey } from "lucide-react";
 import { libraryProducts } from "@/data/library";
+import { Esqueleto, Vazio, fmtData } from "./admin-ui";
 
 type SkuRow = { sku: string; product_slug: string };
 type EntRow = { id: string; email: string; product_slug: string; source_sku: string | null; created_at: string; total_count: number };
@@ -20,7 +21,7 @@ interface Props {
 }
 
 const LibrarySection = ({ creds, onUnauthorized }: Props) => {
-  const products = libraryProducts("pt-PT");
+  const products = libraryProducts("pt-BR");
   const productTitle = (slug: string) => products.find((p) => p.slug === slug)?.title ?? slug;
 
   const [skus, setSkus] = useState<SkuRow[]>([]);
@@ -111,48 +112,48 @@ const LibrarySection = ({ creds, onUnauthorized }: Props) => {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <div className="space-y-10">
-      <section>
-        <div className="mb-1 flex items-center gap-2">
-          <Tag className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">SKUs das coleções</h2>
+    <div className="space-y-6">
+      <section className="rounded-xl border border-border bg-card p-4 md:p-5">
+        <div className="mb-1 flex items-center gap-3">
+          <span className="adm-tile"><Tag aria-hidden="true" /></span>
+          <h2 className="font-display text-2xl font-semibold">Coleções por compra (SKU)</h2>
         </div>
         <p className="mb-4 text-sm text-muted-foreground">
           Quando uma compra chega com um destes SKUs, o acesso à coleção é liberado automaticamente para o e-mail do comprador.
         </p>
-        <div className="mb-4 flex flex-wrap items-end gap-3">
+        <div className="mb-4 grid gap-3 sm:flex sm:flex-wrap sm:items-end">
           <div>
             <Label htmlFor="new-sku">SKU do checkout</Label>
-            <Input id="new-sku" value={newSku} onChange={(e) => setNewSku(e.target.value)} placeholder="ex.: APOCALIPSE-8V" className="w-56" />
+            <Input id="new-sku" value={newSku} onChange={(e) => setNewSku(e.target.value)} placeholder="ex.: APOCALIPSE-8V" className="w-full sm:w-56" />
           </div>
           <div>
             <Label>Coleção</Label>
             <Select value={newSkuProduct} onValueChange={setNewSkuProduct}>
-              <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full sm:w-56"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {products.map((p) => <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={addSku} disabled={saving || !newSku.trim()} className="gap-1.5"><Plus className="h-4 w-4" />Vincular</Button>
+          <Button onClick={addSku} disabled={saving || !newSku.trim()} className="gap-1.5"><Plus className="h-5 w-5" />Ligar SKU</Button>
         </div>
         {skusLoading ? (
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <Esqueleto linhas={2} label="Carregando SKUs" />
         ) : skus.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhum SKU configurado ainda.</p>
+          <Vazio titulo="Nenhum SKU ligado ainda" texto="Ligue o SKU do checkout a uma coleção para liberar o acesso sozinho na compra." />
         ) : (
-          <Table>
+          <Table className="adm-table">
             <TableHeader>
               <TableRow><TableHead>SKU</TableHead><TableHead>Coleção</TableHead><TableHead className="w-16" /></TableRow>
             </TableHeader>
             <TableBody>
               {skus.map((row) => (
                 <TableRow key={row.sku}>
-                  <TableCell className="font-mono text-sm">{row.sku}</TableCell>
+                  <TableCell className="adm-td-main font-mono">{row.sku}</TableCell>
                   <TableCell>{productTitle(row.product_slug)}</TableCell>
-                  <TableCell>
+                  <TableCell className="adm-td-actions">
                     <Button variant="ghost" size="icon" onClick={() => setDeleteSku(row)} aria-label="Remover SKU">
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash2 className="h-5 w-5 text-destructive" />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -162,47 +163,50 @@ const LibrarySection = ({ creds, onUnauthorized }: Props) => {
         )}
       </section>
 
-      <section>
-        <div className="mb-1 flex items-center gap-2">
-          <BookKey className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">Acessos dos usuários</h2>
+      <section className="rounded-xl border border-border bg-card p-4 md:p-5">
+        <div className="mb-1 flex items-center gap-3">
+          <span className="adm-tile"><BookKey aria-hidden="true" /></span>
+          <h2 className="font-display text-2xl font-semibold">Acessos dos assinantes</h2>
         </div>
         <p className="mb-4 text-sm text-muted-foreground">Libere ou revogue manualmente o acesso de um e-mail a uma coleção.</p>
-        <div className="mb-4 flex flex-wrap items-end gap-3">
+        <div className="mb-4 grid gap-3 sm:flex sm:flex-wrap sm:items-end">
           <div>
             <Label htmlFor="grant-email">E-mail do usuário</Label>
-            <Input id="grant-email" value={grantEmail} onChange={(e) => setGrantEmail(e.target.value)} placeholder="usuario@email.com" className="w-64" />
+            <Input id="grant-email" value={grantEmail} onChange={(e) => setGrantEmail(e.target.value)} placeholder="usuario@email.com" className="w-full sm:w-64" />
           </div>
           <div>
             <Label>Coleção</Label>
             <Select value={grantProduct} onValueChange={setGrantProduct}>
-              <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full sm:w-56"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {products.map((p) => <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={grant} disabled={saving || !grantEmail.trim()} className="gap-1.5"><Plus className="h-4 w-4" />Liberar acesso</Button>
+          <Button onClick={grant} disabled={saving || !grantEmail.trim()} className="gap-1.5"><Plus className="h-5 w-5" />Liberar acesso</Button>
         </div>
         <div className="mb-3 flex items-center gap-2">
           <Input
+            type="search"
+            aria-label="Buscar acesso por e-mail"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") { setPage(0); setSearch(searchInput); } }}
             placeholder="Buscar por e-mail…"
-            className="w-64"
+            className="w-full sm:w-64"
           />
           <Button variant="outline" size="icon" onClick={() => { setPage(0); setSearch(searchInput); }} aria-label="Buscar">
-            <Search className="h-4 w-4" />
+            <Search className="h-5 w-5" />
           </Button>
         </div>
         {entsLoading ? (
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <Esqueleto linhas={3} label="Carregando acessos" />
         ) : ents.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhum acesso encontrado.</p>
+          search ? <Vazio tipo="busca" titulo={`Ninguém com “${search}”`} texto="Confira o e-mail ou busque só por um pedaço dele." />
+            : <Vazio titulo="Nenhum acesso ainda" texto="Os acessos liberados por compra ou à mão aparecem aqui." />
         ) : (
           <>
-            <Table>
+            <Table className="adm-table">
               <TableHeader>
                 <TableRow>
                   <TableHead>E-mail</TableHead><TableHead>Coleção</TableHead><TableHead>Origem</TableHead><TableHead>Data</TableHead><TableHead className="w-16" />
@@ -211,13 +215,13 @@ const LibrarySection = ({ creds, onUnauthorized }: Props) => {
               <TableBody>
                 {ents.map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell>{row.email}</TableCell>
-                    <TableCell>{productTitle(row.product_slug)}</TableCell>
-                    <TableCell className="font-mono text-xs">{row.source_sku ?? "—"}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{new Date(row.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>
+                    <TableCell className="adm-td-main break-all">{row.email}</TableCell>
+                    <TableCell className="adm-td-full">{productTitle(row.product_slug)}</TableCell>
+                    <TableCell data-label="Origem" className="font-mono text-sm">{row.source_sku ?? "manual"}</TableCell>
+                    <TableCell data-label="Data" className="text-sm text-muted-foreground">{fmtData(row.created_at)}</TableCell>
+                    <TableCell className="adm-td-actions">
                       <Button variant="ghost" size="icon" onClick={() => setRevoke(row)} aria-label="Revogar acesso">
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Trash2 className="h-5 w-5 text-destructive" />
                       </Button>
                     </TableCell>
                   </TableRow>

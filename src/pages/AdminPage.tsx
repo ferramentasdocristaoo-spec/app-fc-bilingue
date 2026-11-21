@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import i18n from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Loader2, LogIn, LogOut, KeyRound, Shield, LayoutDashboard, Users, Brain, ScrollText, Menu, BarChart3, Library, BookMarked, BellRing, ArrowLeft } from "lucide-react";
+import {
+  Loader2, LogIn, LogOut, KeyRound, Home, Users, Brain, ScrollText, BarChart3, Library, Map, BellRing, ArrowLeft, LayoutGrid, Sun, Moon, X,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import logo from "@/assets/logo-pt.png";
+import { useTheme } from "@/hooks/use-theme";
 import DashboardSection from "@/components/admin/DashboardSection";
 import UsersSection from "@/components/admin/UsersSection";
 import CacheSection from "@/components/admin/CacheSection";
@@ -18,17 +21,43 @@ import AnalyticsSection from "@/components/admin/AnalyticsSection";
 import LibrarySection from "@/components/admin/LibrarySection";
 import JourneyEditorialSection from "@/components/admin/JourneyEditorialSection";
 import NotificationsSection from "@/components/admin/NotificationsSection";
+import { SectionHead } from "@/components/admin/admin-ui";
 import { emailAdminDaSessao, lembrarAdmin } from "@/hooks/use-is-admin";
+import "@/components/admin/AdminShell.css";
 
 const SS_EMAIL = "fc-admin-email";
 const SS_PASS = "fc-admin-pass";
 
-type Tab = "dashboard" | "analytics" | "users" | "sermons" | "cache" | "livraria" | "jornada" | "notificacoes";
+export type Tab = "dashboard" | "analytics" | "users" | "sermons" | "cache" | "livraria" | "jornada" | "notificacoes";
+
+type NavItem = { id: Tab; label: string; curto: string; icon: LucideIcon; grupo: string; titulo: string; lede: string };
+
+/* Painel no padrão do app novo (21/11/2026, Aoliabe): lateral azul-noite no computador; no celular,
+   cabeçalho com a logo discreta + barra inferior igual à do app + folha "Mais". Só a apresentação mudou:
+   login, sessão, RPCs e o fluxo das notificações são os mesmos. */
+const NAV: NavItem[] = [
+  { id: "dashboard", label: "Início", curto: "Início", icon: Home, grupo: "Painel", titulo: "Painel", lede: "" },
+  { id: "analytics", label: "Análises", curto: "Análises", icon: BarChart3, grupo: "Painel", titulo: "Análises", lede: "Como o app está sendo usado: dias, horários, novos acessos e economia da IA." },
+  { id: "users", label: "Assinantes", curto: "Pessoas", icon: Users, grupo: "Pessoas", titulo: "Assinantes", lede: "Quem tem acesso ao app: buscar, liberar, bloquear e corrigir e-mail." },
+  { id: "notificacoes", label: "Notificações", curto: "Avisos", icon: BellRing, grupo: "Pessoas", titulo: "Notificações", lede: "Escreva em português; o painel traduz para cada idioma e mostra a prévia antes de enviar." },
+  { id: "jornada", label: "Jornada", curto: "Jornada", icon: Map, grupo: "Conteúdo", titulo: "Jornada pela Bíblia", lede: "Gerar, revisar e publicar os capítulos da Jornada." },
+  { id: "livraria", label: "Livraria", curto: "Livraria", icon: Library, grupo: "Conteúdo", titulo: "Livraria", lede: "Coleções liberadas por compra (SKU) e acessos dados à mão." },
+  { id: "sermons", label: "Esboços", curto: "Esboços", icon: ScrollText, grupo: "Conteúdo", titulo: "Esboços", lede: "" },
+  { id: "cache", label: "Cache da IA", curto: "Cache", icon: Brain, grupo: "Conteúdo", titulo: "Cache da IA", lede: "Respostas guardadas para não pagar a IA duas vezes pela mesma pergunta." },
+];
+const BARRA: Tab[] = ["dashboard", "users", "notificacoes", "jornada"];
+const TABS = NAV.map((n) => n.id);
+
+const tabDaUrl = (): Tab => {
+  const h = window.location.hash.replace("#", "");
+  return (TABS as string[]).includes(h) ? (h as Tab) : "dashboard";
+};
 
 const AdminPage = () => {
-  // O painel admin é sempre exibido em português, independente do idioma do app.
-  const t = i18n.getFixedT("pt-PT");
+  // O painel é sempre exibido em português do Brasil, independente do idioma do app.
+  const t = i18n.getFixedT("pt-BR");
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [authed, setAuthed] = useState(false);
   // Admin pela sessão do app (e-mail confirmado em admin_users): entra direto, sem senha.
   const [sessaoEmail, setSessaoEmail] = useState<string | null>(null);
@@ -38,23 +67,23 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
 
-  const [tab, setTab] = useState<Tab>("dashboard");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [tab, setTabState] = useState<Tab>(tabDaUrl);
+  const [buscarAssinante, setBuscarAssinante] = useState(0);
+  const [maisOpen, setMaisOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
 
   const [pwOpen, setPwOpen] = useState(false);
   const [newPw, setNewPw] = useState("");
   const [newPw2, setNewPw2] = useState("");
 
-  const NAV: { id: Tab; label: string; icon: LucideIcon }[] = [
-    { id: "dashboard", label: t("admin.dashboard"), icon: LayoutDashboard },
-    { id: "analytics", label: t("admin.analytics"), icon: BarChart3 },
-    { id: "users", label: t("admin.users"), icon: Users },
-    { id: "livraria", label: t("admin.livraria"), icon: Library },
-    { id: "jornada", label: "Jornada Bíblica", icon: BookMarked },
-    { id: "notificacoes", label: "Notificações", icon: BellRing },
-    { id: "sermons", label: t("admin.sermons"), icon: ScrollText },
-    { id: "cache", label: t("admin.cache"), icon: Brain },
-  ];
+  const ir = useCallback((id: Tab, opts?: { buscar?: boolean }) => {
+    setTabState(id);
+    setMaisOpen(false);
+    if (opts?.buscar) setBuscarAssinante((n) => n + 1);
+    // A aba fica no endereço (#notificacoes): recarregar o PWA volta no mesmo lugar.
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${id}`);
+    window.scrollTo(0, 0);
+  }, []);
 
   // Na sessão, as RPCs admin_* recebem o e-mail da sessão e senha vazia (verify_admin aceita a sessão).
   const creds = sessaoEmail
@@ -72,6 +101,21 @@ const AdminPage = () => {
       .finally(() => { if (ativo) setConferindoSessao(false); });
     return () => { ativo = false; };
   }, []);
+
+  // Link direto para uma aba (ex.: /fc-control-panel#notificacoes) com a página já aberta.
+  useEffect(() => {
+    const onHash = () => setTabState(tabDaUrl());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  // Folha "Mais": Esc fecha.
+  useEffect(() => {
+    if (!maisOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMaisOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [maisOpen]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,48 +170,60 @@ const AdminPage = () => {
     setPwOpen(false);
   };
 
+  const temaLabel = theme === "dark" ? "Tema claro" : "Tema escuro";
+  const TemaIcon = theme === "dark" ? Sun : Moon;
+
   if (!authed && conferindoSessao) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" aria-label="Conferindo acesso" />
+      <div className="adm-root adm-login">
+        <div className="adm-login-box" role="status" aria-label="Conferindo acesso">
+          <img src={logo} alt="" />
+          <Loader2 className="h-8 w-8 animate-spin text-gold-ink" aria-hidden="true" />
+          <p className="adm-lede">Conferindo o seu acesso…</p>
+        </div>
       </div>
     );
   }
 
   if (!authed) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="w-full max-w-sm flex flex-col items-center gap-6">
-          <div className="w-20 h-20"><img src={logo} alt="Ferramentas do Cristão" className="w-full h-full object-contain" /></div>
-          <div className="w-full rounded-xl border border-border bg-card p-6 space-y-5">
-            <div className="text-center space-y-1">
-              <Shield className="w-8 h-8 mx-auto text-primary" />
-              <h1 className="font-display text-xl font-bold text-primary">{t("admin.title")}</h1>
-              <p className="text-sm text-muted-foreground">{t("admin.subtitle")}</p>
-            </div>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-1.5"><Label>{t("admin.emailLabel")}</Label><Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} placeholder="admin@..." /></div>
-              <div className="space-y-1.5"><Label>{t("admin.passwordLabel")}</Label><Input type="password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} /></div>
-              {loginError && <p className="text-sm text-destructive bg-destructive/10 rounded-lg p-3">{loginError}</p>}
-              <Button type="submit" className="w-full gap-2" disabled={loading}>
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+      <div className="adm-root adm-login">
+        <img className="adm-wm" src={logo} alt="" aria-hidden="true" />
+        <div className="adm-login-box">
+          <img src={logo} alt="Ferramentas do Cristão" />
+          <div className="adm-card">
+            <span className="adm-eyebrow">Ferramentas do Cristão</span>
+            <h1 className="adm-h1">{t("admin.title")}</h1>
+            <p className="adm-lede">Acesso só para a equipe. Entre com o e-mail e a senha do painel.</p>
+            <form onSubmit={handleLogin} className="mt-5 space-y-4">
+              <div>
+                <label className="adm-label" htmlFor="adm-email">{t("admin.emailLabel")}</label>
+                <input id="adm-email" className="adm-field" type="email" autoComplete="username" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} placeholder="admin@..." />
+              </div>
+              <div>
+                <label className="adm-label" htmlFor="adm-pass">{t("admin.passwordLabel")}</label>
+                <input id="adm-pass" className="adm-field" type="password" autoComplete="current-password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} />
+              </div>
+              {loginError && <p className="adm-error" role="alert">{loginError}</p>}
+              <button type="submit" className="adm-btn w-full" disabled={loading}>
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <LogIn className="h-5 w-5" aria-hidden="true" />}
                 {t("admin.button")}
-              </Button>
+              </button>
             </form>
           </div>
-          <Link to="/" className="inline-flex min-h-12 items-center gap-2 rounded-lg px-4 text-[0.9375rem] text-muted-foreground hover:bg-muted hover:text-foreground">
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />Voltar ao app
-          </Link>
+          <Link to="/" className="adm-back"><ArrowLeft className="h-5 w-5" aria-hidden="true" />Voltar ao app</Link>
         </div>
       </div>
     );
   }
 
+  const atual = NAV.find((n) => n.id === tab)!;
+
   const renderSection = () => {
     switch (tab) {
-      case "dashboard": return <DashboardSection creds={creds} />;
+      case "dashboard": return <DashboardSection creds={creds} onIr={ir} />;
       case "analytics": return <AnalyticsSection creds={creds} />;
-      case "users": return <UsersSection creds={creds} onUnauthorized={handleUnauthorized} />;
+      case "users": return <UsersSection creds={creds} onUnauthorized={handleUnauthorized} focarBusca={buscarAssinante} />;
       case "livraria": return <LibrarySection creds={creds} onUnauthorized={handleUnauthorized} />;
       case "jornada": return <JourneyEditorialSection credentials={creds} />;
       case "notificacoes": return <NotificationsSection creds={creds} onUnauthorized={handleUnauthorized} />;
@@ -176,95 +232,99 @@ const AdminPage = () => {
     }
   };
 
-  const currentNav = NAV.find((n) => n.id === tab)!;
+  const grupos = [...new Set(NAV.map((n) => n.grupo))];
+  const mais = NAV.filter((n) => !BARRA.includes(n.id));
 
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Sidebar mobile overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-
-      {/* Sidebar */}
-      <aside className={`
-        fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-card border-r border-border
-        flex flex-col transition-transform duration-200
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-      `}>
-        <div className="p-5 border-b border-border flex items-center gap-3">
-          <div className="w-9 h-9"><img src={logo} alt="" className="w-full h-full object-contain" /></div>
-          <div>
-            <h1 className="font-display text-base font-bold text-primary leading-tight">{t("admin.title")}</h1>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Ferramentas do Cristão</p>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-3 space-y-1">
-          {NAV.map((item) => {
-            const Icon = item.icon;
-            const active = tab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => { setTab(item.id); setSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition ${
-                  active
-                    ? "bg-primary text-primary-foreground font-medium"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
+    <div className="adm-root">
+      {/* Computador: lateral azul-noite, com a marca discreta no topo e "Voltar ao app" sempre à vista. */}
+      <aside className="adm-side" aria-label="Menu do painel">
+        <Link to="/" className="adm-brand" aria-label="Ferramentas do Cristão: voltar ao app">
+          <img src={logo} alt="" />
+          <span><b>Ferramentas do Cristão</b><small>Painel do dono</small></span>
+        </Link>
+        <nav className="adm-side-nav">
+          {grupos.map((g) => (
+            <div key={g}>
+              <p className="adm-side-group">{g}</p>
+              {NAV.filter((n) => n.grupo === g).map((item) => (
+                <button key={item.id} type="button" className="adm-side-item" aria-current={tab === item.id ? "page" : undefined} onClick={() => ir(item.id)}>
+                  <item.icon aria-hidden="true" />{item.label}
+                </button>
+              ))}
+            </div>
+          ))}
         </nav>
-
-        <div className="p-3 border-t border-border space-y-1">
-          <Link
-            to="/"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-primary hover:bg-muted transition"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar ao app
-          </Link>
-          {sessaoEmail && <p className="px-3 py-1 text-sm text-muted-foreground break-all">Entrou pela conta {sessaoEmail}</p>}
-          {!sessaoEmail && <button
-            onClick={() => setPwOpen(true)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition"
-          >
-            <KeyRound className="w-4 h-4" />
-            {t("admin.changePassword")}
-          </button>}
-          {!sessaoEmail && <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition"
-          >
-            <LogOut className="w-4 h-4" />
-            {t("admin.logout")}
-          </button>}
+        <div className="adm-side-foot">
+          <Link to="/" className="adm-side-item adm-side-app"><ArrowLeft aria-hidden="true" />Voltar ao app</Link>
+          <button type="button" className="adm-side-item" onClick={toggleTheme}><TemaIcon aria-hidden="true" />{temaLabel}</button>
+          {!sessaoEmail && <button type="button" className="adm-side-item" onClick={() => setPwOpen(true)}><KeyRound aria-hidden="true" />{t("admin.changePassword")}</button>}
+          {!sessaoEmail && <button type="button" className="adm-side-item adm-side-danger" onClick={handleLogout}><LogOut aria-hidden="true" />{t("admin.logout")}</button>}
+          {sessaoEmail && <p className="adm-side-who">Entrou pela conta {sessaoEmail}</p>}
         </div>
       </aside>
 
-      {/* Main */}
-      <div className="flex-1 min-w-0 flex flex-col">
-        <header className="h-14 border-b border-border flex items-center gap-3 px-4 md:px-6 bg-card/50 backdrop-blur sticky top-0 z-30">
-          <Button size="icon" variant="ghost" className="md:hidden" onClick={() => setSidebarOpen(true)}>
-            <Menu className="w-5 h-5" />
-          </Button>
-          <currentNav.icon className="w-5 h-5 text-primary" />
-          <h2 className="font-display text-lg font-bold text-primary">{currentNav.label}</h2>
-          <Link to="/" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground">
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" /><span className="hidden sm:inline">Voltar ao app</span><span className="sm:hidden">App</span>
-          </Link>
+      <div className="adm-shell">
+        {/* Celular: logo pequena, nome da aba, tema e "App" (voltar) sempre visíveis. */}
+        <header className="adm-top">
+          <img className="adm-top-logo" src={logo} alt="Ferramentas do Cristão" />
+          <p className="adm-top-title">Painel</p>
+          <button type="button" className="adm-iconbtn" onClick={toggleTheme} aria-label={temaLabel} title={temaLabel}>
+            <TemaIcon className="h-6 w-6" aria-hidden="true" />
+          </button>
+          <Link to="/" className="adm-back" aria-label="Voltar ao app"><ArrowLeft className="h-5 w-5" aria-hidden="true" />App</Link>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
-          <div className="w-full">
-            {renderSection()}
-          </div>
+        <main ref={mainRef} className="adm-main" id="adm-conteudo">
+          <img className="adm-wm" src={logo} alt="" aria-hidden="true" />
+          {tab !== "dashboard" && <SectionHead title={atual.titulo} lede={atual.lede || undefined} />}
+          {renderSection()}
         </main>
       </div>
+
+      {/* Celular: barra inferior no mesmo desenho da barra do app. */}
+      <nav className="adm-bnav" aria-label="Menu do painel">
+        <div className="adm-bnav-bar">
+          {BARRA.map((id) => {
+            const item = NAV.find((n) => n.id === id)!;
+            return (
+              <button key={id} type="button" className="adm-bnav-tab" aria-current={tab === id ? "page" : undefined} onClick={() => ir(id)}>
+                <span className="adm-bnav-pill"><item.icon aria-hidden="true" /></span><span>{item.curto}</span>
+              </button>
+            );
+          })}
+          <button type="button" className="adm-bnav-tab" aria-haspopup="dialog" aria-expanded={maisOpen}
+            aria-current={mais.some((m) => m.id === tab) ? "page" : undefined} onClick={() => setMaisOpen(true)}>
+            <span className="adm-bnav-pill"><LayoutGrid aria-hidden="true" /></span><span>Mais</span>
+          </button>
+        </div>
+      </nav>
+
+      {maisOpen && (
+        <>
+          <div className="adm-sheet-overlay" onClick={() => setMaisOpen(false)} aria-hidden="true" />
+          <div className="adm-sheet" role="dialog" aria-modal="true" aria-labelledby="adm-mais-titulo">
+            <div className="adm-sheet-grab" aria-hidden="true" />
+            <div className="adm-sheet-head">
+              <h2 id="adm-mais-titulo">Mais do painel</h2>
+              <button type="button" className="adm-iconbtn" onClick={() => setMaisOpen(false)} aria-label="Fechar" autoFocus><X className="h-6 w-6" aria-hidden="true" /></button>
+            </div>
+            <div className="adm-sheet-grid">
+              {mais.map((item) => (
+                <button key={item.id} type="button" className="adm-sheet-card" aria-current={tab === item.id ? "page" : undefined} onClick={() => ir(item.id)}>
+                  <span className="adm-tile"><item.icon aria-hidden="true" /></span>{item.label}
+                </button>
+              ))}
+            </div>
+            <p className="adm-sec">Ajustes</p>
+            <Link to="/" className="adm-sheet-row"><ArrowLeft aria-hidden="true" />Voltar ao app</Link>
+            <button type="button" className="adm-sheet-row" onClick={toggleTheme}><TemaIcon aria-hidden="true" />{temaLabel}</button>
+            {!sessaoEmail && <button type="button" className="adm-sheet-row" onClick={() => { setMaisOpen(false); setPwOpen(true); }}><KeyRound aria-hidden="true" />{t("admin.changePassword")}</button>}
+            {!sessaoEmail && <button type="button" className="adm-sheet-row is-danger" onClick={handleLogout}><LogOut aria-hidden="true" />{t("admin.logout")}</button>}
+            {sessaoEmail && <p className="adm-kpi-hint" style={{ padding: "10px 6px 0", wordBreak: "break-all" }}>Entrou pela conta {sessaoEmail}</p>}
+          </div>
+        </>
+      )}
 
       <Dialog open={pwOpen} onOpenChange={setPwOpen}>
         <DialogContent>

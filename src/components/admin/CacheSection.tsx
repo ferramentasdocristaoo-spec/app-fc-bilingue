@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Loader2, Trash2, ChevronLeft, ChevronRight, Search, Sparkles } from "lucide-react";
+import { Trash2, ChevronLeft, ChevronRight, Search, Sparkles } from "lucide-react";
 import { costFor, labelFor } from "./cost-map";
+import { Esqueleto, Vazio, fmt, fmtData } from "./admin-ui";
 
 type Row = { id: string; action: string; cache_key: string; created_at: string; expires_at: string; total_count: number };
 type StatRow = { action: string; total: number };
@@ -79,7 +80,7 @@ const CacheSection = ({ creds }: Props) => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div className="rounded-xl border border-border bg-card p-5">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Total em cache</p>
           <p className="font-display text-3xl font-bold mt-2">{totalAll.toLocaleString("pt-BR")}</p>
@@ -88,9 +89,9 @@ const CacheSection = ({ creds }: Props) => {
         <div className="rounded-xl border border-border bg-card p-5">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Economia estimada</p>
           <p className="font-display text-3xl font-bold mt-2 text-primary">~${estimatedSaved.toFixed(2)}</p>
-          <p className="text-xs text-muted-foreground mt-1">veja detalhes em "Análises"</p>
+          <p className="text-xs text-muted-foreground mt-1">detalhes em Análises</p>
         </div>
-        <div className="rounded-xl border border-border bg-card p-5">
+        <div className="col-span-2 md:col-span-1 rounded-xl border border-border bg-card p-5">
           <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Por tipo</p>
           <div className="space-y-1">
             {stats.slice(0, 4).map((s) => (
@@ -106,19 +107,19 @@ const CacheSection = ({ creds }: Props) => {
       <div className="flex flex-wrap gap-2">
         <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-[240px]">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar por tipo ou chave..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="pl-9" />
+            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input type="search" aria-label="Buscar no cache" placeholder="Buscar por tipo ou chave…" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="pl-10" />
           </div>
           <Button type="submit" variant="outline">Buscar</Button>
         </form>
-        <Button variant="outline" onClick={() => setConfirmClear(true)} className="gap-2">
-          <Sparkles className="w-4 h-4" />
-          Limpar antigos (+30d)
+        <Button variant="outline" onClick={() => setConfirmClear(true)} className="gap-2 w-full sm:w-auto">
+          <Sparkles className="w-5 h-5" />
+          Limpar os de mais de 30 dias
         </Button>
       </div>
 
       <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <Table>
+        <Table className="adm-table">
           <TableHeader>
             <TableRow>
               <TableHead>Tipo</TableHead>
@@ -129,17 +130,17 @@ const CacheSection = ({ creds }: Props) => {
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={4} className="text-center py-8"><Loader2 className="w-5 h-5 animate-spin mx-auto text-muted-foreground" /></TableCell></TableRow>
+              <TableRow className="adm-tr-state"><TableCell colSpan={4} className="py-4"><Esqueleto linhas={4} label="Carregando o cache" /></TableCell></TableRow>
             ) : rows.length === 0 ? (
-              <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground text-sm">Nenhuma entrada.</TableCell></TableRow>
+              <TableRow className="adm-tr-state"><TableCell colSpan={4}>{search ? <Vazio tipo="busca" titulo={`Nada com “${search}”`} texto="Busque pelo tipo (ex.: raio-x) ou por um pedaço da chave." /> : <Vazio titulo="Cache vazio" texto="As respostas da IA guardadas aparecem aqui." />}</TableCell></TableRow>
             ) : (
               rows.map((r) => (
                 <TableRow key={r.id}>
-                  <TableCell><span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">{r.action}</span></TableCell>
-                  <TableCell className="text-xs font-mono break-all max-w-md truncate">{r.cache_key}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{new Date(r.created_at).toLocaleDateString("pt-BR")}</TableCell>
+                  <TableCell className="adm-td-full"><span className="adm-pill">{labelFor(r.action)}</span></TableCell>
+                  <TableCell className="adm-td-full text-sm font-mono break-all max-w-md truncate">{r.cache_key}</TableCell>
+                  <TableCell data-label="Criado" className="text-sm text-muted-foreground whitespace-nowrap">{fmtData(r.created_at)}</TableCell>
                   <TableCell className="text-right">
-                    <Button size="icon" variant="ghost" onClick={() => setConfirmDelete(r)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                    <Button size="icon" variant="ghost" aria-label="Excluir esta entrada" title="Excluir" onClick={() => setConfirmDelete(r)} className="text-destructive hover:text-destructive"><Trash2 className="w-5 h-5" /></Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -149,10 +150,10 @@ const CacheSection = ({ creds }: Props) => {
       </div>
 
       <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">{total.toLocaleString("pt-BR")} entradas • Página {page + 1} de {totalPages}</span>
+        <span className="text-muted-foreground">{fmt(total)} entradas · página {page + 1} de {totalPages}</span>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage(page - 1)}><ChevronLeft className="w-4 h-4" /></Button>
-          <Button size="sm" variant="outline" disabled={page + 1 >= totalPages} onClick={() => setPage(page + 1)}><ChevronRight className="w-4 h-4" /></Button>
+          <Button size="sm" variant="outline" aria-label="Página anterior" disabled={page === 0} onClick={() => setPage(page - 1)}><ChevronLeft className="w-5 h-5" /></Button>
+          <Button size="sm" variant="outline" aria-label="Próxima página" disabled={page + 1 >= totalPages} onClick={() => setPage(page + 1)}><ChevronRight className="w-5 h-5" /></Button>
         </div>
       </div>
 
@@ -160,7 +161,7 @@ const CacheSection = ({ creds }: Props) => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Limpar cache antigo?</AlertDialogTitle>
-            <AlertDialogDescription>Vai apagar todas entradas com mais de 30 dias. Próximas requisições vão regenerar e salvar de novo.</AlertDialogDescription>
+            <AlertDialogDescription>Vai apagar todas as entradas com mais de 30 dias. Próximas requisições vão regenerar e salvar de novo.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>

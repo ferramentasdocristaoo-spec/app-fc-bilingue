@@ -107,8 +107,8 @@ try {
     await page.waitForURL(/fc-control-panel/);
     assert.equal(await page.locator('input[type="password"]').count(), 0, "não pode pedir senha na sessão");
     ok("celular: Admin abre o painel direto, sem senha");
-    await page.locator("header button").first().click(); // abre a lateral do painel
-    await page.getByRole("button", { name: "Notificações" }).click();
+    // Painel novo (21/11): no celular a aba fica na barra inferior, com o nome curto "Avisos".
+    await page.locator(".adm-bnav").getByRole("button", { name: "Avisos" }).click();
     await page.getByText("Firebase pronto · fc-teste").waitFor();
     ok("celular: aba Notificações com selo do Firebase");
     await page.getByLabel("Título").fill("Rute chegou na Jornada");
@@ -157,7 +157,7 @@ try {
     await print(page, "06-computador-dock-admin.png");
     await dockAdmin.click();
     await page.waitForURL(/fc-control-panel/);
-    await page.getByRole("button", { name: "Notificações" }).click();
+    await page.locator(".adm-side").getByRole("button", { name: "Notificações" }).click();
     await page.getByLabel("Título").fill("Rute chegou na Jornada");
     await page.getByLabel("Mensagem").fill("O mapa interativo de Rute já está no app. Toque para abrir.");
     await page.getByLabel("Ao tocar, abre").selectOption("/jornada");

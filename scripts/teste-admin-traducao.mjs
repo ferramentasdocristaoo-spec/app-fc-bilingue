@@ -107,16 +107,18 @@ const ok = (m) => console.log(`ok  ${m}`);
 async function fluxo(tipo, sufixo) {
   const { ctx, page, erros, chamadas } = await contexto(browser, { tipo, email: ADMIN, admin: ADMIN, sessao: sessaoFalsa(ADMIN) });
   await page.goto(BASE + "/fc-control-panel");
-  if (tipo !== "desktop") await page.locator("header button.md\\:hidden").first().click(); // abre o menu do painel
-  await page.getByRole("button", { name: "Notificações" }).click();
+  // Painel novo (21/11): celular = barra inferior (aba "Avisos"); computador = lateral ("Notificações").
+  if (tipo !== "desktop") await page.locator(".adm-bnav").getByRole("button", { name: "Avisos" }).click();
+  else await page.locator(".adm-side").getByRole("button", { name: "Notificações" }).click();
   await page.getByLabel("Título em português").fill(TITULO);
   await page.getByLabel("Mensagem em português").fill(TEXTO);
   await page.getByLabel("Ao tocar, abre").selectOption("/jornada");
   await page.getByLabel("Todos com acesso").check();
   for (const l of ["Português (Portugal)", "Inglês", "Espanhol", "Francês", "Italiano", "Alemão"]) await page.getByLabel(l, { exact: true }).check();
   await print(page, `01-${sufixo}-escrever-e-idiomas.png`, true);
-  await page.getByRole("button", { name: /Traduzir para 6 idioma/ }).click();
+  // Desde 1fdec62 a tradução sai sozinha 1,5 s depois de escrever/marcar (não há mais botão "Traduzir para N").
   await page.getByLabel("Título em Inglês").waitFor();
+  await page.waitForFunction((v) => document.querySelector('[aria-label="Título em Alemão"], #push-titulo-de')?.value === v || [...document.querySelectorAll("input")].some((i) => i.value === v), TRAD.de.titulo);
   assert.equal(await page.getByLabel("Título em Alemão").inputValue(), TRAD.de.titulo);
   ok(`${sufixo}: Traduzir preenche as 6 versões editáveis`);
   assert.equal(chamadas.filter((c) => c.corpo?.acao === "traduzir").length, 1);

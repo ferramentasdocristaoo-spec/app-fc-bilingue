@@ -105,7 +105,7 @@ const JourneyEditorialSection = ({ credentials }: { credentials: AdminCredential
       setQueue(current => saveEditorialQueueState(updateEditorialQueueItem(current, item.id, generatedItem)));
       saveJourneyEditorialDraft(credentials, generatedItem).catch(() => setCloudStatus("error"));
       if (!silent) getJourneyAiUsage(credentials).then(setUsage).catch(() => undefined);
-      if (!silent) toast.success("Conteúdo gerado e guardado localmente.");
+      if (!silent) toast.success("Conteúdo gerado e salvo neste aparelho.");
       return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : "Falha ao gerar o conteúdo.";

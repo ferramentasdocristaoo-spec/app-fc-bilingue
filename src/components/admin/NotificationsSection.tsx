@@ -319,7 +319,7 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
         <Button variant="ghost" size="sm" className="gap-2" onClick={() => void carregar()}><RefreshCw className="h-4 w-4" />Atualizar</Button>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         {/* Escrever */}
         <section className="rounded-xl border border-border bg-card p-4 md:p-5 space-y-5">
           <h3 className="font-display text-lg font-bold text-primary">Nova mensagem</h3>
@@ -498,8 +498,9 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
         {historico.length === 0 ? (
           <p className="text-sm text-muted-foreground">Nenhum envio ainda.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
+          <div className="md:overflow-x-auto">
+            {/* Celular: cada envio vira um cartão (adm-table); os papéis de tabela ficam explícitos para leitor de tela. */}
+            <Table className="adm-table" role="table">
               <TableHeader>
                 <TableRow>
                   <TableHead>Quando</TableHead><TableHead>Mensagem</TableHead><TableHead>Público</TableHead>
@@ -510,16 +511,16 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
               </TableHeader>
               <TableBody>
                 {historico.map((e) => (
-                  <TableRow key={e.id}>
-                    <TableCell className="whitespace-nowrap">{fmtData(e.criado_em)}</TableCell>
-                    <TableCell className="min-w-[14rem]"><p className="font-medium">{e.titulo}</p><p className="text-sm text-muted-foreground">{e.texto}</p></TableCell>
-                    <TableCell className="min-w-[10rem]">{e.publico_rotulo}</TableCell>
-                    <TableCell className="text-right">{e.pessoas}</TableCell>
-                    <TableCell className="text-right">{e.enviados}</TableCell>
-                    <TableCell className="text-right">{e.falhas}</TableCell>
-                    <TableCell className="text-right">{e.removidos}</TableCell>
-                    <TableCell className="text-right">{e.abertos}</TableCell>
-                    <TableCell>{situacao(e)}</TableCell>
+                  <TableRow key={e.id} role="row">
+                    <TableCell role="cell" className="adm-td-full whitespace-nowrap text-muted-foreground">{fmtData(e.criado_em)}</TableCell>
+                    <TableCell role="cell" className="adm-td-main md:min-w-[14rem]"><p className="font-medium">{e.titulo}</p><p className="text-sm text-muted-foreground font-normal">{e.texto}</p></TableCell>
+                    <TableCell role="cell" data-label="Público" className="md:min-w-[10rem]">{e.publico_rotulo}</TableCell>
+                    <TableCell role="cell" data-label="Pessoas" className="md:text-right">{e.pessoas}</TableCell>
+                    <TableCell role="cell" data-label="Chegaram" className="md:text-right">{e.enviados}</TableCell>
+                    <TableCell role="cell" data-label="Falhas" className="md:text-right">{e.falhas}</TableCell>
+                    <TableCell role="cell" data-label="Removidos" className="md:text-right">{e.removidos}</TableCell>
+                    <TableCell role="cell" data-label="Toques" className="md:text-right">{e.abertos}</TableCell>
+                    <TableCell role="cell" data-label="Situação">{situacao(e)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

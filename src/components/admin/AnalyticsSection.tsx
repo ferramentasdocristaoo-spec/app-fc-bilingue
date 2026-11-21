@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, TrendingUp, Clock, Calendar, UserPlus, Repeat, DollarSign, Info } from "lucide-react";
+import { TrendingUp, Clock, Calendar, UserPlus, Repeat, DollarSign, Info } from "lucide-react";
 import { costFor, labelFor } from "./cost-map";
+import { EsqueletoKpis, Periodo, fmt } from "./admin-ui";
 
 interface Props {
   creds: { _admin_email: string; _admin_password: string };
@@ -55,11 +56,7 @@ const AnalyticsSection = ({ creds }: Props) => {
   }, [days]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-      </div>
-    );
+    return <EsqueletoKpis n={4} />;
   }
 
   const maxDay = Math.max(...byDay.map((d) => Number(d.uses)), 1);
@@ -92,20 +89,7 @@ const AnalyticsSection = ({ creds }: Props) => {
   return (
     <div className="space-y-6">
       {/* Período */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm text-muted-foreground">Período:</span>
-        {[7, 30, 90, 180].map((d) => (
-          <button
-            key={d}
-            onClick={() => setDays(d)}
-            className={`text-xs px-3 py-1.5 rounded-full border transition ${
-              days === d ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            {d} dias
-          </button>
-        ))}
-      </div>
+      <Periodo dias={days} opcoes={[7, 30, 90, 180]} onChange={setDays} />
 
       {/* KPIs rápidos */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -226,9 +210,9 @@ const AnalyticsSection = ({ creds }: Props) => {
               <p className="text-[10px] uppercase text-primary">Regulares (6-20)</p>
               <p className="font-display text-2xl font-bold mt-1 text-primary">{retention.regular || 0}</p>
             </div>
-            <div className="rounded-lg bg-amber-500/10 p-3 text-center">
-              <p className="text-[10px] uppercase text-amber-600 dark:text-amber-500">Power (20+)</p>
-              <p className="font-display text-2xl font-bold mt-1 text-amber-600 dark:text-amber-500">{retention.power || 0}</p>
+            <div className="rounded-lg bg-gold-soft p-3 text-center">
+              <p className="text-[10px] uppercase text-gold-ink">Muito ativos (20+)</p>
+              <p className="font-display text-2xl font-bold mt-1 text-gold-ink">{retention.power || 0}</p>
             </div>
             <div className="rounded-lg bg-muted/20 p-3 text-center">
               <p className="text-[10px] uppercase text-muted-foreground">Inativos</p>
@@ -242,37 +226,37 @@ const AnalyticsSection = ({ creds }: Props) => {
       )}
 
       {/* Economia detalhada */}
-      <Card title="Economia detalhada por ferramenta" icon={DollarSign} hint="cálculo refinado">
+      <Card title="Economia detalhada por ferramenta" icon={DollarSign} hint="estimativa">
         <div className="space-y-3">
           <div className="rounded-lg bg-primary/5 border border-primary/20 p-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
                 <p className="text-xs text-muted-foreground">Economia total estimada</p>
-                <p className="font-display text-3xl font-bold text-primary mt-1">~${totalSaved.toFixed(2)}</p>
+                <p className="font-display text-3xl font-bold text-primary mt-1">≈ US$ {totalSaved.toFixed(2)}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-muted-foreground">{totalHits.toLocaleString("pt-BR")} cache hits</p>
-                <p className="text-xs text-muted-foreground">média ${totalHits ? (totalSaved / totalHits).toFixed(4) : "0"}/hit</p>
+                <p className="text-xs text-muted-foreground">{fmt(totalHits)} respostas reaproveitadas</p>
+                <p className="text-xs text-muted-foreground">média US$ {totalHits ? (totalSaved / totalHits).toFixed(4) : "0"} por resposta</p>
               </div>
             </div>
           </div>
 
-          <table className="w-full text-sm">
+          <table className="adm-table w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs text-muted-foreground">
                 <th className="py-2">Ferramenta</th>
-                <th className="py-2 text-right">Hits</th>
-                <th className="py-2 text-right">Custo unitário</th>
-                <th className="py-2 text-right">Economizado</th>
+                <th className="py-2 text-right">Reaproveitadas</th>
+                <th className="py-2 text-right">Custo cada</th>
+                <th className="py-2 text-right">Poupado</th>
               </tr>
             </thead>
             <tbody>
               {costBreakdown.map((c) => (
                 <tr key={c.action} className="border-b border-border/50">
-                  <td className="py-2 font-medium">{c.label}</td>
-                  <td className="py-2 text-right text-muted-foreground">{c.hits.toLocaleString("pt-BR")}</td>
-                  <td className="py-2 text-right text-muted-foreground text-xs">${c.unitCost.toFixed(4)}</td>
-                  <td className="py-2 text-right font-bold text-primary">${c.saved.toFixed(2)}</td>
+                  <td className="adm-td-main py-2 font-medium">{c.label}</td>
+                  <td data-label="Reaproveitadas" className="py-2 text-right text-muted-foreground">{fmt(c.hits)}</td>
+                  <td data-label="Custo cada" className="py-2 text-right text-muted-foreground text-xs">US$ {c.unitCost.toFixed(4)}</td>
+                  <td data-label="Poupado" className="py-2 text-right font-bold text-primary">US$ {c.saved.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
