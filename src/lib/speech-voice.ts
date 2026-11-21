@@ -4,6 +4,10 @@
 
 const CHAVE = "fc-voz-leitura";
 
+/** Leitura em voz alta desligada a pedido do dono (21/11/2026): as vozes do celular são ruins.
+ *  Volta quando os áudios gravados com a voz do Narrador estiverem prontos. */
+export const AUDIO_LEITURA = false;
+
 // Vozes "de efeito" ou de baixa qualidade do iOS/macOS que nunca devem ser escolhidas sozinhas.
 const RUINS = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|grandma|grandpa|eddy|flo|reed|rocko|sandy|shelley|junior|ralph|kathy|fred)\b/i;
 const BOAS = /(premium|enhanced|aprimorad|natural|neural|siri|google)/i;

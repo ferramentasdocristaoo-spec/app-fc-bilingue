@@ -18,7 +18,7 @@ import {
   Library,
   X,
 } from "lucide-react";
-import { escolherVoz, carregarVozes } from "@/lib/speech-voice";
+import { escolherVoz, carregarVozes, AUDIO_LEITURA } from "@/lib/speech-voice";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToolError } from "@/components/ToolKit";
 import { toast } from "@/hooks/use-toast";
@@ -732,6 +732,7 @@ const BibliaPage = () => {
             >
               <ChevronLeft size={22} />
             </button>
+            {AUDIO_LEITURA && (
             <button
               type="button"
               className="biblia-bottom-text-btn"
@@ -740,6 +741,7 @@ const BibliaPage = () => {
               {!lendo ? <Volume2 size={18} /> : pausado ? <Play size={18} /> : <Pause size={18} />}
               <span>{!lendo ? t("biblia.listen") : pausado ? t("biblia.resume") : t("biblia.pause")}</span>
             </button>
+            )}
             <button
               type="button"
               className="biblia-bottom-text-btn"

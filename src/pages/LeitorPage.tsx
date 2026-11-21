@@ -1,5 +1,5 @@
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { escolherVoz, carregarVozes } from "@/lib/speech-voice";
+import { escolherVoz, carregarVozes, AUDIO_LEITURA } from "@/lib/speech-voice";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowRight, List, Pause, Play, Square, Volume2, X } from "lucide-react";
@@ -264,9 +264,11 @@ export default function LeitorPage() {
         <button ref={tocOpenRef} onClick={() => setSumario((open) => !open)} aria-label={t("livraria.reader.toc")} aria-expanded={sumario} title={t("livraria.reader.toc")} className={iconButton} style={{ color: theme.sub }}>
           <List className="h-5 w-5" />
         </button>
+        {AUDIO_LEITURA && (
         <button onClick={alternarLeitura} aria-label={!lendo ? t("livraria.reader.listen") : pausado ? t("livraria.reader.resume") : t("livraria.reader.pause")} title={t("livraria.reader.listen")} className={iconButton} style={{ color: lendo ? theme.acento : theme.sub }}>
           {!lendo ? <Volume2 className="h-5 w-5" /> : pausado ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
         </button>
+        )}
         <Popover>
           <PopoverTrigger aria-label={t("livraria.reader.appearance")} title={t("livraria.reader.appearance")} className={`${iconButton} font-display text-xl font-semibold`} style={{ color: theme.sub }}>
             Aa

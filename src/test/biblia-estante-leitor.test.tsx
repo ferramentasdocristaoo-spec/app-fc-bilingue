@@ -86,6 +86,7 @@ describe("Bíblia: Estante (66 Livros) e Leitura Direção A", () => {
 
     // A pílula flutuante embaixo deve estar presente
     expect(screen.getByRole("navigation", { name: /navegação e leitura/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /ouvir/i })).toBeInTheDocument();
+    // Áudio desligado a pedido do dono (21/11/2026) até os áudios do Narrador ficarem prontos.
+    expect(screen.queryByRole("button", { name: /ouvir/i })).not.toBeInTheDocument();
   });
 });
