@@ -97,9 +97,21 @@ const AdminPage = () => {
   const handleLogout = () => {
     // Na sessão do app, "sair do painel" é só voltar ao app (a conta continua logada).
     if (sessaoEmail) { navigate("/"); return; }
+    lembrarAdmin(null);
     sessionStorage.removeItem(SS_EMAIL);
     sessionStorage.removeItem(SS_PASS);
     setAuthed(false);
+  };
+
+  // Sessão recusada no meio do uso (expirou ou o e-mail saiu de admin_users): volta ao login antigo com aviso.
+  const handleUnauthorized = () => {
+    if (sessaoEmail) {
+      setSessaoEmail(null);
+      setAuthed(!!(sessionStorage.getItem(SS_EMAIL) && sessionStorage.getItem(SS_PASS)));
+      setLoginError("A sessão de admin não vale mais. Entre com e-mail e senha do painel.");
+      return;
+    }
+    handleLogout();
   };
 
   const handleChangePassword = async () => {
@@ -155,10 +167,10 @@ const AdminPage = () => {
     switch (tab) {
       case "dashboard": return <DashboardSection creds={creds} />;
       case "analytics": return <AnalyticsSection creds={creds} />;
-      case "users": return <UsersSection creds={creds} onUnauthorized={handleLogout} />;
-      case "livraria": return <LibrarySection creds={creds} onUnauthorized={handleLogout} />;
+      case "users": return <UsersSection creds={creds} onUnauthorized={handleUnauthorized} />;
+      case "livraria": return <LibrarySection creds={creds} onUnauthorized={handleUnauthorized} />;
       case "jornada": return <JourneyEditorialSection credentials={creds} />;
-      case "notificacoes": return <NotificationsSection creds={creds} onUnauthorized={handleLogout} />;
+      case "notificacoes": return <NotificationsSection creds={creds} onUnauthorized={handleUnauthorized} />;
       case "sermons": return <SermonsSection />;
       case "cache": return <CacheSection creds={creds} />;
     }

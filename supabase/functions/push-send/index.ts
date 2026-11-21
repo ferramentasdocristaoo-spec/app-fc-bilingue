@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { emLotes, enviarFcm, lerContaServico, type ResultadoFcm } from "./fcm.ts";
+import { emLotes, enviarFcm, lerContaServico, tokenAcesso, type ResultadoFcm } from "./fcm.ts";
 import { filtrarPublico, lerPublico, rotuloPublico, validarMensagem, type Acesso, type Inscricao, type Publico } from "./publico.ts";
 
 // Central de mensagens do FC (21/11/2026, Noé). Modelo da Fome Livre (FCM HTTP v1, um projeto Firebase por produto).
@@ -130,29 +130,34 @@ Deno.serve(async (req) => {
     if (alvo.aparelhos === 0) return json({ ok: false, error: "ninguem_inscrito" }, 400);
     if (alvo.aparelhos > MAX_APARELHOS) return json({ ok: false, error: "publico_grande", aparelhos: alvo.aparelhos }, 413);
 
-    // Duplo clique / reenvio igual em menos de 1 minuto: não manda de novo.
+    // Mesma mensagem para o mesmo público em menos de 1 minuto: não manda de novo (o teste no e-mail do dono
+    // seguido do envio para "Todos" é outro público, então passa).
+    const rotulo = rotuloPublico(publico);
     const { data: recente } = await sb.from("push_envios").select("id")
-      .eq("titulo", v.msg.titulo).eq("texto", v.msg.texto).gte("criado_em", new Date(Date.now() - 60_000).toISOString()).limit(1);
+      .eq("titulo", v.msg.titulo).eq("texto", v.msg.texto).eq("publico_rotulo", rotulo)
+      .gte("criado_em", new Date(Date.now() - 60_000).toISOString()).limit(1);
     if (recente?.length) return json({ ok: false, error: "envio_repetido", envio: recente[0].id }, 409);
 
+    // OAuth antes de gravar/enviar: se a conta de serviço for recusada, nada saiu.
+    const teste = Deno.env.get("FCM_TESTE") || undefined;
+    try { await tokenAcesso(conta, teste); } catch (e) {
+      console.error("[push-send] oauth:", (e as Error).message);
+      return json({ ok: false, error: "firebase_recusou" }, 502);
+    }
+
+    // chave = idempotência gerada no navegador a cada "Sim, enviar" (UNIQUE no banco): duas abas ou dois
+    // cliques com a mesma confirmação não mandam duas vezes.
+    const chave = typeof body.chave === "string" && /^[A-Za-z0-9-]{8,64}$/.test(body.chave) ? body.chave : null;
     const { data: linha, error: erroLinha } = await sb.from("push_envios").insert({
-      criado_por: admin, titulo: v.msg.titulo, texto: v.msg.texto, link: v.msg.link,
-      publico, publico_rotulo: rotuloPublico(publico), pessoas: alvo.pessoas, aparelhos: alvo.aparelhos, status: "enviando",
+      criado_por: admin, titulo: v.msg.titulo, texto: v.msg.texto, link: v.msg.link, chave,
+      publico, publico_rotulo: rotulo, pessoas: alvo.pessoas, aparelhos: alvo.aparelhos, status: "enviando",
     }).select("id").single();
+    if (erroLinha?.code === "23505") return json({ ok: false, error: "envio_repetido" }, 409);
     if (erroLinha || !linha) throw new Error(`envio_${erroLinha?.code ?? "erro"}`);
     const envio = Number(linha.id);
 
     const conteudo = { ...v.msg, envio, tag: `fc-${envio}`, ping: `${SUPABASE_URL}/functions/v1/push-send` };
-    const teste = Deno.env.get("FCM_TESTE") || undefined;
-    let resultados: ResultadoFcm[];
-    try {
-      resultados = await emLotes(alvo.tokens, PARALELO, (t) => enviarFcm(conta, t, conteudo, APP_URL, teste));
-    } catch (e) {
-      // Falha no OAuth do Google (conta de serviço errada/revogada): nada saiu.
-      await sb.from("push_envios").update({ status: "falhou", falhas: alvo.aparelhos, concluido_em: new Date().toISOString() }).eq("id", envio);
-      console.error("[push-send] oauth:", (e as Error).message);
-      return json({ ok: false, error: "firebase_recusou", envio }, 502);
-    }
+    const resultados: ResultadoFcm[] = await emLotes(alvo.tokens, PARALELO, (t) => enviarFcm(conta, t, conteudo, APP_URL, teste));
 
     const ok = alvo.tokens.filter((_, i) => resultados[i].tipo === "ok");
     const mortos = alvo.tokens.filter((_, i) => resultados[i].tipo === "invalido");

@@ -77,6 +77,16 @@ describe("FCM HTTP v1", () => {
   });
 });
 
+describe("OAuth recusado", () => {
+  it("vira falha por aparelho, sem derrubar o lote", async () => {
+    limparCacheToken();
+    const { conta } = await contaDeTeste();
+    const falso = (async () => new Response(JSON.stringify({ error: "invalid_grant" }), { status: 400 })) as typeof fetch;
+    const r = await emLotes(["a", "b"], 2, (t) => enviarFcm(conta, t, { titulo: "t", texto: "x", link: "/", envio: 1, tag: "fc-1" }, "https://app", "http://fcm.falso", falso));
+    expect(r.map((x) => [x.tipo, x.erro])).toEqual([["falha", "oauth"], ["falha", "oauth"]]);
+  });
+});
+
 describe("público da Central de mensagens", () => {
   const agora = Date.parse("2026-11-21T12:00:00Z");
   const acessos = new Map<string, Acesso>([

@@ -65,12 +65,27 @@ beforeAll(async () => {
   await db.exec(BASE);
   await db.exec(migracao);
   await db.exec(migracao); // idempotente: rodar de novo não pode falhar
+  // Passo manual do dono: liga a linha de admin à própria conta.
+  await db.exec("UPDATE public.admin_users SET user_id = '11111111-1111-1111-1111-111111111111' WHERE email = 'dono@fc.test'");
 }, 60_000);
 
 describe("admin pela sessão", () => {
   it("dono com e-mail confirmado e em admin_users é admin", async () => {
     const [r] = await como<{ ok: boolean }>("authenticated", DONO, "SELECT public.is_session_admin() AS ok");
     expect(r.ok).toBe(true);
+  });
+
+  it("conta com o e-mail do admin mas sem user_id ligado NÃO é admin (cadastro aberto não vira admin)", async () => {
+    await db.exec("INSERT INTO auth.users VALUES ('44444444-4444-4444-4444-444444444444', 'novo-admin@fc.test', now())");
+    await db.query("INSERT INTO public.admin_users (email, password_hash) VALUES ('novo-admin@fc.test', 'x')");
+    const s = sessao("44444444-4444-4444-4444-444444444444", "novo-admin@fc.test");
+    expect((await como<{ ok: boolean }>("authenticated", s, "SELECT public.is_session_admin() AS ok"))[0].ok).toBe(false);
+    expect((await como<{ ok: boolean }>("authenticated", s, "SELECT public.verify_admin('', '') AS ok"))[0].ok).toBe(false);
+  });
+
+  it("trocar a senha do painel exige a senha atual, mesmo com sessão de admin", async () => {
+    await expect(como("authenticated", DONO, "SELECT public.admin_change_password('dono@fc.test', '', 'nova')")).rejects.toThrow(/unauthorized/);
+    await como("anon", null, "SELECT public.admin_change_password('dono@fc.test', 'senha-velha', 'senha-velha')");
   });
 
   it("cliente logado não é admin; sem sessão também não", async () => {
@@ -128,14 +143,32 @@ describe("push: tabelas e RPCs", () => {
     expect(rows[0].email).toBe("dono@fc.test");
   });
 
-  it("troca de token apaga o antigo do mesmo e-mail; limite de 10 aparelhos", async () => {
+  it("sem sessão: não apaga aparelhos de ninguém e para em 10 por e-mail", async () => {
     const novo = "z".repeat(120);
     await como("anon", null, "SELECT public.push_inscrever('cliente@fc.test', $1, $2)", [novo, TOKEN]);
     const { rows } = await db.query<{ n: number }>("SELECT count(*)::int AS n FROM public.push_inscricoes WHERE token = $1", [TOKEN]);
-    expect(rows[0].n).toBe(0);
-    for (let i = 0; i < 12; i++) await como("anon", null, "SELECT public.push_inscrever('cliente@fc.test', $1)", [`k${i}`.padEnd(120, "k")]);
+    expect(rows[0].n).toBe(1); // o "antigo" informado sem sessão não é apagado
+    const res: string[] = [];
+    for (let i = 0; i < 12; i++) res.push((await como<{ r: string }>("anon", null, "SELECT public.push_inscrever('cliente@fc.test', $1) AS r", [`k${i}`.padEnd(120, "k")]))[0].r);
+    expect(res.filter((r) => r === "limite").length).toBeGreaterThan(0);
     const c = await db.query<{ n: number }>("SELECT count(*)::int AS n FROM public.push_inscricoes WHERE email = 'cliente@fc.test'");
     expect(c.rows[0].n).toBe(10);
+    expect((await db.query("SELECT 1 FROM public.push_inscricoes WHERE token = $1", [TOKEN])).rows.length).toBe(1);
+  });
+
+  it("com sessão: inscrição verificada, troca de token apaga o antigo, e anon não toma o token", async () => {
+    const t1 = "q".repeat(120), t2 = "w".repeat(120);
+    await como("authenticated", DONO, "SELECT public.push_inscrever(NULL, $1)", [t1]);
+    await como("authenticated", DONO, "SELECT public.push_inscrever(NULL, $1, $2)", [t2, t1]);
+    expect((await db.query("SELECT 1 FROM public.push_inscricoes WHERE token = $1", [t1])).rows.length).toBe(0);
+    await como("anon", null, "SELECT public.push_inscrever('cliente@fc.test', $1)", [t2]);
+    const { rows } = await db.query<{ email: string; verificado: boolean }>("SELECT email, verificado FROM public.push_inscricoes WHERE token = $1", [t2]);
+    expect(rows[0]).toEqual({ email: "dono@fc.test", verificado: true });
+  });
+
+  it("envio com a mesma chave não entra duas vezes", async () => {
+    await db.query("INSERT INTO public.push_envios (titulo, texto, chave) VALUES ('a', 'b', 'chave-1')");
+    await expect(db.query("INSERT INTO public.push_envios (titulo, texto, chave) VALUES ('a', 'b', 'chave-1')")).rejects.toThrow(/duplicate key/);
   });
 
   it("anon e cliente não leem nem escrevem as tabelas direto; admin da sessão lê", async () => {
@@ -149,7 +182,7 @@ describe("push: tabelas e RPCs", () => {
 
   it("desligar apaga só o token informado", async () => {
     const t = "d".repeat(120);
-    await como("anon", null, "SELECT public.push_inscrever('cliente@fc.test', $1)", [t]);
+    await como("authenticated", DONO, "SELECT public.push_inscrever(NULL, $1)", [t]);
     const [r] = await como<{ ok: boolean }>("anon", null, "SELECT public.push_desligar($1) AS ok", [t]);
     expect(r.ok).toBe(true);
     const [r2] = await como<{ ok: boolean }>("anon", null, "SELECT public.push_desligar($1) AS ok", [t]);

@@ -15,6 +15,13 @@
 --     SECURITY DEFINER ou pela função push-send com service_role) e RPCs push_inscrever,
 --     push_desligar, push_marcar_aberto.
 --
+-- SEGURANÇA (revisão 21/11): o e-mail sozinho NÃO basta. Quem tem a anon key consegue chamar /auth/v1/signup
+-- com o e-mail do dono antes dele; por isso o admin da sessão exige admin_users.user_id = id da conta em
+-- auth.users, preenchido À MÃO pelo dono depois de criar e conferir a própria conta:
+--   UPDATE public.admin_users SET user_id = (SELECT id FROM auth.users WHERE lower(email) = 'email-do-dono@exemplo.com')
+--   WHERE email = 'email-do-dono@exemplo.com';
+-- Sem user_id, a linha só vale para o login antigo (e-mail + senha). Ver PENDENTE-JARVIS.md.
+--
 -- Trocar/acrescentar admin = só um INSERT (nada fixo no front):
 --   INSERT INTO public.admin_users (email, password_hash)
 --   VALUES ('email-do-dono@exemplo.com', extensions.crypt(gen_random_uuid()::text, extensions.gen_salt('bf')))
@@ -22,6 +29,8 @@
 -- (a senha aleatória só serve para o login antigo do painel; quem entra pela sessão não usa senha.)
 
 -- ── 1) Admin pela sessão ────────────────────────────────────────────────────────────────────────────
+ALTER TABLE public.admin_users ADD COLUMN IF NOT EXISTS user_id uuid UNIQUE;
+
 CREATE OR REPLACE FUNCTION public.session_admin_email()
 RETURNS text
 LANGUAGE sql STABLE SECURITY DEFINER
@@ -29,7 +38,7 @@ SET search_path = public, auth
 AS $$
   SELECT lower(u.email)
   FROM auth.users u
-  JOIN public.admin_users a ON lower(a.email) = lower(u.email)
+  JOIN public.admin_users a ON a.user_id = u.id AND lower(a.email) = lower(u.email)
   WHERE u.id = auth.uid()
     AND coalesce(auth.jwt() ->> 'role', '') = 'authenticated'
     AND coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false) = false
@@ -69,6 +78,27 @@ AS $$
     );
 $$;
 
+-- Trocar a senha do login antigo continua exigindo a senha atual (a sessão não basta: protege a senha
+-- mesmo que alguém consiga uma sessão de admin).
+CREATE OR REPLACE FUNCTION public.admin_change_password(_admin_email text, _admin_password text, _new_password text)
+RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public, extensions
+AS $$
+BEGIN
+  IF coalesce(_admin_password, '') = '' OR NOT EXISTS (
+    SELECT 1 FROM public.admin_users
+    WHERE lower(email) = lower(trim(coalesce(_admin_email, '')))
+      AND password_hash = extensions.crypt(_admin_password, password_hash)
+  ) THEN
+    RAISE EXCEPTION 'unauthorized';
+  END IF;
+  UPDATE public.admin_users
+  SET password_hash = extensions.crypt(_new_password, extensions.gen_salt('bf'))
+  WHERE lower(email) = lower(trim(_admin_email));
+END;
+$$;
+
 -- ── 2) Push: inscrições (um token FCM por aparelho) ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.push_inscricoes (
   id bigserial PRIMARY KEY,
@@ -77,10 +107,12 @@ CREATE TABLE IF NOT EXISTS public.push_inscricoes (
   lang text,
   plataforma text,
   ativo boolean NOT NULL DEFAULT true,
+  verificado boolean NOT NULL DEFAULT false, -- true = inscrito com sessão Supabase (e-mail comprovado)
   criado_em timestamptz NOT NULL DEFAULT now(),
   atualizado_em timestamptz NOT NULL DEFAULT now(),
   ultimo_envio timestamptz
 );
+ALTER TABLE public.push_inscricoes ADD COLUMN IF NOT EXISTS verificado boolean NOT NULL DEFAULT false;
 CREATE INDEX IF NOT EXISTS idx_push_inscricoes_email ON public.push_inscricoes (email);
 CREATE INDEX IF NOT EXISTS idx_push_inscricoes_lang ON public.push_inscricoes (lang);
 
@@ -100,8 +132,10 @@ CREATE TABLE IF NOT EXISTS public.push_envios (
   falhas integer NOT NULL DEFAULT 0,
   removidos integer NOT NULL DEFAULT 0,
   abertos integer NOT NULL DEFAULT 0,
-  concluido_em timestamptz
+  concluido_em timestamptz,
+  chave text UNIQUE -- idempotência: o mesmo "Sim, enviar" não sai duas vezes (duas abas, clique repetido)
 );
+ALTER TABLE public.push_envios ADD COLUMN IF NOT EXISTS chave text UNIQUE;
 CREATE INDEX IF NOT EXISTS idx_push_envios_criado ON public.push_envios (criado_em DESC);
 
 ALTER TABLE public.push_inscricoes ENABLE ROW LEVEL SECURITY;
@@ -130,6 +164,7 @@ SET search_path = public, auth
 AS $$
 DECLARE
   v_email text;
+  v_sessao boolean := auth.uid() IS NOT NULL;
 BEGIN
   IF auth.uid() IS NOT NULL THEN
     SELECT lower(u.email) INTO v_email
@@ -148,20 +183,32 @@ BEGIN
     RETURN 'sem_acesso';
   END IF;
 
-  IF _antigo IS NOT NULL AND _antigo <> _token THEN
+  -- Sem sessão (login antigo, modo "email"), o e-mail não é comprovado: nunca apaga aparelhos de ninguém;
+  -- se o e-mail já tem 10 aparelhos, recusa (tokens falsos saem no próximo envio, como token morto).
+  IF NOT v_sessao THEN
+    IF NOT EXISTS (SELECT 1 FROM public.push_inscricoes WHERE token = _token)
+       AND (SELECT count(*) FROM public.push_inscricoes WHERE email = v_email) >= 10 THEN
+      RETURN 'limite';
+    END IF;
+  ELSIF _antigo IS NOT NULL AND _antigo <> _token THEN
     DELETE FROM public.push_inscricoes WHERE token = _antigo AND email = v_email;
   END IF;
 
-  INSERT INTO public.push_inscricoes (email, token, lang, plataforma, ativo, atualizado_em)
-  VALUES (v_email, _token, left(_lang, 8), left(_plataforma, 16), true, now())
+  INSERT INTO public.push_inscricoes (email, token, lang, plataforma, ativo, verificado, atualizado_em)
+  VALUES (v_email, _token, left(_lang, 8), left(_plataforma, 16), true, v_sessao, now())
   ON CONFLICT (token) DO UPDATE
-    SET email = EXCLUDED.email, lang = EXCLUDED.lang, plataforma = EXCLUDED.plataforma, ativo = true, atualizado_em = now();
+    SET email = EXCLUDED.email, lang = EXCLUDED.lang, plataforma = EXCLUDED.plataforma, ativo = true,
+        verificado = EXCLUDED.verificado, atualizado_em = now()
+    -- sem sessão não toma token que já é de outro e-mail comprovado
+    WHERE v_sessao OR NOT public.push_inscricoes.verificado;
 
-  -- No máximo 10 aparelhos por e-mail (os mais antigos saem).
-  DELETE FROM public.push_inscricoes
-  WHERE email = v_email AND id NOT IN (
-    SELECT id FROM public.push_inscricoes WHERE email = v_email ORDER BY atualizado_em DESC LIMIT 10
-  );
+  -- Com sessão: no máximo 10 aparelhos por e-mail (os mais antigos saem).
+  IF v_sessao THEN
+    DELETE FROM public.push_inscricoes
+    WHERE email = v_email AND id NOT IN (
+      SELECT id FROM public.push_inscricoes WHERE email = v_email ORDER BY atualizado_em DESC LIMIT 10
+    );
+  END IF;
   RETURN 'ok';
 END;
 $$;

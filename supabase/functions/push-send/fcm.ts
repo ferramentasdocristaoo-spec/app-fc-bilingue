@@ -116,7 +116,9 @@ export function classificarFcm(status: number, corpo: any): ResultadoFcm {
 }
 
 export async function enviarFcm(conta: ContaServico, token: string, c: ConteudoPush, urlBase: string, teste?: string, f: typeof fetch = fetch): Promise<ResultadoFcm> {
-  const acesso = await tokenAcesso(conta, teste, f);
+  // Falha ao renovar o OAuth no meio do lote vira "falha" deste aparelho, sem derrubar o lote (o que já saiu conta).
+  let acesso: string;
+  try { acesso = await tokenAcesso(conta, teste, f); } catch { return { status: 0, tipo: "falha", erro: "oauth" }; }
   try {
     const r = await f(urlsFcm(conta, teste).enviar, {
       method: "POST", headers: { authorization: `Bearer ${acesso}`, "content-type": "application/json" },

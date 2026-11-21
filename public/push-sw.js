@@ -25,16 +25,17 @@ self.addEventListener("notificationclick", (e) => {
   if (url.origin !== self.location.origin) url.href = self.location.origin + "/";
   e.waitUntil((async () => {
     // Conta o toque no histórico do admin. Só aceita o endereço da própria função push-send.
-    if (envio && typeof ping === "string" && /^https:\/\/[a-z0-9-]+\.supabase\.co\/functions\/v1\/push-send$/.test(ping)) {
-      fetch(ping, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ acao: "aberto", envio }) }).catch(() => {});
-    }
+    const contar = envio && typeof ping === "string" && /^https:\/\/[a-z0-9-]+\.supabase\.co\/functions\/v1\/push-send$/.test(ping)
+      ? fetch(ping, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ acao: "aberto", envio }) }).catch(() => {})
+      : Promise.resolve();
     const janelas = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
     const j = janelas.find((w) => new URL(w.url).origin === self.location.origin);
     if (j) {
       try { await j.focus(); } catch { /* sem foco */ }
       try { await j.navigate(url.href); } catch { j.postMessage({ tipo: "abrir", link: url.pathname + url.search + url.hash }); }
-      return;
+    } else {
+      await self.clients.openWindow(url.href);
     }
-    await self.clients.openWindow(url.href);
+    await contar; // o SW só pode encerrar depois de avisar o toque
   })());
 });

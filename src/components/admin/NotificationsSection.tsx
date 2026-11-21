@@ -55,6 +55,9 @@ const ERROS: Record<string, string> = {
 };
 
 const STATUS_ROTULO: Record<string, string> = { enviando: "Enviando", enviado: "Enviado", parcial: "Parcial", falhou: "Falhou" };
+/** "Enviando" há mais de 10 minutos = a função parou no meio (tempo limite); os números podem estar incompletos. */
+const situacao = (e: Envio) =>
+  e.status === "enviando" && Date.now() - new Date(e.criado_em).getTime() > 10 * 60_000 ? "Interrompido" : STATUS_ROTULO[e.status] ?? e.status;
 
 /** Resposta da push-send: ok + data, ou erro (+ extra com o corpo do erro, ex.: { pessoas } no 409). */
 type Resposta<T> = { ok: boolean; data: T | null; erro: string; extra: Record<string, unknown> | null };
@@ -92,6 +95,8 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
   const [contando, setContando] = useState(false);
   const [confirmar, setConfirmar] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  // Uma chave por confirmação: o servidor recusa a mesma chave duas vezes (duas abas, clique repetido).
+  const chaveRef = useRef<string>("");
 
   const link = linkSel === "outro" ? linkOutro.trim() : linkSel;
   const publico: Publico = useMemo(() => {
@@ -140,7 +145,7 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
     if (!validacao.ok || !contagem) return;
     setEnviando(true);
     const r = await chamar<{ envio: number; enviados: number; falhas: number; removidos: number; status: string }>(
-      base("enviar", { publico, titulo, texto, link, confirmar: contagem.pessoas }),
+      base("enviar", { publico, titulo, texto, link, confirmar: contagem.pessoas, chave: chaveRef.current }),
     );
     setEnviando(false);
     setConfirmar(false);
@@ -248,7 +253,7 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
           </p>
           {erroValidacao && (titulo || texto || linkSel === "outro") && <p className="text-sm text-destructive">{ERROS[erroValidacao]}</p>}
 
-          <Button className="h-12 w-full gap-2 text-base" disabled={!podeEnviar || enviando} onClick={() => setConfirmar(true)}>
+          <Button className="h-12 w-full gap-2 text-base" disabled={!podeEnviar || enviando} onClick={() => { chaveRef.current = crypto.randomUUID(); setConfirmar(true); }}>
             {enviando ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
             {publico.tipo === "email" ? "Enviar teste" : "Enviar"}
           </Button>
@@ -313,7 +318,7 @@ const NotificationsSection = ({ creds, onUnauthorized }: Props) => {
                     <TableCell className="text-right">{e.falhas}</TableCell>
                     <TableCell className="text-right">{e.removidos}</TableCell>
                     <TableCell className="text-right">{e.abertos}</TableCell>
-                    <TableCell>{STATUS_ROTULO[e.status] ?? e.status}</TableCell>
+                    <TableCell>{situacao(e)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
