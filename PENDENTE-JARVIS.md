@@ -1,5 +1,51 @@
 # Pendente para o Jarvis — App FC (wt-final, branch `app-novo`)
 
+## 2026-11-21 · Botão Admin no app + Central de mensagens (push Firebase)
+Feito por **Noé** (Tecnologia), com revisão do code-reviewer. Branch **`admin-push`** (a partir do `app-novo` 0f718e7), commits `fa25aed` + `46c8a9a` (+ este registro). **Sem push, sem deploy, sem SQL remoto, sem secret, nenhuma notificação enviada a cliente.**
+
+**O que ficou pronto**
+- **Admin pela sessão:** `session_admin_email()` / `is_session_admin()` — vale quem está logado no Supabase Auth com e-mail **confirmado** (`auth.users.email_confirmed_at`; não o `user_metadata` do JWT, que o próprio usuário edita) **e** ligado a uma linha de `admin_users` pelo `user_id`. `verify_admin` aceita a sessão (e-mail vazio ou o da sessão), então todas as RPCs `admin_*` e a geração da Jornada (`ai-assistant`) funcionam sem senha. O login antigo do painel (e-mail + senha) continua igual. Trocar a senha do painel continua exigindo a senha atual.
+- **Botão "Admin"** só para admin: faixa no menu do celular (MenuSheet) e ícone no Dock. Leva direto a `/fc-control-panel` (sem senha na sessão); o painel tem **"Voltar ao app"** no topo, na lateral e no login. Nenhum e-mail fixo no front.
+- **Notificações (modelo da Fome Livre):** convite "Ative as notificações" ("Agora não" esconde por 3 aberturas, no máximo 6 vezes), sininho no cabeçalho, passo a passo do iPhone (instalar na Tela de Início antes), aviso de bloqueado, textos nos 7 idiomas. Sair da conta desliga o aparelho.
+- **Painel → aba Notificações:** título (60), mensagem (180), link do app, público (só um e-mail de teste / todos com acesso / por plano: Brasil, Internacional, com idiomas, lista antiga, vencidos) + filtro de idioma, prévia iPhone e Android, contagem "vai para N pessoas", confirmação "Tem certeza? Vai para N pessoas", histórico (chegaram, falhas, removidos, toques).
+- **Banco** (`supabase/migrations/20261121010000_admin_sessao_e_push.sql`, só aditiva e idempotente): `admin_users.user_id`, `push_inscricoes`, `push_envios` com RLS (só o admin da sessão lê; escrita só por RPC ou service_role), RPCs `push_inscrever`, `push_desligar`, `push_marcar_aberto`.
+- **Função `push-send`** (FCM HTTP v1, JWT RS256 com WebCrypto, 25 em paralelo, tokens mortos apagados, confirmação conferida no servidor, chave de idempotência, mesma mensagem para o mesmo público bloqueada por 1 min). `verify_jwt = false` no `config.toml` (a própria função confere o admin).
+- **PWA:** o `sw.js` do vite-plugin-pwa só ganhou `importScripts("/push-sw.js")`; cache e atualização automática iguais. O SDK do Firebase vem num pedaço separado (~17 KB gzip), baixado só ao ativar.
+- **Config web do Firebase:** o dono deixou `firebase-ferramentas-do-cristao.json` na raiz do `wt-final` (projeto `ferramentas-do-cristao`, com a VAPID pública). É público, mas a trava de segredos não deixou entrar no git: o arquivo está no `.gitignore` e o build lê ele (`import.meta.glob` em `src/lib/firebase-config.ts`). **Atenção:** build feito sem esse arquivo sai sem notificações (convite e sininho escondidos), sem quebrar nada.
+
+**Qualidade:** `npm test` **299/299** (eram 270; +15 do SQL rodado num Postgres em memória/PGlite, +14 da função). `npm run build` ok. `tsc` só com os 10 erros antigos. `deno check` da `push-send` e da `ai-assistant` ok. Chrome (`scripts/teste-admin-push.mjs`, Supabase todo simulado): **20 conferências** em 390×844 (Android e iPhone) e 1440×900 — convite, sininho, Admin no menu/Dock só para admin, painel direto pela sessão, Voltar ao app, prévia, contagem, confirmação, histórico, login antigo, **push entregue ao service worker real vira notificação**. Com `TOKEN_REAL=1`: **token real do Firebase `ferramentas-do-cristao` gerado** (22 conferências; 1 rodada em 6 passou do limite de espera no perfil novo do Chrome, depois a espera foi aumentada). Prints: `direcoes-identidade/prints/admin-push/` (10).
+
+**Não testado:** o trecho Google → aparelho (depende da conta de serviço) e o SQL no banco real.
+
+**Riscos que ficam (decisão do dono):**
+- Produção está no login **modo "email"** (sem sessão). Nesse modo: (1) o botão Admin só aparece no aparelho depois de entrar no painel uma vez com e-mail + senha; (2) a inscrição no push confia no e-mail digitado — alguém poderia inscrever um aparelho no e-mail de outra pessoa e receber os testes "só para esse e-mail" (não consegue apagar os aparelhos dela). Conserto definitivo: ligar login por senha ou link mágico (item 6 de 19/11).
+- Toques ("aberto") são métrica aproximada: dá para inflar chamando a função.
+- Revisão também apontou: se o envio passar do tempo limite da função (público muito grande), o histórico mostra "Interrompido".
+
+### Passo a passo do dono (nesta ordem, cada um com "confirma")
+1. **SQL** — Supabase FC-Bilingue (`rwyyggtsjbwnwzsnlkgy`) → SQL Editor → colar `supabase/migrations/20261121010000_admin_sessao_e_push.sql` → Run.
+2. **E-mail admin** (pendente: `ferramentasdocristaoo@gmail.com` ou outro). Para acrescentar outro, no SQL Editor:
+   ```sql
+   INSERT INTO public.admin_users (email, password_hash)
+   VALUES ('EMAIL-DO-DONO', extensions.crypt(gen_random_uuid()::text, extensions.gen_salt('bf')))
+   ON CONFLICT (email) DO NOTHING;
+   ```
+3. **Ligar a conta ao admin** — só depois de o dono entrar no app com login por senha/link mágico e confirmar o e-mail (a conta precisa existir em Authentication → Users; confira que é a sua):
+   ```sql
+   UPDATE public.admin_users
+   SET user_id = (SELECT id FROM auth.users WHERE lower(email) = 'EMAIL-DO-DONO' AND email_confirmed_at IS NOT NULL)
+   WHERE email = 'EMAIL-DO-DONO';
+   ```
+   Recomendado: Authentication → Sign In / Providers → desligar **"Allow new users to sign up"** (clientes entram pela compra), a menos que o login dos clientes precise do cadastro aberto.
+4. **Conta de serviço (SECRETA)** — Firebase → projeto `ferramentas-do-cristao` → ⚙️ Configurações do projeto → **Contas de serviço** → Firebase Admin SDK → **Gerar nova chave privada** (baixa um `.json`). Guardar no Keychain (serviço "Firebase admin (service account)", conta `ferramentas-do-cristao`, valor em base64, como na Fome Livre: ver `Area-Membros-push/PUBLICAR-PUSH.md`), apagar o arquivo baixado e mandar do Keychain direto para o secret **`FCM_SERVICE_ACCOUNT`** da função (`supabase secrets set --project-ref rwyyggtsjbwnwzsnlkgy FCM_SERVICE_ACCOUNT=…` lendo do Keychain, sem colar na tela). O config web e a VAPID pública **já estão** no JSON da raiz; se mudar, baixar de novo em Configurações → Geral → app da Web e Cloud Messaging → Certificados de push da Web.
+5. **Deploy das funções:** `supabase functions deploy push-send --project-ref rwyyggtsjbwnwzsnlkgy` e `supabase functions deploy ai-assistant --project-ref rwyyggtsjbwnwzsnlkgy`.
+6. **Merge** `admin-push` → `app-novo` (`git merge --ff-only admin-push`), push e deploy do app (Pages `app-fc-bilingue`), com o build **nesta máquina** (precisa do JSON do Firebase).
+7. **Conferir sem incomodar clientes:** painel → Notificações mostra **"Firebase pronto · ferramentas-do-cristao"**; no iPhone do dono, instalar o app na Tela de Início → abrir pelo ícone → Ativar → Permitir; no painel, público **"Só um e-mail (teste)"** → Enviar teste → conferir se chega e se o toque abre o link. **Não usar "Todos" nem plano** até o dono decidir a primeira mensagem.
+
+**Voltar atrás:** tirar o secret `FCM_SERVICE_ACCOUNT` desliga os envios; as tabelas novas podem ficar. Notificação enviada não tem volta.
+
+---
+
 ## 2026-11-20 · Jornada: Levítico, Deuteronômio, Juízes e Rute interativos
 Feito por **Noé** (Tecnologia), com 4 ajudantes (um por livro) e revisão do code-reviewer. **Sem push, sem deploy, sem SQL.** 7 commits locais no `app-novo` (2a0718b..85a6b9b), em cima de 0d08bb4 (produção).
 
