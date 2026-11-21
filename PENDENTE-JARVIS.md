@@ -1,5 +1,31 @@
 # Pendente para o Jarvis — App FC (wt-final, branch `app-novo`)
 
+
+## 2026-11-21 · Admin novo no padrão do app (Aoliabe, Criação)
+Branch **`admin-push`**, commits `089a954` + `a256fbe` + `9957b44`. **Sem push, sem deploy, sem SQL, sem secret, nenhuma notificação enviada.** Só a apresentação mudou: login antigo, sessão, RPCs e o fluxo de envio/tradução continuam iguais.
+
+**Direções:** 2 rápidas (`direcoes-identidade/prints/admin-novo/direcoes/`, 390×844 e 1440×900): A "livro-razão" (filetes, sem cartões) e **B "cartões do app" (escolhida)**: mesma linguagem do Início, do menu em cartõezinhos e da barra inferior do app; é o que o dono já reconhece como "o app novo". Dá para trocar.
+
+**O que ficou**
+- **Celular (PWA):** cabeçalho com a logo discreta + "Painel", tema claro/escuro e **"App" (voltar) sempre à vista**; **barra inferior igual à do app** (Início, Pessoas, Avisos, Jornada, Mais) e folha **"Mais"** em cartõezinhos (Análises, Livraria, Esboços, Cache da IA, Voltar ao app, tema, trocar senha/sair).
+- **Computador:** lateral azul-noite (nos dois temas) com a marca pequena, grupos Painel / Pessoas / Conteúdo e "Voltar ao app" no rodapé. Marca-d'água do brasão bem suave no fundo.
+- **Início do painel:** saudação + data, atalhos **Enviar notificação / Buscar assinante (já abre com o cursor na busca) / Jornada**; números-chave: **assinantes ativos por plano** (Brasil, Internacional, lista antiga; vencidos, bloqueados e ativos em 7 dias), **novos acessos em 30 dias** (+ hoje), **aparelhos com notificação**, **IA da Jornada hoje** (x de 40) + economia do cache, **último envio** (somando os idiomas da mesma campanha, com selo se parcial/falhou); ferramentas mais abertas e assinantes mais ativos com período 7/30/90.
+- **Tabelas viram cartões no celular** (Assinantes, Livraria, Cache, Análises, histórico das Notificações), com papéis de tabela para leitor de tela. Estados **carregando** (esqueleto no formato do conteúdo) e **vazios** separados (sem dados / busca sem resultado / erro com "Tentar de novo").
+- **pt-BR** no painel inteiro (era pt-PT fixo): datas, "Liberar acesso", "Vencido", US$ com vírgula etc. A aba fica no endereço (`/fc-control-panel#notificacoes`): recarregar o PWA volta na mesma aba.
+- Legibilidade FC: corpo 17 px, nada < 14 px, toques ≥ 48 px (também nos diálogos), campos em caixa, números em Inter (a Cormorant usa numerais antigos e o "1" parecia "I").
+
+**Qualidade:** `npm test` **324/324** (+3: contas do Início), `npm run build` ok, `tsc` só com os 10 erros antigos. Chrome com Supabase simulado (`scripts/teste-admin-novo.mjs`): **32 telas** (8 abas × 390/1440 × claro/escuro) + 32 com banco vazio (`VAZIO=1`): nenhum texto < 14 px, nenhum toque < 44 px, nada passando da borda; folha Mais, atalho de busca e "Voltar ao app" conferidos. Testes antigos: `teste-admin-push.mjs` **20/20**, `teste-admin-traducao.mjs` **tudo ok** (ajustados só os seletores; o de tradução já estava desatualizado desde `1fdec62`, que tirou o botão "Traduzir para N"). Revisado pelo **ui-designer** e pelo **code-reviewer**; achados corrigidos. Prints finais: `direcoes-identidade/prints/admin-novo/` (82 arquivos: `celular-*`, `*-inteira`, `computador-*`, `vazio-*`, `celular-claro-folha-mais.png`).
+
+**Não testado:** no iPhone de verdade (só Chrome em 390×844) e contra o banco real.
+
+**Decisões / pendências do dono**
+1. Aprovar a direção B pelos prints (ou pedir a A).
+2. **"Vendas" em reais não aparecem no painel**: o banco do FC não guarda valor de venda (fica no KawaiPay). O cartão mostra "Novos acessos (30 dias)" e avisa isso. Se quiser vendas no painel, precisa decidir de onde ler (API do KawaiPay ou gravar o valor no webhook).
+3. **Assinantes por plano** são contados no navegador lendo a lista pela RPC que já existe (de 1000 em 1000, guardado 5 min). Funciona bem até alguns milhares; acima disso (ou se a lista mudar no meio da leitura) o cartão mostra "≈". O certo, mais adiante, é uma RPC só de contagem (SQL novo, precisa do "confirma").
+4. "Custo de IA" exato não existe no banco: o painel mostra a cota da Jornada no dia (o dia vira às 21h de Brasília, porque o servidor conta em UTC) e a economia estimada do cache.
+5. Publicar junto com o resto do `admin-push` (merge, push e deploy só com o ok do dono).
+
+---
 ## 2026-11-21 · Notificação escrita em português e traduzida na hora (painel → Notificações)
 Feito por **Noé** (Tecnologia), com revisão do code-reviewer, **em cima** do trabalho de Admin + push abaixo (mesmo branch **`admin-push`**). Commits `de979cc` + `fc86ec3`. **Sem push, sem deploy, sem secret, sem SQL, nenhuma notificação enviada.**
 
